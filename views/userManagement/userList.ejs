@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+   <%- include ("../layout/navBarAdmin.ejs") %>
+    <h2 class="text-center my-5">User Mangement </h2> 
+
+</body><div class="container-fluid">
+        <div class="container">
+            <div class="d-flex justify-content-end mb-5" >
+                
+            </div>
+            <div class="d-flex justify-content-between mb-5">
+                <table class="table table-bordered" >
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Joining Date</th>
+                        <th scope="col">Contact No</th> 
+                        <th scope="col">Status</th>                         
+                        <th scope="col"  class="text-center">Actions</th>        
+                    </tr>
+                   
+                      
+                    <%if(users.length > 0){
+                        for(let i=0; i<users.length; i++){ 
+                            
+                        %>
+                    
+                        <tr>
+                            <td scope="row" class="text-capitalize"><%= users[i].user_name %></td>
+                            <td><%= users[i].user_email %></td>
+                            <td><%= users[i].created_on %></td>
+                            <td><%= users[i].user_contact %></td>
+                            <td><%= users[i].isBlocked ? 'Blocked': 'Active'%></td>
+                            
+                            <td class="text-center"><a href="users/block-user/?id=<%= users[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A;"><%= users[i].isBlocked ? 'UNBLOCK': 'BLOCK' %></a></td>
+                            
+                        </tr>  
+                        <%}%>
+                        <%}else{%>
+            
+                            <td>Data not found</td>
+                    
+                        <%}%>
+                 
+                
+                </table>
+                
+                
+            </div>
+        </div>
+    </div>
+</html>

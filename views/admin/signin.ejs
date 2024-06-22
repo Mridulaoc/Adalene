@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+ 
+
+<body>
+    <div class="container-fluid">
+        <div class="container d-flex flex-column justify-content-center align-items-center" style="height: 90vh;" >
+        
+        <form action="/admin" method="post" autocomplete="off" class=" border px-3 py-3 rounded" style="width: 40%;">
+            <h5 class="text-center">Admin Login</h5>
+            <% if(locals.message){%>
+                <div class="alert alert-danger"><%= message %></div>          
+                
+            <%}%>
+    
+            <% if(locals.success){%>
+              <div class="alert alert-success"><%= success %></div> 
+            <%}%>
+            <% if(locals.logout){%>
+              <div class="alert alert-success"><%= logout %></div> 
+            <%}%>
+            <div class="mb-3 ">
+               
+                <label for="email" class="form-label" >Email address</label>
+                <input type="email" class="form-control" id="email" name="email" required >
+              </div>
+              <div class="mb-3 ">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <div class="d-flex justify-content-center">
+              <input type="submit" value="Login" class="btn btn-light">
+              </div>
+        </form>
+        </div>
+    </div>
+
+    </body>
+    </html>
+    

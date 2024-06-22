@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+   <%- include ("../layout/navBarAdmin.ejs") %>
+    <h2 class="text-center my-5">Category List</h2> 
+    
+    <div class="container-fluid">
+        <div class="container">
+            <div class="d-flex justify-content-end mb-5" >
+                <a href="/admin/categories/add-category" class="px-3 mx-5 text-decoration-none fs-6   border rounded-2 p-2" style="background-color: #BC4C2A; color: white;" >ADD NEW CATEGORY</a>
+            </div>
+            <div class="d-flex justify-content-between mb-5">
+                <table class="table table-bordered" >
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Created Date</th>
+                        <th scope="col">Status</th> 
+                        <th scope="col" colspan="2" class="text-center">Actions</th>        
+                    </tr>
+                    <%if(categories.length > 0){
+                        for(let i=0; i<categories.length; i++){ 
+                            
+                        %>
+                    
+                        <tr>
+                            <td scope="row" class="text-capitalize"><%= categories[i].cat_name %></td>
+                            <td><%= categories[i].cat_desc %></td>
+                            <td><%=  categories[i].created_on  %></td>
+                            <td><%= categories[i].cat_status %></td>
+                            <td><a href="categories/edit-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 bg-success text-white">Edit</a></td>
+                            <td><a href="categories/delete-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 bg-danger text-white">Delete</a></td>
+                        </tr>
+                        
+                        <%}%>
+                        <%}else{%>
+            
+                            <td>Data not found</td>
+                    
+                        <%}%>
+                
+                </table>
+                
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

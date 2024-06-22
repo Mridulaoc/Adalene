@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+<%- include ("../layout/navbar.ejs") %>
+
+<div class="container_fluid">
+    <div class="container" style="margin-top: 5rem">
+        <p><a href="/" class="text-decoration-none text-black">Home</a>><%= products.prod_name %></p>
+        <div class="container my-5">
+            <div class="row align-items-start">
+              <div class="col-6">
+                <div class="image-container" onmousemove="zoomIn(event)" onmouseleave="zoomOut()" >
+                    <img src="\uploads\<%= products.prod_images[0] %>" alt="" id="mainImage" >
+                    <img src="\uploads\<%= products.prod_images[0] %>" alt="" class = 'zoomed-image'>
+                </div>
+                <div id="currentImages" class="my-5">
+                    <% products.prod_images.forEach(image => { %>
+                      <img src="\uploads\<%= image %>" alt="" style="width: 150px; height: 150px;" onclick="changeImage('<%= image %>')">
+                    <% }) %>
+                  </div>
+              </div>
+              <div class="col-6">
+                <h3><%= products.prod_name %> (<%= products.prod_rating %> <i class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)</h3>
+                <p><i class="fa-solid fa-indian-rupee-sign fs-5"></i> <%= products.prod_price %></p>
+                <p>Size : <%= products.prod_size.size %></p>
+                <p>Colour : <%= products.prod_color.color_name %></p>
+                <% if(products.prod_quantity>0){ %> 
+                    <p>Stock : <%= products.prod_quantity %></p>
+                    <%} else { %>
+                    <p>Stock : OUT OF STOCK</p>
+                    <%}%>
+                <p>PRODUCT INFO</p>
+                <p class="fs-5" style="width: 70%;"><%= products.prod_desc %></p>
+                <div class="d-flex flex-column gap-3">
+                    <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: #BC4C2A;">ADD TO CART</button>
+                    <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: black;">BUY NOW</button>
+                </div>
+              </div>              
+            </div>
+    </div>
+
+    <div class="container my-5 mx-5 d-flex flex-column justify-content-center align-items-center">
+        <h2 class="" style="color:#BC4C2A">Related Products</h2>
+        <div class="d-flex justify-content-between my-5 mx-5 gap-5">
+            <%if(relatedProducts.length > 0){
+                for(let i=0; i<relatedProducts.length; i++){ 
+                    
+                %>
+            <a href="/products/?id=<%= relatedProducts[i]._id %>" class="text-decoration-none">
+            <div class="card shadow" style="width: 18rem;">
+                <img src="\uploads\<%= relatedProducts[i].prod_images[0] %>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title"><%= relatedProducts[i].prod_name %></h5>
+                  <p class="card-text fs-5"><i class="fa-solid fa-indian-rupee-sign"></i><%= relatedProducts[i].prod_price %></p>
+                 
+                </div>
+            </div>
+              <%}%>
+                        <%}else{%>
+            
+                            Data not found
+                    
+                        <%}%>
+        
+            </div>
+        </div>
+    </a>
+</div>
+<script>
+    function zoomIn(event) {
+      const imageContainer = event.currentTarget;
+      const zoomedImage = imageContainer.querySelector('.zoomed-image');
+      const rect = imageContainer.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      zoomedImage.style.display = 'block';
+      zoomedImage.style.transform = `translate(-${x}px, -${y}px) scale(1.5)`;
+    }
+
+    function zoomOut() {
+      const zoomedImage = document.querySelector('.zoomed-image');
+      zoomedImage.style.display = 'none';
+    }
+  </script>
+  <script>
+    function changeImage(imageUrl) {
+      const mainImage = document.getElementById('mainImage');
+      mainImage.src = '\\upload\\' + imageUrl;
+    }
+  </script>
+
+
+</body>
+</html>

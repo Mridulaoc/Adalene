@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+    <div class="container-fluid d-flex flex-column justify-content-center align-items-center" style="height: 90vh;">
+        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my5 rounded col-md-4 col-xs-12 form"  >
+            <form action="/otp" method="post"  autocomplete="off" style="width: 90%;" >
+                <% if(locals.success){%>
+                    <div class="alert alert-success"><%= success %></div>     
+                    
+                <%}%>
+                <h4 class="mb-3 text-center"> OTP Verification</h4> 
+                <div class="mb-3 "> 
+                    <input type="hidden" name="email" value="<%= email %>">                       
+                    <input type="text" class="form-control" name="otp" required>                    
+                  </div>
+                  <button type="submit" class="form-control  fs-6">Verify OTP</button>
+            </form>
+            <input type="hidden" name="email" value="<%= email %>">  
+            <p id="timer" class="fs-5 text-center">Time left: 60 seconds</p>
+        </div>
+    </div>
+    <script>
+        let timer;
+        let timeLeft = 60;
+
+        function startTimer() {
+            timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer').innerText = "OTP expired";
+                } else {
+                    timeLeft--;
+                    document.getElementById('timer').innerText = "Time left: " + timeLeft + " seconds";
+                }
+            }, 1000);
+        }
+
+        window.onload = startTimer;
+    </script>
+</body>
+</html>

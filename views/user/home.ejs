@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+<%- include ("../layout/navbar.ejs") %>
+
+<div class="container-fluid mx-0">
+   
+    <div class="d-flex justify-content-between align-content-center"> 
+        <div class="hero container-fluid ">
+            <h2 class="header">CUE THE COLOR</h2>
+            <div class="mb-3 border button1 text-center my-3" style="border-color: #BC4C2A; width: 20%;">       
+            <a href="/shopall" class="text-decoration-none text-uppercase fs-4 text-white fw-bold">Shop All</a>
+            </div>   
+        </div> 
+    </div>  
+        <div class="container my-5 mx-5 d-flex flex-column justify-content-center align-items-center">
+            <h2 class="text-center" style="color:#BC4C2A">BEST SELLERS</h2>
+            <div class="d-flex justify-content-between my-5 mx-5 gap-5">
+            <%if(products.length > 0){
+                for(let i=0; i<products.length; i++){ 
+                    
+                %>
+            
+            <div class="card shadow" style="width: 18rem;">
+                <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title"><%= products[i].prod_name %></h5>
+                  <p class="card-text fs-5"><i class="fa-solid fa-indian-rupee-sign"></i><%= products[i].prod_price %></p>
+                 
+                </div>
+            </div>
+              <%}%>
+                        <%}else{%>
+            
+                            Data not found
+                    
+                        <%}%>
+        
+            </div>
+                  
+            <div class="my-5">
+                <button  style="padding: 5px 50px; background: transparent; border-color: #BC4C2A;  "><a href="/shopall" class="fs-5 text-decoration-none " style="color: #BC4C2A; ">SHOP ALL</a></button>
+            </div>
+               
+        </div>
+
+
+
+
+</body>
+</html>

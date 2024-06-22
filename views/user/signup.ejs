@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+<%- include ("../layout/navbarSignIn.ejs") %>
+    
+    <div class="container-fluid">
+        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my5 rounded col-md-4 col-xs-12 form"  >
+    
+    <form action="/signup" method="post"  autocomplete="off" style="width: 90%;" >
+        <h4 class="mb-3 text-center"> Sign Up</h4> 
+        <p class="fs-6 text-center">Already have an account? <a href="/signin" class="text-decoration-none"><span style="color: #BC4C2A; font-weight: bold;"> Sign in</span></a></p>
+        <% if(typeof message !== "undefined"){%>
+            <div class="alert alert-danger" ><%= message %></div>       
+        <%}%>
+    
+        <% if(locals.success){%>
+            <div class="alert alert-success" ><%= success %></div> 
+        <%}%>
+        <div class="mb-3 ">           
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" onchange="validateName()" required >
+            <span id="nameError" style="color: red;"></span>
+          </div>
+          <div class="mb-3 ">           
+            <label for="email" class="form-label"> Email address</label>
+            <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required>
+            <span id="emailError" style="color: red;"></span>
+          </div>
+          <div class="mb-3 ">           
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()"  required>
+            <span id="passwordError" style="color: red;"></span>
+            
+          </div> 
+          <div class="mb-3 ">           
+            <label for="mobileno" class="form-label">Mobile Number</label>
+            <input type="text" class="form-control" id="mobileno" name="mobileno" onChange="validateNumber()" required >
+            <span id="numberError" style="color: red;"></span>
+          </div>          
+          
+          <div class="mb-3 " style="border-color: #BC4C2A;">       
+            <input type="submit" class="form-control  fs-6"  value="CREATE ACCOUNT" style="color: #BC4C2A;"  required>
+          </div>    
+        </form>      
+          <div class="mb-3 text-center" >       
+            OR USING
+          </div>
+        
+          <div class="mb-3" style="width: 90%;">             
+            <button class="form-control text-center  fs-6" ><a href="/google" class="text-decoration-none " style="color: #BC4C2A;">Google</a></button>
+          </div>
+          
+        </div>
+    </div>    
+    
+    
+    </div>
+
+
+    <script >
+        function validateName(){
+            const name = document.getElementById("name").value.trim();
+            const nameError = document.getElementById("nameError");
+            
+            if(name.length<5){
+                nameError.textContent = "Name must be atleat 5 characters long"
+            }
+
+        }
+        
+       
+    
+        function validateEmail() {
+        const email = document.getElementById("email");
+        const emailError = document.getElementById("emailError");
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+       
+        if (emailPattern.test(email.value)) {
+          emailError.textContent = "";
+        } else {
+          emailError.textContent = "Invalid email id";
+        }
+    } 
+    
+      function validateNumber() {
+        const mobileno = document.getElementById("mobileno").value;
+        const numberError = document.getElementById("numberError");    
+        if(isNaN(mobileno)) { 
+          numberError.textContent = 'Mobile number should be digits' 
+        }
+        if(mobileno.length >10 ){
+          numberError.textContent = 'Mobile number must be 10 digits'
+        }
+        if(mobileno.length <10 ){
+          numberError.textContent = 'Mobile number must be 10 digits'
+        }
+        if((mobileno.charAt(0) !=9) && (mobileno.charAt(0) !=8) && (mobileno.charAt(0)!=7)){
+          numberError.textContent = 'Mobile number must start with 9, 8 or 7'
+        }
+      }
+    
+      function validatePassword(){
+        const password = document.getElementById("password");
+        const passwordError = document.getElementById("passwordError");
+        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/
+        if(!passwordPattern.test(password.value)){
+          passwordError.textContent = "Password must contain atleast 6 characters and maximum 20 characters. should contain at least one numeric digit, one uppercase and one lowercase letter"
+        }
+      }
+    
+    
+    </script>
+    
+</body>
+</html>

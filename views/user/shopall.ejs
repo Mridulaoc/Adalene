@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+<%- include ("../layout/navbar.ejs") %>
+<div class="conatiner-fluid">
+    <div class="container " style="margin-top: 5rem;">
+        <p><a href="/" class="text-decoration-none text-black">Home</a>>All Products</p>
+        <div class="container my-5">
+            <div class="row align-items-start">
+              <div class="col-4">
+                <p>Filter By</p>
+                <hr style="width: 60%;">
+                <p>Price</p>
+                <p>Model</p>
+                <p>Size</p>
+              </div>
+              <div class="col-8">
+                <div class="d-flex flex-wrap my-5 mx-5 gap-5">
+                    <%if(products.length > 0){
+                        for(let i=0; i<products.length; i++){ 
+                            
+                        %>
+                    
+                    <a href="/products/?id=<%= products[i]._id %>" class="text-decoration-none"><div class="card shadow d-flex flex-column align-items-center" style="width: 22rem;">
+                        <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top px-2 py-2" alt="...">
+                        <div class="card-body">
+                          <h5 class="card-title"><%= products[i].prod_name %></h5>
+                          <p class="card-text fs-5"><i class="fa-solid fa-indian-rupee-sign"></i><%= products[i].prod_price %></p>
+                         
+                        </div>
+                    </div>
+                </a>
+                      <%}%>
+                                <%}else{%>
+                    
+                                    Data not found
+                            
+                                <%}%>
+                
+                    </div>
+              </div>              
+            </div>
+    </div>
+</div>
+</body>
+</html>
