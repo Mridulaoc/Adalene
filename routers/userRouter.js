@@ -38,7 +38,8 @@ userRoute.get('/google', passport.authenticate('google', {
 
 userRoute.get('/auth/google/callback',
     passport.authenticate('google',{
-        successRedirect:'/home',
+        scope:['profile'] ,
+        successRedirect:'/',
         failureRedirect:'/login'
     })
 )
@@ -50,7 +51,7 @@ userRoute.get('/auth/google/callback',
 //     // failureFlash: true
 // }))
 
-userRoute.get('/home', userController.successGoogleLogin)
+userRoute.get('/', userController.successGoogleLogin)
 userRoute.get('/home',userAuth.isSignedIn, userController.loadHome);
 userRoute.get('/failure', userController.failureGoogleLogin);
 userRoute.get('/', userAuth.isSignedIn, userController.loadSigIn);

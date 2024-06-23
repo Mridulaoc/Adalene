@@ -19,7 +19,7 @@
             <form action="/resend" method="POST">
             <input type="hidden" name="email" value="<%= email %>">
             <div class="mb-3">
-                <button type="submit" class="">Resend OTP</button>
+                <button type="submit" id="resendOTPButton" disabled>Resend OTP</button>
             </div>                
             </form>
             </div>
@@ -39,7 +39,8 @@
             timer = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('timer').innerText = "OTP expired";
+                    document.getElementById('timer').innerText = "OTP expired. Resend OTP";
+                    document.getElementById('resendOTPButton').disabled = false;
                 } else {
                     timeLeft--;
                     document.getElementById('timer').innerText = "Time left: " + timeLeft + " seconds";

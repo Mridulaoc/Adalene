@@ -17,7 +17,7 @@ const successGoogleLogin = async(req, res)=>{
    
         if(req.isAuthenticated){
             const products = await Products.find({is_bestseller:true});
-            res.render('home',{products, signOut:'Sign Out',user:req.user});
+            res.render('home',{products, user:req.user});
         }
     }
     

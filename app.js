@@ -11,6 +11,8 @@ mongoose.connect(process.env.CONNECTION_STRING)
     console.log(err)
 });
 
+const port = process.env.PORT;
+
 const userRoute = require('./routers/userRouter');
 app.use('/',userRoute);
 
@@ -26,6 +28,9 @@ app.use('/admin', productRoute);
 const userManagementRoute = require('./routers/userManagementRouter');
 app.use('/admin', userManagementRoute)
 
-app.listen(3000, ()=>{
+
+
+
+app.listen(port, ()=>{
     console.log("Server starting...")
 })

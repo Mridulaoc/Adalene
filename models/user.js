@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
     },
     user_password:{
         type: 'string',
-        required: true,
+        required: false,
     },
     user_name:{
         type: 'string',
@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema({
     },
     user_contact:{
         type:'number',
-        required: true,
+        required: false,
     },
     created_on:{
         default: new Date(),
@@ -41,6 +41,10 @@ const userSchema = mongoose.Schema({
     isBlocked:{
         type:'boolean',
         default: false,
+    },
+
+    user_googleId:{
+        type:'string',
     }
 
 })
