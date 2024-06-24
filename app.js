@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+// import swal from 'sweetalert';
 require('dotenv/config')
 const mongoose = require('mongoose');
 mongoose.connect(process.env.CONNECTION_STRING)

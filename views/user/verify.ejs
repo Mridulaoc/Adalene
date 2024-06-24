@@ -2,24 +2,28 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 <body>
-
+    <%- include ("../layout/navbar.ejs") %>
     <div class="container-fluid">
-        <div class="container d-flex flex-column justify-content-center align-items-center " style="height: 80vh;" >
-            <form action="/verify" method="post"  autocomplete="off" class=" border shadow px-3 py-3 rounded col-md-4 col-xs-12 form" >
+        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"   >
+            <form action="/verify" method="post"  autocomplete="off" style="width: 90%;" >
                 <h4 class="mb-3 text-center"> OTP Verification</h4> 
-                <div class="mb-3 "> 
+                <div class="mb-3 d-flex justify-content-between "> 
                     <input type="hidden" name="email" value="<%= email %>">          
-                    <div class="alert alert-danger" ></div>
-                    <input type="text" class="form-control" name="otp" required>                    
+                   
+                    <!-- <input type="text" class="form-control" name="otp" required> -->
+                    <input type="text" name="digit1" maxlength="1" required class="form-control">
+                    <input type="text" name="digit2" maxlength="1" required class="form-control">
+                    <input type="text" name="digit3" maxlength="1" required class="form-control" >
+                    <input type="text" name="digit4" maxlength="1" required class="form-control">                    
                   </div>
                   <button type="submit" class="form-control  fs-6">Verify OTP</button>                 
             </form>
-            <div class="flex flex-column justify-content-center">
-            <p id="timer" class="fs-5 text-center">Time left: 60 seconds</p>
+            <div class="d-flex justify-content-between">
+            <p id="timer" class="fs-6 text-center">Time left: 60 seconds</p>
             <form action="/resend" method="POST">
             <input type="hidden" name="email" value="<%= email %>">
             <div class="mb-3">
-                <button type="submit" id="resendOTPButton" disabled>Resend OTP</button>
+                <button class="bg-transparent border-0 fs-6" style="color:#BC4C2A;" type="submit" id="resendOTPButton" disabled>Resend OTP</button>
             </div>                
             </form>
             </div>
@@ -32,6 +36,7 @@
 
 
     <script>
+        // timer function
         let timer;
         let timeLeft = 60;
 
@@ -47,8 +52,30 @@
                 }
             }, 1000);
         }
-
         window.onload = startTimer;
+
+        // otp box
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', () => {
+                    if (input.value.length === input.maxLength) {
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    }
+                });
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && input.value === '') {
+                        if (index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    }
+                });            
+            })
+        });
     </script>
+
+
 </body>
 </html>

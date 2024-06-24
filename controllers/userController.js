@@ -58,15 +58,18 @@ const loadSignUp = (req,res)=>{
 
 const verifySignUp = async(req,res)=>{
     try {
-        const {name,email,mobileno}= req.body;
+        const {name,email,mobileno,password,confirmPassword}= req.body;
+        console.log(password,confirmPassword)
         const isExist = await User.findOne({ user_email: email});
+        console.log(isExist)
         if(isExist) {
             res.render('signup', {message: 'Email id already exists in the database. Use another for registration'})
         }else{
             const otp = Math.floor(1000 + Math.random() * 9000).toString();
-            const otpExpiry = new Date(Date.now() + 1 * 60000); 
-            const sPassword = await securePassword(req.body.password);
-            const user = new User({
+            const otpExpiry = new Date(Date.now() + 1 * 60000);              
+            
+                const sPassword = await securePassword(password);
+                const user = new User({
                 user_name: name,
                 user_email: email,
                 user_contact:mobileno,                
@@ -89,8 +92,10 @@ const verifySignUp = async(req,res)=>{
             }
         });
 
-        res.render('verify',{email: email})
+        res.render('verify',{email: email}) 
+  
     }
+
     } catch (error) {
         console.log(error.message);
     }
@@ -110,8 +115,12 @@ const loadVerify = (req,res) => {
 
 const verifyOTP = async(req, res) => {
     try {
-        const {email,otp} = req.body;
-        const user = await User.findOne({user_email: email, otp:otp})
+        const {email} = req.body;
+        const { digit1, digit2, digit3, digit4} = req.body
+        // const otp = Object.values(req.body).join('');
+        const newOTP = `${digit1}${digit2}${digit3}${digit4}`
+        console.log(newOTP);
+        const user = await User.findOne({user_email: email, otp:newOTP})
         console.log(user);
         const otpExpiry = user.otp_expiry;
         const otpMilliseconds = new Date(otpExpiry).getTime();
@@ -124,14 +133,18 @@ const verifyOTP = async(req, res) => {
             user.otp = null;
             user.otp_expiry = null;
             await user.save();
-           res.render('signin')
-    
+            req.login(user, (err) => {
+                if (err) {
+                    return next(err);
+                }
+                return res.redirect('/'); // Redirect to home page after successful signup
+            });
         }
         else{
-            res.send("OTP is incorrect or expired")
+            res.render("verify", {message: 'OTP is incorrect or expired'})
         }
     }
-
+    
      catch (error) {
         console.log(error)
     }
@@ -178,7 +191,7 @@ const verifySignIn = async(req, res) => {
         const passwordMatch = await bCrypt.compare(password, userData.user_password);
         if(passwordMatch){
             req.session.userId = userData._id;            
-            res.redirect('/home');
+            res.redirect('/');
         }else{
             res.render('signin',{message:"Email or password is incorrect"})
         }
@@ -276,8 +289,10 @@ const loadHome = async(req,res)=>{
         if(!req.session.userId){
             res.redirect('/');
         }else{            
-            const products = await Products.find({is_bestseller:true});
-            res.render('home',{products, message:'Sign Out'});
+            if(req.isAuthenticated){
+                const products = await Products.find({is_bestseller:true});
+                res.render('home',{products, user:req.user});
+            }
         }
         
     } catch (error) {
@@ -359,11 +374,11 @@ const loadProductDetails = async(req,res)=>{
 const userSignOut = async(req,res)=>{
     try {
         
-        if(req.session.userId){
-            req.session.destroy();
-            console.log('session destroyed')
-        }
-        res.redirect('/signin')
+        req.logout((err) => {
+            if (err) { return next(err); }
+            res.redirect('/');  // Redirect to the homepage or login page after logout
+          });
+       
       
     } catch (error) {
         console.log(error)

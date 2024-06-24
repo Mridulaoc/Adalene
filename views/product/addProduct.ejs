@@ -13,7 +13,8 @@
             <form action="/admin/products/add-product" method="post" enctype="multipart/form-data" autocomplete="off" class=" border px-3 py-3 rounded" style="width: 40%">
                 <div class="mb-3 ">           
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required >
+                    <input type="text" class="form-control" id="name" name="name" required onchange="validateName()">
+                    <span id="nameError" style="color: red;"></span>
                 </div>
                 <div class="mb-3 d-md-flex justify-content-between">
                     <div class="d-flex flex-column">
@@ -46,15 +47,18 @@
                 <div class="mb-3 d-flex justify-content-between align-items-center" >
                     <div class="mb-3 d-flex flex-column " style="width: 25%">           
                         <label for="price" class="form-label">Price</label>
-                        <input type="text" class="form-control" id="price" name="price" required >
+                        <input type="number" class="form-control" id="price" name="price" required onchange="validatePrice()">
+                        <span id="error" style="color: red;"></span>
                     </div>
                     <div class="mb-3 flex-column " style="width: 25%">           
                         <label for="quantity" class="form-label">Quantity</label>
-                        <input type="text" class="form-control" id="quantity" name="quantity" required >
+                        <input type="number" class="form-control" id="quantity" name="quantity" required onchange="validateValues(quantity)">
+                        <span id="error" style="color: red;"></span>
                     </div>
                     <div class="mb-3 flex-column ">           
                         <label for="rating" class="form-label" style=" width:25%">Rating</label>
-                        <input type="text" class="form-control" id="rating" name="rating" required >
+                        <input type="number" class="form-control" id="rating" name="rating" step="0.1" min="1" max="5" required onchange="validateValues(rating)">
+                        <span id="error" style="color: red;"></span>
                     </div>
                 </div>
                 
@@ -106,6 +110,57 @@
     });
   });
 });
+
+
+// validation scripts 
+
+function validateName(){
+            const name = document.getElementById("name").value.trim();
+            const nameError = document.getElementById("nameError");
+            
+            if(name.length<5){
+                nameError.textContent = "Name must be atleat 5 characters long"
+            }
+
+        }
+
+
+        function validatPrice(){
+            const priceInput = document.getElementById('price').value;
+            const errorSpan = document.getElementById('error');
+            // errorSpan.textContent = ''; // Clear previous error message
+            if (isNaN(priceInput) || priceInput<= 0) {
+            errorSpan.textContent = 'Please enter a valid amount greater than 0.';      
+            }
+        }
+
+//    function validateValues(input){
+//     const priceInput = document.getElementById('price').value;
+//     const quantityInput = document.getElementById('quantity').value;
+//     const ratingInput = document.getElementById('rating').value;
+//     const errorSpan = document.getElementById('error');
+    
+//     errorSpan.textContent = ''; // Clear previous error message
+
+    
+//     if (isNaN(priceInput) || priceInput<= 0) {
+//       errorSpan.textContent = 'Please enter a valid amount greater than 0.';      
+//     }
+
+//     if (isNaN(quantityInput) || quantityInput<= 0) {
+//       errorSpan.textContent = 'Please enter a valid amount greater than 0.';      
+//     }
+
+//     if (isNaN(ratingInput) || ratingInput<= 0) {
+//       errorSpan.textContent = 'Please enter a valid amount greater than 0.';      
+//     }
+
+
+//    }
+   
+  
+              
+
 </script>
 </body>
 </html>

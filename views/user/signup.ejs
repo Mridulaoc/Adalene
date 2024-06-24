@@ -5,9 +5,9 @@
 <%- include ("../layout/navbarSignIn.ejs") %>
     
     <div class="container-fluid">
-        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my5 rounded col-md-4 col-xs-12 form"  >
+        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"  >
     
-    <form action="/signup" method="post"  autocomplete="off" style="width: 90%;" >
+    <form action="/signup" method="post" class=""  autocomplete="off" style="width: 90%;" onsubmit="validatePasswords()" >
         <h4 class="mb-3 text-center"> Sign Up</h4> 
         <p class="fs-6 text-center">Already have an account? <a href="/signin" class="text-decoration-none"><span style="color: #BC4C2A; font-weight: bold;"> Sign in</span></a></p>
         <% if(typeof message !== "undefined"){%>
@@ -26,12 +26,24 @@
             <label for="email" class="form-label"> Email address</label>
             <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required>
             <span id="emailError" style="color: red;"></span>
-          </div>
+          </div>          
           <div class="mb-3 ">           
             <label for="password" class="form-label">Password</label>
+            <div class="d-flex align-items-center">
             <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()"  required>
-            <span id="passwordError" style="color: red;"></span>
-            
+            <div>            
+            <span  style="cursor: pointer;" ><i id="eyeIcon" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('password')"></i></span>
+            </div>  
+            <span id="passwordError" style="color: red;"></span> 
+                    
+          </div> 
+          <div class="mb-3 ">           
+            <label for="password" class="form-label">Confirm Password</label>
+            <div class="d-flex align-items-center">
+            <input type="password" class="form-control" id="confirmPassword" name="password" onchange="validatePassword()"  required>
+            <span  style="cursor: pointer;" ><i id="eyeIcon" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('confirmPassword')"></i></span> 
+            </div>
+            <span id="passwordError" style="color: red;"></span>            
           </div> 
           <div class="mb-3 ">           
             <label for="mobileno" class="form-label">Mobile Number</label>
@@ -68,8 +80,7 @@
             }
 
         }
-        
-       
+              
     
         function validateEmail() {
         const email = document.getElementById("email");
@@ -108,8 +119,37 @@
           passwordError.textContent = "Password must contain atleast 6 characters and maximum 20 characters. should contain at least one numeric digit, one uppercase and one lowercase letter"
         }
       }
-    
-    
+          
+      function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const eyeIcon = document.querySelectorAll('.eyeIcon');
+            console.log(eyeIcon)
+            if (field.type === "password") {
+                field.type = "text";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+                
+            } else {
+                field.type = "password";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            }
+        }
+        function validatePasswords() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Passwords do not match!',
+                });
+                return false;
+            }
+            return true;
+        }
+        
     </script>
     
 </body>

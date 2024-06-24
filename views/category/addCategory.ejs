@@ -4,31 +4,62 @@
 <body>
    <%- include ("../layout/navBarAdmin.ejs") %>
     <div class="container-fluid">
-        <div class="container d-flex flex-column justify-content-center align-items-center" style="height: 90vh;" >
-            <h2 class="mb-3 text-center"> Add New Category</h2>
-            <% if(typeof message !== "undefined"){%>
-                <div class="alert alert-danger" ><%= message %></div>       
-            <%}%>
+        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"  style="height: 90vh;" >
+            <h2 class="mb-5 text-center fs-5"> ADD NEW CATEGORY</h2>
            
-            <form action="/admin/categories/add-category" method="post" autocomplete="off" class=" border px-3 py-3 rounded" style="width: 40%">
+           
+            <form action="/admin/categories/add-category" method="post" autocomplete="off" style="width: 90%;">
+                <% if (locals.error) { %>
+                    <div class="alert alert-danger" ><%= error %></div>
+                    <%}%> 
+                
                 <div class="mb-3 ">           
                     <label for="category" class="form-label">Category Name</label>
-                    <input type="text" class="form-control" id="category" name="category" required >
+                    <input type="text" class="form-control" id="category" name="category" required onchange="validateCategoryName()">
+                    <span id="nameError" style="color: red;"></span>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" rows="3" name="description"></textarea>
+                    <textarea class="form-control" id="description" rows="3" name="description" required minlength="10" maxlength="200" onchange="validateCategoryDesc()"></textarea>
+                    <span id="descError" style="color: red;"></span>
                 </div>
                 <div class="mb-3 ">       
-                    <input type="submit" class="form-control fw-bold fs-4"  value="ADD NEW CATEGORY"   required>
-                </div> 
-                <div class="mb-3 ">       
-                    <input type="submit" class="form-control fw-bold fs-4"  value="CANCEL" required>
-                </div> 
+                    <input type="submit" class="form-control  fs-6"  value="ADD NEW CATEGORY"   required>
+                </div>                 
             </form>
+            <div class="mb-3 border text-center py-1 rounded" style="width: 90%;">       
+                <a href="/admin/categories" class="fs-6 text-decoration-none text-black"> CANCEL</a>
+            </div> 
             
         </div>
     </div>
 
+
+
+
+
+    <!-- Validation Scripts -->
+    <script>
+    function validateCategoryName(){
+        const categoryName = document.getElementById("category").value.trim();
+        const nameError = document.getElementById("nameError");
+        
+        if(categoryName.length<1 || categoryName.length === 0 ){
+            nameError.textContent = "Category name must be not be empty";
+        }
+        }
+
+    function validateCategoryDesc(){
+        var categoryDescription = document.getElementById('description').value.trim();
+        const descError = document.getElementById("descError");
+    
+    
+    if (categoryDescription.length < 10 || categoryDescription.length > 200) {        
+        descError.textContent = "Category description must be between 10 and 200 characters";      
+    } 
+};
+
+    
+    </script>
 </body>
 </html>

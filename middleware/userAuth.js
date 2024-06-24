@@ -1,28 +1,47 @@
-const isSignedIn = async(req,res,next)=>{
-    try {
+// const isSignedIn = async(req,res,next)=>{
+//     try {
 
-        if(req.session.userId){
+//         if(req.session.userId){
 
-        }else{
-            res.redirect('/signin');
-        }
-        next();
+//         }else{
+//             res.redirect('/signin');
+//         }
+//         next();
         
-    } catch (error) {
-        console.log(error);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
+
+
+// const isSignedOut = async(req,res,next)=>{
+//     try {
+//         if(req.session.userId){
+//             res.redirect('/');
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+//     next();
+// }
+
+// module.exports ={isSignedIn, isSignedOut}
+
+
+
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return next()
     }
-}
-
-
-const isSignedOut = async(req,res,next)=>{
-    try {
-        if(req.session.userId){
-            res.redirect('/');
-        }
-    } catch (error) {
-        console.log(error)
+  
+    res.redirect('/signin')
+  }
+  
+  function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return res.redirect('/')
     }
-    next();
-}
+    next()
+  }
 
-module.exports ={isSignedIn, isSignedOut}
+  module.exports = {checkAuthenticated,checkNotAuthenticated}

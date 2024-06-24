@@ -27,10 +27,10 @@
                         <tr>
                             <td scope="row" class="text-capitalize"><%= categories[i].cat_name %></td>
                             <td><%= categories[i].cat_desc %></td>
-                            <td><%=  categories[i].created_on  %></td>
+                            <td><%=  moment(categories[i].created_on).format('MMMM Do YYYY, h:mm:ss')  %></td>
                             <td><%= categories[i].cat_status %></td>
-                            <td><a href="categories/edit-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 bg-success text-white">Edit</a></td>
-                            <td><a href="categories/delete-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 bg-danger text-white">Delete</a></td>
+                            <td><a href="categories/edit-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 " style="color: #BC4C2A;">EDIT</a></td>
+                            <td><a href="categories/delete-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 " style="color: #BC4C2A;">UNLIST</a></td>
                         </tr>
                         
                         <%}%>

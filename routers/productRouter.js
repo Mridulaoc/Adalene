@@ -4,8 +4,9 @@ const bodyParser = require("body-parser");
 const multer = require('multer');
 const path = require('path');
 const authAdmin =require('../middleware/adminAuth')
+const methodOverride = require('method-override');
 
-
+productRoute.use(methodOverride('_method'));
 productRoute.use(express.static('public'));
 
 productRoute.use(bodyParser.json());

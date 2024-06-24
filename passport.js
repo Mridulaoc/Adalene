@@ -2,16 +2,9 @@ const passport = require('passport');
 const User = require('./models/user');
 const googleStrategy = require('passport-google-oauth20').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
+const bcrypt = require('bcrypt');
 require('dotenv/config')
 
-passport.serializeUser((user,done)=>{
-    done(null,user.id);
-})
-passport.deserializeUser((id,done)=>{
-    const user = { id};
-    done(null, user);
-     
-})
 
 passport.use(
     new googleStrategy({
@@ -40,16 +33,38 @@ function(request, accessToken,refreshToken,profile,done) {
 
 ))
 
-// passport.use(new LocalStrategy((usernameField:'email', password, done) => {
-//     const user = User.findOne({user_email:email});
-//     if (!user) {
-//         return done(null, false, { message: 'Incorrect username.' });
-//     }
-//     bcrypt.compare(password, user_password, (err, res) => {
-//         if (res) {
-//             return done(null, user);
-//         } else {
-//             return done(null, false, { message: 'Incorrect password.' });
-//         }
-//     });
-// }));
+passport.use(new LocalStrategy(
+    {
+        usernameField:'email',
+        passwordField:'password',
+    },
+    async(email,password,done) => {
+    const user = await User.findOne({user_email:email});
+    console.log(user)
+    if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+    }
+    bcrypt.compare(password, user.user_password, (err, res) => {
+        if (res) {
+            return done(null, user);
+        } else {
+            return done(null, false, { message: 'Incorrect password.' });
+        }
+    });
+}));
+
+
+passport.serializeUser((user,done)=>{
+    done(null,user.id);
+})
+passport.deserializeUser(async(id,done)=>{
+    try {
+        // const user = await User.findById(id);
+        const user = {id};
+        done(null, user);
+    } catch (error) {
+        done(error,false)
+    }
+    
+     
+})

@@ -39,43 +39,35 @@ userRoute.get('/google', passport.authenticate('google', {
 userRoute.get('/auth/google/callback',
     passport.authenticate('google',{
         scope:['profile'] ,
-        successRedirect:'/',
-        failureRedirect:'/login'
+        successRedirect:'/home',
+        failureRedirect:'/signin'
     })
 )
-
-// userRoute.get('/signin',
-//     passport.authenticate('local', {
-//     successRedirect: '/',
-//     failureRedirect: '/signin',
-//     // failureFlash: true
-// }))
+userRoute.get('/signin', userAuth.checkNotAuthenticated, userController.loadSigIn);
+userRoute.post('/signin',
+    passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/signin',
+    // failureFlash: true
+}))
 
 userRoute.get('/', userController.successGoogleLogin)
-userRoute.get('/home',userAuth.isSignedIn, userController.loadHome);
+userRoute.get('/home', userController.loadHome);
 userRoute.get('/failure', userController.failureGoogleLogin);
-userRoute.get('/', userAuth.isSignedIn, userController.loadSigIn);
+userRoute.get('/', userController.loadSigIn);
 userRoute.post('/', userController.verifySignIn);
-userRoute.get('/signin',  userController.loadSigIn);
-userRoute.post('/signin', userController.verifySignIn);
 userRoute.get('/forgot-password',userController.loadForgotPassword);
 userRoute.post('/forgot-password', userController.requestOtp);
 userRoute.post('/otp',userController.verifyFPOTP);
 userRoute.post('/reset-password', userController.updatePassword);
-userRoute.get('/shopall',userAuth.isSignedIn,userController.loadShopall);
+userRoute.get('/shopall',userController.loadShopall);
 userRoute.get('/bags', userController.loadBags);
-userRoute.get('/wallets', userAuth.isSignedIn,userController.loadWallets);
-userRoute.get('/belts', userAuth.isSignedIn,userController.loadBelts);
-userRoute.get('/phonecases', userAuth.isSignedIn, userController.loadPhoneCases);
-userRoute.get('/products', userAuth.isSignedIn,  userController.loadProductDetails);
+userRoute.get('/wallets',userController.loadWallets);
+userRoute.get('/belts', userController.loadBelts);
+userRoute.get('/phonecases', userController.loadPhoneCases);
+userRoute.get('/products', userController.loadProductDetails);
 userRoute.get('/signout',  userController.userSignOut);
 
 
-// userRoute.get('/signin',
-//     passport.authenticate('local', {
-//     successRedirect: '/',
-//     failureRedirect: '/signin',
-//     // failureFlash: true
-// }))
 
 module.exports = userRoute;
