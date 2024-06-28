@@ -2,46 +2,135 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 <body>
-<%- include ("../layout/navbar.ejs") %>
+  <%- include ("../layout/navBarnew.ejs") %>
 <div class="conatiner-fluid">
     <div class="container " style="margin-top: 5rem;">
         <p><a href="/" class="text-decoration-none text-black">Home</a>>All Products</p>
         <div class="container my-5">
             <div class="row align-items-start">
               <div class="col-4">
-                <p>Filter By</p>
-                <hr style="width: 60%;">
-                <p>Price</p>
-                <p>Model</p>
-                <p>Size</p>
+                <div class="d-flex flex-column">
+                <% categories.forEach(function(category) { %>
+                  <a href="/shopall/products?categoryId=<%= category._id %>"><%= category.cat_name %></a>
+                <% }); %>
+                </div>
+                <select name="category" id="category" onchange="fetchProducts()" style="width: 50%;">
+                  <option value="All">All Categories</option>
+                  <% categories.forEach(function(category) { %>
+                    <option value="<%= category._id %>"><%= category.cat_name %></option>
+                  <% }); %>
+                </select>
+    
+                <select name="color" id="color" onchange="fetchProducts()" style="width: 50%;">
+                  <option value="All">All Colors</option>
+                  <% colors.forEach(function(color) { %>
+                    <option value="<%= color._id %>"><%= color.color_name %></option>
+                  <% }); %>
+                </select>
+    
+                <select name="size" id="size" onchange="fetchProducts()" style="width: 50%;">
+                  <option value="All">All Sizes</option>
+                  <% sizes.forEach(function(size) { %>
+                    <option value="<%= size._id %>"><%= size.size_name %></option>
+                  <% }); %>
+                </select>
+    
+                <select name="sort" id="sort" onchange="fetchProducts()" style="width: 50%;">
+                  <option value="name-asc">A-Z</option>
+                  <option value="name-desc">Z-A</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                </select>
+                
               </div>
-              <div class="col-8">
+              <div class="col-8 d-flex flex-column align-items-center">
                 <div class="d-flex flex-wrap my-5 mx-5 gap-5">
-                    <%if(products.length > 0){
-                        for(let i=0; i<products.length; i++){ 
-                            
+                    <% if(products.length > 0){
+                        for(let i=0; i<products.length; i++){                             
                         %>
                     
-                    <a href="/products/?id=<%= products[i]._id %>" class="text-decoration-none"><div class="card shadow d-flex flex-column align-items-center" style="width: 22rem;">
+                    <a href="/products/?id=<%= products[i]._id %>" class="text-decoration-none"><div class="card shadow d-flex flex-column align-items-center" style="width: 22rem; height: 32rem;">
                         <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top px-2 py-2" alt="...">
-                        <div class="card-body">
-                          <h5 class="card-title"><%= products[i].prod_name %></h5>
-                          <p class="card-text fs-5"><i class="fa-solid fa-indian-rupee-sign"></i><%= products[i].prod_price %></p>
-                         
+                        <div class="card-body d-flex flex-column align-items-center">
+                          <p class="fs-6"><%= products[i].prod_name %></p>
+                          <p class="card-text fs-5">₹<%= products[i].prod_price %></p>
+                          <p><% if(products[i].prod_quantity>0){ %> 
+                            <p></p>
+                            <%} else { %>
+                            <p class="fs-5 fw-bold"> OUT OF STOCK</p>
+                            <%}%></p>
                         </div>
                     </div>
-                </a>
+                    </a>
                       <%}%>
                                 <%}else{%>
                     
                                     Data not found
                             
-                                <%}%>
-                
-                    </div>
-              </div>              
+                                <%}%>                
+                </div>
+                <div class="d-flex flex-column gap-3">
+                  <div class="d-flex gap-3">
+                    <% if (currentPage > 1) { %>
+                    <a href="/shopall/?page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
+                    <% } %>
+                    <div class="d-flex gap-3 ">
+                    <% for (i = 1; i <= totalPages; i++ ){ %>
+                    <a href="/shopall/?page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
+                    <%}%>
+                  </div>
+                    <% if (currentPage < totalPages) { %>
+                    <a href="/shopall/?page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                    <% } %>
+                    </div>   
+                     
+                  </div>
+                  
+              </div>
+              <br> 
+             
             </div>
     </div>
 </div>
+
+<script>
+  let currentPage = 1;
+
+document.addEventListener('DOMContentLoaded', function() {
+fetchProducts();
+});
+
+function fetchProducts(page = 1) {
+const categoryId = document.getElementById('category').value;
+const colorId = document.getElementById('color').value;
+const sizeId = document.getElementById('size').value;
+currentPage = page;
+
+fetch(`/products?categoryId=${category._id}&colorId=${color._id}&sizeId=${size._id}&page=${currentPage}`)
+.then(response => response.json())
+.then(data => {
+  const productsDiv = document.getElementById('products');
+  productsDiv.innerHTML = '';
+  data.products.forEach(product => {
+    const productDiv = document.createElement('div');
+    productDiv.textContent = product.name;
+    productsDiv.appendChild(productDiv);
+  });
+
+  const paginationDiv = document.getElementById('pagination');
+  paginationDiv.innerHTML = '';
+
+  for (let i = 1; i <= data.totalPages; i++) {
+    const pageButton = document.createElement('button');
+    pageButton.textContent = i;
+    pageButton.onclick = () => fetchProducts(i);
+    if (i === currentPage) {
+      pageButton.disabled = true;
+    }
+    paginationDiv.appendChild(pageButton);
+  }
+});
+}
+</script>
 </body>
 </html>

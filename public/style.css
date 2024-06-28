@@ -22,11 +22,21 @@ p{
     border-color: #BC4C2A;
 }
 
-.navbarbrand{
+.navbar{
+    height: 10rem;
+}
+.navbar-brand{
     font-family: "Playwrite AU VIC", cursive;
     color: #BC4C2A;
-    font-size: 2rem;
+    font-size: 2.5rem;
     text-decoration: none;
+}
+
+.nav-link{
+    font-size: 1.3rem;
+    color: #888888;
+    position: relative;
+    
 }
 
 .hero{
@@ -77,6 +87,26 @@ p{
     transform-origin: top left;
     z-index: 10;
   }
+
+
+
+  .product-image-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+.procuct-image-container img {
+    max-width: 100%;
+    max-height: 300px;
+    margin-bottom: 10px;
+}
+
+.button{
+    padding: .5rem 1rem;
+    border: 1px solid #ccc;
+    color: #BC4C2A;
+}
 
 @media screen and (max-width: 768px) {
     html{

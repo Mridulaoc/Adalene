@@ -18,7 +18,7 @@ userManagementRoute.use(bodyParser.urlencoded({ extended: true }));
 userManagementRoute.set('view engine', 'ejs');
 userManagementRoute.set("views", './views/userManagement');
 
-userManagementRoute.get('/users',userMangementController.loadUserManagement);
-userManagementRoute.get('/users/block-user',userMangementController.blockUser);
+// userManagementRoute.get('/users',userMangementController.loadUserManagement);
+// userManagementRoute.get('/users/block-user',userMangementController.blockUser);
 
 module.exports = userManagementRoute;

@@ -301,23 +301,147 @@ const loadHome = async(req,res)=>{
    
 }
 
-const loadShopall = async(req,res)=>{
+const loadShopall = async(req,res) => {
+    
+        try {
+            let page = 1;
+            if (req.query.page) {
+                page = req.query.page;
+            }
+            const limit = 5; 
+            const categories = await Category.find();
+            const sizes = await Size.find();
+            const colors = await Color.find();        
+            
+            const products = await Products.find({})
+            .limit(limit*1)
+            .skip((page-1)*limit)
+            .exec();
+
+            const count = await Products.find().countDocuments();
+            res.render('shopall',{products, totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,
+                categories,sizes,colors
+            });
+        } catch (error) {
+            console.log(error)
+        }
+       
+    }
+   
+
+const loadFilteredProducts = async(req,res)=>{
     try {
-        const products = await Products.find({prod_status:'ACTIVE'});
-        res.render('shopall',{products});
+        
+        const { categoryId, colorId, sizeId, page = 1, limit = 5, sort } = req.query;
+        const query = {};
+
+        if (categoryId && categoryId !== 'All') query.prod_category = ObjectId(categoryId);
+        if (colorId && colorId !== 'All') query.prod_color = colorId;
+        if (sizeId && sizeId !== 'All') query.prod_size = sizeId;
+
+        let sortQuery = {};
+        switch (sort) {
+          case 'name-asc':
+            sortQuery = { prod_name: 1 };
+            break;
+          case 'name-desc':
+            sortQuery = { prod_name: -1 };
+            break;
+          case 'price-asc':
+            sortQuery = { prod_price: 1 };
+            break;
+          case 'price-desc':
+            sortQuery = { prod_price: -1 };
+            break;
+          default:
+            sortQuery = { prod_name: 1 };
+        }
+
+        const products = await Products.find(query)
+        .populate('prod_category')
+        .populate('prod_color')
+        .populate('prod_size')
+        .sort(sortQuery)
+        .skip((page - 1) * limit)
+        .limit(5);
+
+        const total = await Products.countDocuments(query);
+        const totalPages = Math.ceil(total / limit);
+
+        res.render('shopall',{ products, totalPages });
+      
+        // const page = parseInt(req.query.page) || 1;
+        // const limit = parseInt(req.query.limit) || 5;
+        // const search = req.query.search || "";
+        // let sort = req.query.sort || "price";
+        // let category = req.query.category || "All";
+        // let size = req.query.size || "All";
+        // let color = req.query.color || "All";
+
+        // const categories = await Category.find();
+        // const sizes = await Size.find();
+        // const colors = await Color.find();
+
+        // category === "All" ? (category = categories.map(category => category._id)) : (category = req.query.category.split(","));
+        // size === "All" ? (size = sizes.map(size => size._id)) : (size = req.query.size.split(","));
+        // color === "All" ? (color = colors.map(color => color._id)) : (color = req.query.color.split(","));
+
+        // req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
+
+        // let sortBy = {};
+        // if (sort[1]) {
+        //     sortBy[sort[0]] = sort[1];
+        // } else {
+        //     sortBy[sort[0]] = "asc";
+        // }
+
+        // const products = await Products.find({ 
+        //     prod_name: { $regex: search, $options: "i" },
+        //     prod_category: { $in: category },
+        //     prod_size: { $in: size },
+        //     prod_color: { $in: color }
+        // })
+        // .sort(sortBy)
+        // .skip(page * limit)
+        // .limit(limit)
+        // .populate('prod_category')
+        // .populate('prod_size')
+        // .populate('prod_color');
+
+        // const count = await Products.countDocuments({
+        //     prod_category: { $in: category },
+        //     prod_size: { $in: size },
+        //     prod_color: { $in: color },
+        //     prod_name: { $regex: search, $options: "i" },
+        // });
+
+        
+        // res.status(200).render('shopall',{products,categories,sizes,colors,page:page+1,totalPages:Math.ceil(count/limit),currentPage:page,search} )
     } catch (error) {
+        res.status(500).send({error:error});
         
     }
    
 }
 
 
+
 const loadBags = async(req,res)=>{
     try {
+        let page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+        const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const bags = products.filter(product=>product.prod_category.cat_name === 'Bags')
-        console.log(bags);
-        res.render('bags',{products: bags });
+        const bagsData = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'})
+        .limit(limit*1)
+        .skip((page-1)*limit)
+        .exec();
+       
+        const count = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'}).countDocuments();
+        
+        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
     } catch (error) {
         console.log(error)
 
@@ -327,20 +451,43 @@ const loadBags = async(req,res)=>{
 
 const loadWallets = async(req,res)=>{
     try {
+        let page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+        const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const wallets = products.filter(product=>product.prod_category.cat_name === 'Wallets')
-        res.render('wallets',{products: wallets});
+        const walletData = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'})
+        .limit(limit*1)
+        .skip((page-1)*limit)
+        .exec();
+      
+        const count = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'}).countDocuments();
+      
+        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
     } catch (error) {
         console.log(error)
 
     }
    
+   
 }
 const loadBelts = async(req,res)=>{
     try {
+        let page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+        const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const belts = products.filter(product=>product.prod_category.cat_name === 'Belts')
-        res.render('belts',{products: belts});
+        const beltsData = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'})
+        .limit(limit*1)
+        .skip((page-1)*limit)
+        .exec();
+      
+        const count = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'}).countDocuments();
+      
+        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
     } catch (error) {
         console.log(error)
 
@@ -408,6 +555,7 @@ module.exports = {
     loadWallets,
     loadPhoneCases,
     loadProductDetails,
-    userSignOut
+    userSignOut,
+    loadFilteredProducts
 
 }

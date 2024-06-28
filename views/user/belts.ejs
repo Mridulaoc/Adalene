@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-<%- include ("../layout/navbar.ejs") %>
+<body>  
+<%- include ("../layout/navBarnew.ejs") %>
 <div class="conatiner-fluid">
     <div class="container " style="margin-top: 5rem;">
         <p><a href="/" class="text-decoration-none text-black">Home</a>><%= products[0].prod_category.cat_name %></p>
@@ -15,7 +15,7 @@
                 <p>Model</p>
                 <p>Size</p>
               </div>
-              <div class="col-8">
+              <div class="col-8 d-flex flex-column align-items-center">
                 <div class="d-flex flex-wrap my-5 mx-5 gap-5">
                     <%if(products.length > 0){
                         for(let i=0; i<products.length; i++){ 
@@ -39,6 +39,20 @@
                                 <%}%>
                 
                     </div>
+                    <div class="d-flex flex-column gap-3">
+                      <div class="d-flex gap-3">
+                        <% if (currentPage > 1) { %>
+                        <a href="/belts/?page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
+                        <% } %>
+                        <div class="d-flex gap-3 ">
+                        <% for (i = 1; i <= totalPages; i++ ){ %>
+                        <a href="/belts/?page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
+                        <%}%>
+                      </div>
+                        <% if (currentPage < totalPages) { %>
+                        <a href="/belts/?page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                        <% } %>
+                        </div>  
               </div>              
             </div>
     </div>

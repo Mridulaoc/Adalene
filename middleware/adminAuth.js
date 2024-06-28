@@ -1,28 +1,19 @@
-const isSignedIn = async(req,res,next)=>{
-    try {
 
-        if(req.session.userId){
 
-        }else{
-            res.redirect('/admin/signin');
-        }
-        next();
-        
-    } catch (error) {
-        console.log(error);
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.userid) {
+        return next();
+    } else {
+        res.status(301).redirect('/admin')
     }
 }
 
-
-const isSignedOut = async(req,res,next)=>{
-    try {
-        if(req.session.userId){
-            res.redirect('/');
-        }
-    } catch (error) {
-        console.log(error)
+function isNotAuthenticated(req, res, next) {
+    if (!req.session && !req.session.userid) {
+        res.status(301).redirect('/admin')
+    } else {
+        return next();
     }
-    next();
 }
+module.exports = {isAuthenticated,isNotAuthenticated};
 
-module.exports ={isSignedIn, isSignedOut}

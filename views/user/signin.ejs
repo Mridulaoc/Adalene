@@ -46,6 +46,14 @@
           <p><a href="/forgot-password" class="fs-6 text-decoration-none" style="color: #BC4C2A;" >Forgot Password?</a></p>
         </div>
     </div>    
-    
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <script>
+          Swal.fire({
+              icon: 'error',
+              title: 'Login Error',
+              text: '<%= errorMessage %>'
+          });
+      </script>
+  <% } %>
 </body>
 </html>

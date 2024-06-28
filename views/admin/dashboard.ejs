@@ -4,8 +4,53 @@
 <body>
    <%- include ("../layout/navBarAdmin.ejs") %>
     <div class="container-fluid">
-       <h1>dashboard</h1>
+       <h1 class="text-center">Dashboard</h1>
+
+       <div class="container d-flex flex-column">
+         <div class="d-flex justify-content-between my-5">
+            <div class="border shadow" style="padding: 1rem 4rem;">
+               
+                  <h3>Total Sales</h3>
+                  <p class="fs-5 mb-2">₹40,29,000</p>
+                  <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+               </div>
+               <div class="border shadow" style="padding: 1rem 4rem;">
+               <h3>Orders</h3>
+               <p class="fs-5 mb-2">450</p>
+               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+            </div>
+            <div class="border shadow" style="padding: 1rem 4rem;">
+               <h3>Profit</h3>
+               <p class="fs-5 mb-2">10,350</p>
+               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+            </div>                    
+         </div>
+         <canvas id="myChart" width="400" height="100" class="my-5"></canvas>
+       </div>
     </div>
+    <script>
+      const ctx = document.getElementById('myChart');
+    
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            borderWidth: 1,
+            backgroundColor:'#BC4C2A',
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    </script>
 
     </body>
     </html>
