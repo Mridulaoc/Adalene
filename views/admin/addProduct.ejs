@@ -84,7 +84,7 @@
                 <div class="input-group mb-3 d-flex flex-column">
                   <label for="images" class="form-label">Images</label>
                   <input type="file" class="form-control" id="images" name="images"
-                    accept="image/png,image/gif,image/jpg,image/jpeg" style="width: 100%" multiple />
+                    accept="image/*" style="width: 100%" multiple />
                   <div id="imagePreview" class="d-flex justify-content-between flex-wrap"></div>
                 </div>
 
@@ -99,7 +99,7 @@
               </div>
         </div>
       </div>
-
+      <%- include ("../layout/footerAdmin.ejs") %>
 
       <script>
 

@@ -30,6 +30,8 @@
             </div> 
         </div> 
     </div>
+    <%- include ("../layout/footerAdmin.ejs") %>
+        
     <!-- Validation Scripts -->
     <script>
         function validateCategoryName(){
@@ -50,8 +52,7 @@
             descError.textContent = "Category description must be between 10 and 200 characters";      
         } 
     };
-    
-        
+  
         </script>
 </body>
 </html>

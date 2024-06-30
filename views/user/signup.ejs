@@ -27,7 +27,7 @@
             <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required>
             <span id="emailError" style="color: red;"></span>
           </div>          
-          <div class="mb-3 ">           
+          <div class="mb-3 d-flex flex-column ">           
             <label for="password" class="form-label">Password</label>
             <div class="d-flex align-items-center">
             <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()"  required>
@@ -69,7 +69,7 @@
     
     </div>
 
-
+    <%- include ("../layout/footerUser.ejs") %>
     <script >
         function validateName(){
             const name = document.getElementById("name").value.trim();

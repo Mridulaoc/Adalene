@@ -4,8 +4,7 @@
 <body>
 <%- include ("../layout/navBarnew.ejs") %>
 
-<div class="container-fluid mx-0">
-   
+<div class="container-fluid mx-0">   
     <div class="d-flex justify-content-between align-content-center"> 
         <div class="hero container-fluid ">
             <h2 class="header">CUE THE COLOR</h2>
@@ -24,9 +23,9 @@
             
             <div class="card shadow" style="width: 18rem;">
                 <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title"><%= products[i].prod_name %></h5>
-                  <p class="card-text fs-5"><i class="fa-solid fa-indian-rupee-sign"></i><%= products[i].prod_price %></p>
+                <div class="card-body d-flex flex-column align-items-center">
+                    <p class="fs-6"><%= products[i].prod_name %></p>
+                    <p class="card-text fs-5">₹<%= products[i].prod_price %></p>
                  
                 </div>
             </div>
@@ -46,7 +45,7 @@
         </div>
 
 
-
+        <%- include ("../layout/footerUser.ejs") %>
 
 </body>
 </html>

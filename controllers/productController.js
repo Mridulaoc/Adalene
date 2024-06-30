@@ -211,17 +211,24 @@ const deleteProductImage = async (req, res) => {
   }
 };
 
+
+
 const deleteProduct = async (req, res) => {
   try {
-    const productData = await Product.findByIdAndUpdate(
-      { _id: req.query.id },
-      { $set: { is_deleted: true } }
-    );
-    res.redirect("/admin/products");
+
+    const id = req.query.id;
+    const productData = await Product.findById({_id:id});
+    if(productData.is_deleted){
+      await Product.findByIdAndUpdate({_id:id},{$set:{is_deleted:false}});
+      res.status(301).redirect("/admin/products");
+    }else{
+      await Product.findByIdAndUpdate({_id:id},{$set:{is_deleted:true}});
+      res.status(301).redirect("/admin/products");    
+    }      
   } catch (error) {
     console.log(error);
-  }
-};
+
+}};
 
 module.exports = {
   loadProductList,

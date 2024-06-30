@@ -39,11 +39,13 @@ const securePassword = async(password)=>{
 }
 
 
+
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'mridulagirish2024@gmail.com',
-        pass: 'flda jurt auvl hhfz'
+        user: process.env.MAIL_USERNAME,
+        pass: process.env.MAIL_PASSWORD,
     }
 });
 
@@ -92,7 +94,7 @@ const verifySignUp = async(req,res)=>{
             }
         });
 
-        res.render('verify',{email: email}) 
+        res.render('verify',{email: email,user:req.user,success:'Email sent successfully'}) 
   
     }
 
@@ -116,19 +118,19 @@ const loadVerify = (req,res) => {
 const verifyOTP = async(req, res) => {
     try {
         const {email} = req.body;
-        const { digit1, digit2, digit3, digit4} = req.body
-        // const otp = Object.values(req.body).join('');
+        const { digit1, digit2, digit3, digit4} = req.body        
         const newOTP = `${digit1}${digit2}${digit3}${digit4}`
         console.log(newOTP);
         const user = await User.findOne({user_email: email, otp:newOTP})
         console.log(user);
+        if(user){
         const otpExpiry = user.otp_expiry;
         const otpMilliseconds = new Date(otpExpiry).getTime();
     
         
         console.log(Date.now());
     
-        if(user && otpMilliseconds > Date.now()){
+        if(otpMilliseconds > Date.now()){
             user.isVerified = true;
             user.otp = null;
             user.otp_expiry = null;
@@ -137,11 +139,13 @@ const verifyOTP = async(req, res) => {
                 if (err) {
                     return next(err);
                 }
-                return res.redirect('/'); // Redirect to home page after successful signup
+                return res.redirect('/'); 
             });
         }
+    }
         else{
-            res.render("verify", {message: 'OTP is incorrect or expired'})
+            const otpExpired = true;
+            res.render('verify',{user:req.user,message:'OTP expired or wrong OTP',email:email})
         }
     }
     
@@ -171,7 +175,7 @@ transporter.sendMail(mailOptions,(err,data)=>{
     }
 })
 
-res.render('verify', { email });
+res.render('verify', { email,user:req.user });
 }
 
 
@@ -206,7 +210,7 @@ const verifySignIn = async(req, res) => {
 
 
 const loadForgotPassword = (req,res)=>{
-    res.render('forgotPassword');
+    res.render('forgotPassword',{user:req.user});
 }
 
 const requestOtp = async(req,res)=>{
@@ -235,7 +239,7 @@ const requestOtp = async(req,res)=>{
                 console.log("Email sent successfully")
             }
         });
-            res.render('otp',{success:'Check your email for the OTP',email:email })
+            res.render('otp',{success:'Check your email for the OTP',email:email,user:req.user })
         } 
         
        
@@ -256,11 +260,11 @@ const verifyFPOTP = async(req,res)=>{
             user.otp = null;
             user.otp_expiry = null;
             await user.save();
-            res.render('resetPassword',{email})     
+            res.render('resetPassword',{email,user:req.user})     
     
         }
         else{
-            res.render('otp',{incorrect:"OTP is incorrect or expired"})
+            res.render('otp',{incorrect:"OTP is incorrect or expired",user:req.user})
         }      
       
     } catch (error) {
@@ -274,7 +278,7 @@ const updatePassword = async (req, res) => {
         console.log(email,password)
         const user = await User.findOne({user_email:email});
         if (!user) {
-            return res.render('resetPassword', { message: 'User not found' });
+            return res.render('resetPassword', { message: 'User not found',user:req.user });
           }
         const sPassword = await securePassword(password);
         const userData = await User.updateOne({user_email: email},{$set:{user_password:sPassword}});        
@@ -286,6 +290,7 @@ const updatePassword = async (req, res) => {
 
 const loadHome = async(req,res)=>{
     try {
+        
         if(!req.session.userId){
             res.redirect('/');
         }else{            
@@ -304,6 +309,7 @@ const loadHome = async(req,res)=>{
 const loadShopall = async(req,res) => {
     
         try {
+            console.log(process.env)
             let page = 1;
             if (req.query.page) {
                 page = req.query.page;
@@ -432,6 +438,9 @@ const loadBags = async(req,res)=>{
         if (req.query.page) {
             page = req.query.page;
         }
+        const categories = await Category.find();
+        const sizes = await Size.find();
+        const colors = await Color.find();   
         const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
         const bagsData = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'})
@@ -441,7 +450,7 @@ const loadBags = async(req,res)=>{
        
         const count = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'}).countDocuments();
         
-        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
+        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
     } catch (error) {
         console.log(error)
 
@@ -455,6 +464,9 @@ const loadWallets = async(req,res)=>{
         if (req.query.page) {
             page = req.query.page;
         }
+        const categories = await Category.find();
+        const sizes = await Size.find();
+        const colors = await Color.find();   
         const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
         const walletData = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'})
@@ -464,7 +476,7 @@ const loadWallets = async(req,res)=>{
       
         const count = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'}).countDocuments();
       
-        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
+        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
     } catch (error) {
         console.log(error)
 
@@ -478,6 +490,9 @@ const loadBelts = async(req,res)=>{
         if (req.query.page) {
             page = req.query.page;
         }
+        const categories = await Category.find();
+        const sizes = await Size.find();
+        const colors = await Color.find();   
         const limit = 5; 
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
         const beltsData = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'})
@@ -487,7 +502,7 @@ const loadBelts = async(req,res)=>{
       
         const count = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'}).countDocuments();
       
-        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user });
+        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
     } catch (error) {
         console.log(error)
 
@@ -511,7 +526,7 @@ const loadProductDetails = async(req,res)=>{
         const products = await Products.findById({_id:req.query.id}).populate('prod_category').populate('prod_size').populate('prod_color')
         const relatedProducts = await Products.find({prod_status:'ACTIVE',prod_category:products.prod_category._id,_id:{$ne:products._id}}).populate('prod_category');    
         console.log(relatedProducts)   
-        res.render('productDetails',{products,relatedProducts});
+        res.render('productDetails',{products,relatedProducts,user:req.user});
 }
      catch (error) {
         console.log(error)
@@ -523,7 +538,7 @@ const userSignOut = async(req,res)=>{
         
         req.logout((err) => {
             if (err) { return next(err); }
-            res.redirect('/');  // Redirect to the homepage or login page after logout
+            res.redirect('/'); 
           });
        
       

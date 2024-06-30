@@ -39,9 +39,9 @@
                             <td><%= products[i].prod_quantity %></td>
                             <td><%= products[i].prod_rating %></td>
                             <td><img src="\uploads\<%= products[i].prod_images[0] %>" width="50px" height="50px"></td>
-                            <td class="text-center"><a href="/admin/products/edit-product/<%= products[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A;">Edit</a></td>
+                            <td class="text-center"><a href="/admin/products/edit-product/<%= products[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A;">EDIT</a></td>
                             
-                            <td><button class="px-3 fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="confirmDelete('<%= products[i]._id %>')"><%= products[i].is_deleted ? 'LIST': 'UNLIST' %></button></td>
+                            <td><button class="px-3 fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="confirmDelete('<%= products[i]._id %>')"><%= products[i].is_deleted ? 'LIST': 'UNLIST'%></button></td>
                         </tr>  
                         <%}%>
                         <%}else{%>
@@ -69,6 +69,8 @@
             </div>
         </div>
     </div>
+    <%- include ("../layout/footerAdmin.ejs") %>
+        
     <script>
        function confirmDelete(productId) {
             Swal.fire({

@@ -7,42 +7,7 @@
     <div class="container " style="margin-top: 5rem;">
         <p><a href="/" class="text-decoration-none text-black">Home</a>>All Products</p>
         <div class="container my-5">
-            <div class="row align-items-start">
-              <div class="col-4">
-                <div class="d-flex flex-column">
-                <% categories.forEach(function(category) { %>
-                  <a href="/shopall/products?categoryId=<%= category._id %>"><%= category.cat_name %></a>
-                <% }); %>
-                </div>
-                <select name="category" id="category" onchange="fetchProducts()" style="width: 50%;">
-                  <option value="All">All Categories</option>
-                  <% categories.forEach(function(category) { %>
-                    <option value="<%= category._id %>"><%= category.cat_name %></option>
-                  <% }); %>
-                </select>
-    
-                <select name="color" id="color" onchange="fetchProducts()" style="width: 50%;">
-                  <option value="All">All Colors</option>
-                  <% colors.forEach(function(color) { %>
-                    <option value="<%= color._id %>"><%= color.color_name %></option>
-                  <% }); %>
-                </select>
-    
-                <select name="size" id="size" onchange="fetchProducts()" style="width: 50%;">
-                  <option value="All">All Sizes</option>
-                  <% sizes.forEach(function(size) { %>
-                    <option value="<%= size._id %>"><%= size.size_name %></option>
-                  <% }); %>
-                </select>
-    
-                <select name="sort" id="sort" onchange="fetchProducts()" style="width: 50%;">
-                  <option value="name-asc">A-Z</option>
-                  <option value="name-desc">Z-A</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                </select>
-                
-              </div>
+          <%- include ("../layout/sidebar.ejs") %>
               <div class="col-8 d-flex flex-column align-items-center">
                 <div class="d-flex flex-wrap my-5 mx-5 gap-5">
                     <% if(products.length > 0){
@@ -92,7 +57,7 @@
             </div>
     </div>
 </div>
-
+<%- include ("../layout/footerUser.ejs") %>
 <script>
   let currentPage = 1;
 

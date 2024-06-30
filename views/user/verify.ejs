@@ -3,10 +3,17 @@
 <%- include ("../layout/header.ejs") %>
 <body>
     <%- include ("../layout/navBarnew.ejs") %>
-    <div class="container-fluid">
+    <div class="container-fluid" style="height: 100vh;">
         <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"   >
             <form action="/verify" method="post"  autocomplete="off" style="width: 90%;" >
                 <h4 class="mb-3 text-center"> OTP Verification</h4> 
+                <% if(locals.message){%>
+                    <div class="alert alert-danger"><%= message %></div>         
+                    
+                <%}%>
+                <% if(locals.success){%>
+                    <div class="alert alert-success"><%= success %></div> 
+                  <%}%>
                 <div class="mb-3 d-flex justify-content-between "> 
                     <input type="hidden" name="email" value="<%= email %>">          
                    
@@ -16,9 +23,9 @@
                     <input type="text" name="digit3" maxlength="1" required class="form-control" >
                     <input type="text" name="digit4" maxlength="1" required class="form-control">                    
                   </div>
-                  <button type="submit" class="form-control  fs-6">Verify OTP</button>                 
+                  <button type="submit" class="form-control  fs-6"  id="otpButton">Verify OTP</button>                 
             </form>
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between gap-3">
             <p id="timer" class="fs-6 text-center">Time left: 60 seconds</p>
             <form action="/resend" method="POST">
             <input type="hidden" name="email" value="<%= email %>">
@@ -30,7 +37,7 @@
             
         </div>
     </div>
-
+    <%- include ("../layout/footerUser.ejs") %>
 
 
 
@@ -74,6 +81,35 @@
                 });            
             })
         });
+
+
+//        document.getElementById('checkOtpButton').addEventListener('click', () => {    
+//         fetch('/verify')
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.otpExpired) {
+//                 Swal.fire({
+//                     icon: 'error',
+//                     title: 'Oops...',
+//                     text: 'Your OTP has expired!',
+//                 });
+//             } else {
+//                 Swal.fire({
+//                     icon: 'success',
+//                     title: 'Good job!',
+//                     text: 'Your OTP is still valid!',
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error fetching OTP status:', error);
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Error',
+//                 text: 'There was an error checking your OTP status.',
+//             });
+//         });
+// });
     </script>
 
 

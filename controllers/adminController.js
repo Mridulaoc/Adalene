@@ -5,7 +5,7 @@ const loadSigIn = (req,res)=>{
     if(req.session.userid){
         res.status(301).redirect('/admin/dashboard');
     }
-    res.render('signin');
+    res.status(200).render('signin');
 }
 
 const verifySignIn = async(req,res)=>{

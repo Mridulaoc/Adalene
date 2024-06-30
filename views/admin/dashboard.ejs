@@ -3,7 +3,7 @@
 <%- include ("../layout/header.ejs") %>
 <body>
    <%- include ("../layout/navBarAdmin.ejs") %>
-    <div class="container-fluid">
+    <div class="container-fluid" >
        <h1 class="text-center">Dashboard</h1>
 
        <div class="container d-flex flex-column">
@@ -28,6 +28,7 @@
          <canvas id="myChart" width="400" height="100" class="my-5"></canvas>
        </div>
     </div>
+    <%- include ("../layout/footerAdmin.ejs") %>
     <script>
       const ctx = document.getElementById('myChart');
     
