@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - Product Details</title>
+  <link rel="stylesheet" href="/path/to/your/styles.css"> <!-- Adjust as needed -->
+  <style>
+    .variant {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+    }
+    .quantity-controls button {
+      cursor: pointer;
+      padding: 5px 10px;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      margin: 0 5px;
+    }
+    .quantity-display {
+      font-size: 18px;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1><%= product.name %></h1>
+  <p><strong>Price:</strong> $<%= product.price %></p>
+  <p><strong>Description:</strong> <%= product.description %></p>
+  <p><strong>Category:</strong> <%= product.category %></p>
+
+  <h2>Variants</h2>
+  <% product.prod_variants.forEach((variant, index) => { %>
+    <div class="variant">
+      <p><strong>Color:</strong> <%= variant.color.name %></p>
+      <p><strong>Size:</strong> <%= variant.size.name %></p>
+      <p><strong>Quantity:</strong> <span id="quantity-display-<%= index %>"><%= variant.quantity %></span></p>
+      <div class="quantity-controls">
+        <button onclick="decrementQuantity(<%= index %>)">-</button>
+        <span id="quantity-<%= index %>" class="quantity-display"><%= variant.quantity %></span>
+        <button onclick="incrementQuantity(<%= index %>)">+</button>
+        <button onclick="addToCart('<%= product._id %>', '<%= variant.color._id %>', '<%= variant.size._id %>', <%= index %>)">Add to Cart</button>
+      </div>
+    </div>
+  <% }) %>
+
+  <a href="/editProduct/<%= product._id %>">Edit Product</a>
+
+  <script>
+    // JavaScript functions
+    function incrementQuantity(index) {
+      var quantityElem = document.getElementById('quantity-' + index);
+      var currentQuantity = parseInt(quantityElem.innerText);
+      quantityElem.innerText = currentQuantity + 1;
+    }
+
+    function decrementQuantity(index) {
+      var quantityElem = document.getElementById('quantity-' + index);
+      var currentQuantity = parseInt(quantityElem.innerText);
+      if (currentQuantity > 0) {
+        quantityElem.innerText = currentQuantity - 1;
+      }
+    }
+
+   
+    async function addToCart(productId, colorId, sizeId, variantIndex) {
+      var quantity = parseInt(document.getElementById('quantity-' + variantIndex).innerText);
+
+      try {
+        const response = await fetch('/addToCart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId: productId,
+            colorId: colorId,
+            sizeId: sizeId,
+            quantity: quantity
+          })
+        });
+
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error || 'Failed to add product to cart');
+        }
+
+        const responseData = await response.json();
+        alert(responseData.message); // Optional: Show success message to the user
+      } catch (error) {
+        console.error('Error adding to cart:', error.message);
+        alert('Failed to add product to cart. Please try again.');
+      }
+    }
+
+
+
+  </script>
+</body>
+</html>

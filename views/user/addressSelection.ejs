@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+  <%- include ("../layout/navBarnew.ejs") %>
+   
+  <div class="container-fluid">
+    <div class="container" style="width: 50%; margin: 1rem auto;">
+        <h4 class="py-3">Select Address</h4> 
+        <form action="/checkout" method="POST" class="my-3" id="selectAddressForm">
+            
+            <div >
+                <% user.addresses.forEach((address,index) => { %>
+                <div >
+                    <p  class="fs-5"><%= address.houseNo %></p>
+                    <p  class="fs-5"><%= address.street %></p>
+                    <p  class="fs-5"> <%= address.city %></p>
+                    <p  class="fs-5"> <%= address.state %> - <%= address.zipCode %></p>
+                    <p  class="fs-5"><%= address.country %></p>
+                    <button type="submit" class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent " style="color: #BC4C2A;" >SELECT</button>                    
+                </div>
+                <input type="hidden" name="selectedAddressId" id="selectedAddressId" value="<%= address._id %>">
+                <% }) %>
+            </div>
+        </form>
+        <a href="/addresses/add" class="px-3 text-decoration-none fs-6  border rounded-2" style="color: #BC4C2A; " >ADD ADDRESS</a>
+
+    </div>
+  </div>
+  <!-- <script>
+    function selectAddress(addressId) {
+        document.getElementById('selectedAddressId').value = addressId;
+        document.getElementById('selectAddressForm').submit();
+    }
+</script> -->
+</body>
+</html>

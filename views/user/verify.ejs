@@ -26,11 +26,11 @@
                   <button type="submit" class="form-control  fs-6"  id="otpButton">Verify OTP</button>                 
             </form>
             <div class="d-flex justify-content-between gap-3">
-            <p id="timer" class="fs-6 text-center">Time left: 60 seconds</p>
+            <p id="timer" class="fs-6 text-center">Resend OTP in 60 seconds</p>
             <form action="/resend" method="POST">
             <input type="hidden" name="email" value="<%= email %>">
             <div class="mb-3">
-                <button class="bg-transparent border-0 fs-6" style="color:#BC4C2A;" type="submit" id="resendOTPButton" disabled>Resend OTP</button>
+                <button class="bg-transparent border-0 fs-6 fw-bold " style="color:#BC4C2A; display: none;" type="submit" id="resendOTPButton" >Resend OTP</button>
             </div>                
             </form>
             </div>
@@ -51,11 +51,11 @@
             timer = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    document.getElementById('timer').innerText = "OTP expired. Resend OTP";
-                    document.getElementById('resendOTPButton').disabled = false;
+                    // document.getElementById('timer').innerText = " Resend OTP";
+                    document.getElementById('resendOTPButton').style.display = "block";
                 } else {
                     timeLeft--;
-                    document.getElementById('timer').innerText = "Time left: " + timeLeft + " seconds";
+                    document.getElementById('timer').innerText = "Resend OTP in " + timeLeft + " seconds";
                 }
             }, 1000);
         }

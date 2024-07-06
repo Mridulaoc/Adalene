@@ -13,28 +13,26 @@ passport.use(
     callbackURL:"http://localhost:3000/auth/google/callback",
     passReqToCallback:true,
 },
-function(request, accessToken,refreshToken,profile,done) {
-    // console.log(profile)
-    User.findOne({user_googleId: profile.id}).then((currentUser)=>{
-        if(currentUser){
-            console.log('User is', currentUser)
-            
-        }else{
-                const user = User.updateOne({user_email:profile.emails[0].value},
-                {$set:{user_email:profile.emails[0].value,user_name:profile.displayName,isVerified:profile.emails[0].verified,user_googleId:profile.id}}, {upsert:true});
-            
-            // new User({
-            //     user_email: profile.emails[0].value,
-            //     user_name: profile.displayName,
-            //     isVerified:profile.emails[0].verified,
-            //     user_googleId:profile.id,
-            // }).save()
+ async(request, accessToken,refreshToken,profile,done)=>
+  {
+    try {
+        let user = await User.findOne({ user_googleId: profile.id }).exec();
+        if (user && user.authMethod !== 'google') {
+            return done(null, false, { message: 'Please use password login.' });
         }
-    })  
-
-    return done(null,profile);
+        if (!user) {
+            user = new User({
+                useer_email: profile.emails[0].value,
+                user_googleId: profile.id,
+                authMethod: 'google'
+            });
+            await user.save();
+        }
+        return done(null, user);
+    } catch (error) {
+        console.log(error);
+    }  
 }
-
 ))
 
 passport.use(new LocalStrategy(
@@ -51,6 +49,10 @@ passport.use(new LocalStrategy(
     }
 
     if (user.isBlocked) return done(null, false, { message: 'You are blocked.' });
+
+    if (user.authMethod !== 'local') {
+        return done(null, false, { message: 'Please use Google login.' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.user_password);
    

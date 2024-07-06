@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const path = require('path');
 // import swal from 'sweetalert';
 require('dotenv/config')
 const mongoose = require('mongoose');
+const { attachCartData } = require('./middleware/cartMiddleware');
+
+
 mongoose.connect(process.env.CONNECTION_STRING)
 .then(()=>{
     console.log("Database connected successfully")
@@ -14,6 +18,7 @@ mongoose.connect(process.env.CONNECTION_STRING)
 
 const port = process.env.PORT;
 
+app.use(attachCartData);
 const userRoute = require('./routers/userRouter');
 app.use('/',userRoute);
 

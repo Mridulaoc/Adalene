@@ -7,7 +7,9 @@ const Size = require("../models/size");
 const Color = require("../models/color");
 const nodemailer = require("nodemailer");
 const { session } = require("passport");
+const  mongoose  = require("mongoose");
 require('dotenv/config')
+var moment = require('moment');
 
 
 
@@ -60,7 +62,7 @@ const loadSignUp = (req,res)=>{
 
 const verifySignUp = async(req,res)=>{
     try {
-        const {name,email,mobileno,password,confirmPassword}= req.body;
+        const {name,email,mobileno,password,confirmPassword,authMethod}= req.body;
         console.log(password,confirmPassword)
         const isExist = await User.findOne({ user_email: email});
         console.log(isExist)
@@ -77,7 +79,9 @@ const verifySignUp = async(req,res)=>{
                 user_contact:mobileno,                
                 user_password: sPassword,
                 otp: otp,
-                otp_expiry: otpExpiry,                
+                otp_expiry: otpExpiry,
+                authMethod: authMethod,
+
             })
             await user.save();
             const mailOptions = {
@@ -294,9 +298,10 @@ const loadHome = async(req,res)=>{
         if(!req.session.userId){
             res.redirect('/');
         }else{            
-            if(req.isAuthenticated){
+            if(req.isAuthenticated()){
+                console.log(req.user)
                 const products = await Products.find({is_bestseller:true});
-                res.render('home',{products, user:req.user});
+                res.render('home',{products, user:req.user,cart:req.cart});
             }
         }
         
@@ -326,7 +331,7 @@ const loadShopall = async(req,res) => {
 
             const count = await Products.find().countDocuments();
             res.render('shopall',{products, totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,
-                categories,sizes,colors
+                categories,sizes,colors,cart:req.cart
             });
         } catch (error) {
             console.log(error)
@@ -450,7 +455,7 @@ const loadBags = async(req,res)=>{
        
         const count = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'}).countDocuments();
         
-        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
+        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
     } catch (error) {
         console.log(error)
 
@@ -476,7 +481,7 @@ const loadWallets = async(req,res)=>{
       
         const count = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'}).countDocuments();
       
-        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
+        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
     } catch (error) {
         console.log(error)
 
@@ -502,7 +507,7 @@ const loadBelts = async(req,res)=>{
       
         const count = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'}).countDocuments();
       
-        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors });
+        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
     } catch (error) {
         console.log(error)
 
@@ -523,16 +528,291 @@ const loadPhoneCases = async(req,res)=>{
 
 const loadProductDetails = async(req,res)=>{
     try {
-        const products = await Products.findById({_id:req.query.id}).populate('prod_category').populate('prod_size').populate('prod_color')
+        let id =req.params.id;
+        const products = await Products.findById({_id:id}).populate('prod_category').populate('prod_size').populate('prod_color')
         const relatedProducts = await Products.find({prod_status:'ACTIVE',prod_category:products.prod_category._id,_id:{$ne:products._id}}).populate('prod_category');    
         console.log(relatedProducts)   
-        res.render('productDetails',{products,relatedProducts,user:req.user});
+        res.render('productDetails',{products,relatedProducts,user:req.user,cart:req.cart});
 }
      catch (error) {
         console.log(error)
     }
 }
+
+const displayProfile = async(req,res)=>{
+    try {
+        
+        const id =req.user.id;       
+        const userData = await User.findById({_id:id})        
+        res.status(200).render('profile',{userData:userData,user:req.user,moment});
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const displayEditProfile= async(req,res)=>{
+    try {
+        const id = req.params.id; 
+        console.log(id)
+        const userData = await User.findById({_id:id})
+        console.log(userData)
+        res.status(200).render('editProfile',{userData:userData, user:req.user});
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const updateProfile = async(req,res)=>{
+    try {
+        const {name,email,mobileno,gender,dateOfBirth}=req.body;
+        const id = req.params.id;
+        const user = await User.findById({_id:id});
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        user.user_name = name;
+        user.user_email = email;
+        user.user_contact= mobileno;
+        user.user_gender = gender;
+        user.user_dob = new Date(dateOfBirth);
+        await user.save();
+        res.status(302).redirect('/profile');
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+
+const displayAddresses = async(req, res)=>{
+    try {
+        const userData = await User.findById(req.user.id);
+        res.status(200).render('address',{userData:userData, user:req.user})
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+const displayAddAddress = async(req, res)=>{
+    try {
+        const userData = await User.findById(req.user.id);
+        res.status(200).render('addAddress',{userData:userData,user:req.user});
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+const addAddress = async(req, res)=>{
+
+   
+        const {houseNo,street,city,state,zipcode,country}=req.body;
+        const userId = req.user.id;
+        console.log(userId)
+        console.log(houseNo,street,city,state,zipcode,country)
+       
+            const newAddress = {
+                houseNo:houseNo,
+                street:street ,
+                city: city,
+                state: state,
+                zipCode:zipcode ,
+                country: country,
+              };
+        try {
+
+            const updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $push: { addresses: newAddress } },
+                { new: true, useFindAndModify: false }
+              );
+              if (!updatedUser) {
+                return res.status(404).send('User not found');
+              }
+              res.status(200).redirect('/addresses')
+       
+    } catch (error) {
+       console.log(error)
+    }
+
+}
+
+const displayEditAddress = async(req, res)=>{
+    try {
+        const addressIndex = req.params.addressIndex;
+        const userData = await User.findById(req.params.id);
+        const address = userData.addresses[addressIndex];
+        res.status(200).render('editAddress',{userData:userData,user:req.user,address,addressIndex});
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+const updateAddress = async(req, res)=>{
+    const {houseNo,street,city,state,zipcode,country}=req.body;
+    console.log(zipcode)
+    const userId = req.params.id;
+    const addressIndex = req.params.addressIndex;
+    try {
+    const user = await User.findById(userId)
+
+    user.addresses[addressIndex] = {houseNo,street,city,state,zipCode:zipcode,country};
+    await user.save();
+    res.status(200).redirect('/addresses')
+   
+    } catch (error) {
+   console.log(error)
+        }
+}
+
+const addToCart = async(req,res)=>{
+
+    if(!req.user){
+        res.redirect('/signin');
+    }else{
+    const { productId, quantity } = req.body;
+    console.log(productId, quantity)    
+
+    const userId = req.user.id; 
+       try {
+        let user = await User.findOne({_id:userId});
+
+        if(user){
+            const productIndex = user.cart.products.findIndex(p=>p.product.toString()=== productId);
+            if(productIndex>-1){
+                user.cart.products[productIndex].quantity += parseInt(quantity);
+        }else{
+            user.cart.products.push({product:new mongoose.Types.ObjectId(productId),quantity:parseInt(quantity)});
+        }
+        await user.save();
+        res.json({ success: true, message: 'Product added to cart successfully!' });
+    }else{
+        res.json({ success: false, message: 'User not found.' });
+    }
+        
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: 'Failed to add product to cart.' });
+    }
+}
+}
+
+const loadCartPage = async(req,res)=>{
+    try {
+        const id = req.user.id;
+        const user = await User.findById({_id:id}).populate({
+           path: 'cart.products.product',
+           populate:{
+            path:'prod_color',
+            model:'Color',
+           }
+        });
+
+        let totalValue = 0;
+        user.cart.products.forEach(item => {
+            totalValue += item.product.prod_price * item.quantity;
+        });
+
+        res.status(200).render('cart',{cart:user.cart,user:req.user,totalValue: totalValue });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const updateCart = async(req,res)=>{
+    try {
+        const {productId, action} = req.body;
+        console.log(productId, action);
+        const user = await User.findById({_id:req.user.id})
+        const cartItem = user.cart.products.find(item=>item.product.toString()=== productId);
+        if(cartItem){
+            if(action ===  'increment'){
+                cartItem.quantity += 1;
+            }else if(action === 'decrement' && cartItem.quantity>1 ){
+                cartItem.quantity -=1;
+            }
+            await user.save();            
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+const removeCartItem = async(req,res)=>{
+    try {
+        const {productId} = req.body;
+        console.log(productId)
+        const user = await User.findById({_id:req.user.id});
+        user.cart.products = user.cart.products.filter(item =>item.product.toString() != productId);
+        await user.save();
+        res.json({success:true});
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const displayAddressSelection = async(req,res)=>{
+
+    try {
+        const user = await User.findById(req.user.id);
+        res.status(200).render('addressSelection', {user})
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+const selectedAddress = async(req,res)=>{
+    const selectedAddressId = req.body.selectedAddressId;
+    console.log(selectedAddressId,req.user.id)
+    req.session.selectedAddressId = selectedAddressId;
+    res.redirect('/payment');
     
+}
+
+const displayPayment = async(req,res)=>{
+    const selectedAddressId = req.session.selectedAddressId;
+    if (!selectedAddressId) {
+        res.redirect('/checkout');
+    }
+
+    try {
+        // const user = await User.findById(req.user.id);
+        const id = req.user.id;
+        const user = await User.findById({_id:id}).populate({
+            path: 'cart.products.product',
+            populate:{
+             path:'prod_color',
+             model:'Color',
+            }
+         });
+
+         let totalValue = 0;
+         user.cart.products.forEach(item => {
+             totalValue += item.product.prod_price * item.quantity;
+         });
+        const selectedAddress = user.addresses.id(selectedAddressId);
+        res.render('payment', { user, selectedAddress,cart:user.cart, totalValue:totalValue});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+}
+
+
+
+
 const userSignOut = async(req,res)=>{
     try {
         
@@ -571,6 +851,21 @@ module.exports = {
     loadPhoneCases,
     loadProductDetails,
     userSignOut,
-    loadFilteredProducts
+    loadFilteredProducts,
+    addToCart,
+    loadCartPage,
+    updateCart,
+    removeCartItem,
+    displayProfile,    
+    displayEditProfile,
+    updateProfile,
+    displayAddresses,
+    displayAddAddress,
+    addAddress,
+    displayEditAddress,
+    updateAddress,
+    displayAddressSelection,
+    selectedAddress,
+    displayPayment
 
 }

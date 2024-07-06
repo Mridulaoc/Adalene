@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+  <%- include ("../layout/navBarnew.ejs") %>
+  <div class="container-fluid">
+    <div class="container">
+        <h4>Account</h4>
+        <div class="d-flex ">
+            <div class="col-4">
+              <p><a href="/profile" class="text-decoration-none fs-5 text-black">Profile</a></p>
+              <p><a href="/addresses" class="text-decoration-none fs-5 text-black">Addresses</a></p>
+            </div>
+            <div class="col-8 border shadow">
+              <h4 style="padding: 1.5rem 10rem;">Profile Details</h4>
+              <hr style="width: 80%;margin: auto;">
+              <div style="padding: 3rem 10rem;"> 
+                <table class="table table-borderless">
+                  <tr>
+                    <td>Full Name</td>
+                    <td><%= userData.user_name %></td>
+                  </tr>
+                  <tr>
+                    <td>Mobile Number</td>
+                    <td><%= userData.user_contact %></td>
+                  </tr>
+                  <tr>
+                    <td>Email Id</td>
+                    <td><%= userData.user_email %></td>
+                  </tr>
+                  <tr>
+                    <td>Gender</td>
+                    <td><%= userData.user_gender ? userData.user_gender : '-Not Added-'%></td>
+                  </tr>  
+                  <tr>
+                    <td>Date Of Birth</td>
+                    <td><%= userData.user_dob ? moment(userData.user_dob).format('MMMM Do YYYY') : '-Not Added-'%></td>
+                  </tr>                              
+                </table>
+                <a href="/profile/edit/<%= userData._id%>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A; " >EDIT DETAILS</a>
+              </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  
+</body>
+</html>

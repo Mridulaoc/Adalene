@@ -75,6 +75,7 @@ adminRoute.route('/products/edit-product/:id')
 .put(upload.array('images',10), productController.updateProduct)
 adminRoute.route('/products/delete-image',productController.deleteProductImage)
 adminRoute.get('/products/delete-product', isAuthenticated, productController.deleteProduct);
+adminRoute.post('/delete-image', isAuthenticated, productController.deleteProductImage)
 
 // user routes 
 adminRoute.get('/users',isAuthenticated,userManagementController.loadUserManagement);

@@ -108,6 +108,15 @@ p{
     color: #BC4C2A;
 }
 
+.vertical-align {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Match the height of the cell */
+    text-align: center; /* Optional: center-align text horizontally */
+}
+
 @media screen and (max-width: 768px) {
     html{
         font-size:62.5%

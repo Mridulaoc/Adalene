@@ -76,7 +76,7 @@ const addNewProduct = async (req, res) => {
     const outputPath = path.join(__dirname, "../public/uploads", filename);
 
     console.log(outputPath);
-    await sharp(file.buffer).resize(300, 300).toFile(outputPath);
+    await sharp(file.buffer).resize(500, 500).toFile(outputPath);
     const croppedImg = path.basename(outputPath);
 
     imagePaths.push(croppedImg);
@@ -143,7 +143,7 @@ const updateProduct = async (req, res) => {
         const outputPath = path.join(__dirname, "../public/uploads", filename);
         // Resize and crop
 
-        await sharp(file.buffer).resize(300, 300).toFile(outputPath);
+        await sharp(file.buffer).resize(500, 500).toFile(outputPath);
         const croppedImg = path.basename(outputPath);
 
         imagePaths.push(croppedImg);
@@ -193,21 +193,31 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProductImage = async (req, res) => {
-  const { imageName, id } = req.body;
-  console.log(imageName);
-  try {
-    const updatedProduct = await Product.findOneAndUpdate(
-      { prod_images: imageName },
-      { $pull: { prod_images: imageName } },
-      { new: true }
-    );
 
-    if (!updatedProduct) {
-      throw new Error("Image not found");
+    const {index,image,productId} = req.body;
+    console.log(index,image,productId);
+        
+  try {
+    
+    const product = await Product.findById(productId);
+    
+    if (!product) {
+      return res.status(404).send('Product not found');
+  }
+
+  const imagePath = path.join(__dirname, '../public/uploads', image);
+  
+
+  fs.unlink(imagePath, (err) => {
+    if (err) {
+        return res.status(500).send('Failed to delete image file');
     }
-    res.status(301).redirect("/admin/products/edit-product/:id");
+    product.prod_images.splice(index, 1);
+     product.save();
+
+  })   
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send('Server error');
   }
 };
 

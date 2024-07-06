@@ -6,8 +6,12 @@ const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const passport = require('passport');
 require('../passport')
-const userAuth = require('../middleware/userAuth');
+// const userAuth = require('../middleware/userAuth');
+const {isAuthenticated} = require('../middleware/userAuth')
 const MongoStore = require('connect-mongo');
+const methodOverride = require('method-override');
+const checkBlocked = require('../middleware/checkBlocked');
+
 
 
 // middlewares 
@@ -23,6 +27,9 @@ userRoute.use(bodyParser.json());
 userRoute.use(bodyParser.urlencoded({ extended: true }));
 userRoute.use(passport.initialize());
 userRoute.use(passport.session());
+userRoute.use(methodOverride('_method'));
+userRoute.use(checkBlocked);
+
 
 userRoute.set('view engine', 'ejs');
 userRoute.set("views", './views/user');
@@ -46,7 +53,7 @@ userRoute.get('/auth/google/callback',
     })
 );
 
-userRoute.get('/signin', userAuth.checkNotAuthenticated, userController.loadSigIn);
+userRoute.get('/signin',userController.loadSigIn);
 userRoute.post('/signin', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
@@ -64,7 +71,7 @@ userRoute.post('/signin', (req, res, next) => {
     })(req, res, next);
 });
 
-userRoute.get('/', userController.successGoogleLogin)
+userRoute.get('/',  userController.successGoogleLogin)
 userRoute.get('/home',  userController.loadHome);
 userRoute.get('/failure', userController.failureGoogleLogin);
 userRoute.get('/', userController.loadSigIn);
@@ -79,7 +86,23 @@ userRoute.get('/bags', userController.loadBags);
 userRoute.get('/wallets',userController.loadWallets);
 userRoute.get('/belts', userController.loadBelts);
 userRoute.get('/phonecases', userController.loadPhoneCases);
-userRoute.get('/products', userController.loadProductDetails);
+userRoute.get('/products/:id', userController.loadProductDetails);
+userRoute.post('/add-to-cart', isAuthenticated, userController.addToCart);
+userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
+userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
+userRoute.post('/cart/remove', isAuthenticated, userController.removeCartItem);
+userRoute.get('/checkout', isAuthenticated, userController.displayAddressSelection);
+userRoute.post('/checkout', isAuthenticated, userController.selectedAddress);
+userRoute.get('/payment', isAuthenticated, userController.displayPayment);
+userRoute.post('/payment', isAuthenticated, userController.processPayment);
+userRoute.get('/profile', isAuthenticated, userController.displayProfile);
+userRoute.get('/profile/edit/:id', isAuthenticated, userController.displayEditProfile);
+userRoute.put('/profile/edit/:id',isAuthenticated, userController.updateProfile);
+userRoute.get('/addresses', isAuthenticated, userController.displayAddresses);
+userRoute.get('/addresses/add', isAuthenticated, userController.displayAddAddress);
+userRoute.post('/addresses/add', isAuthenticated, userController.addAddress);
+userRoute.get('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.displayEditAddress);
+userRoute.put('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.updateAddress);
 userRoute.get('/signout',  userController.userSignOut);
 
 userRoute.use((err, req, res, next) => {

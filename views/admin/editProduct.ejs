@@ -67,17 +67,20 @@
                     <textarea class="form-control" id="description" rows="3" name="description" onchange="validateProductDesc()" ><%= products.prod_desc %></textarea>
                     <span id="descError" style="color: red;"></span>
                 </div>
-                <div >
+                <div  class="mb-3">
                     <label for="currentImages">Current Images:</label>
-                    <div id="currentImages" class="mb-3">
-                      <% products.prod_images.forEach(image => { %>
-                        <img src="\uploads\<%= image %>" alt="" style="width: 100px; height: 100px;">
+                    <div id="currentImages" class="mb-5">
+                      <% products.prod_images.forEach((image,index) => { %>
+                        <div class="image-container" data-image="<%= image %>" style="display: inline-block;position: relative;" >
+                        <img src="\uploads\<%= image %>" alt="" style="width: 100px; height: 100px;" class="mb-3">
+                        <button class=" px-1 text-decoration-none fs-6  border rounded-2 bg-transparent delete-image-btn" data-index="<%= index %>" data-image="<%= image %>" style="position: absolute; top: 50%; left: 35%; color: #BC4C2A">Remove</button>
+                        </div>
                       <% }) %>
                     </div>
 
                     <div class="input-group mb-3 d-flex flex-column">
                         <label for="images" class="form-label">Images</label>
-                        <input type="file" class="form-control" id="images" name="images" style="width: 100%;" multiple>
+                        <input type="file" class="form-control" id="images" name="images" style="width: 100%;" accept="image/*" multiple>
                         <div id="imagePreview" class="d-flex justify-content-between"></div>                    
                     </div>
     
@@ -95,33 +98,6 @@
         
     <script>
        document.addEventListener("DOMContentLoaded", function() {
-
-        const removeButtons = document.querySelectorAll('.remove-btn');
-        removeButtons.forEach(button => {
-            button.addEventListener('click', async function() {
-            const imageName = button.getAttribute('data-image');
-            button.parentElement.remove();
-            try {
-                const response = await fetch('/admin/products/delete-image', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                  },
-                 body: JSON.stringify({ imageName: imageName }),                 
-        });
-                if (!response.ok) {
-                throw new Error('Failed to delete image');
-
-                const data = await response.json();
-                console.log('Image deleted successfully:', data.message);
-                 }
-            } catch (error) {
-                console.error('Error deleting image:', error);
-            }
-            });
-        })
-
-
 
     const imageInput = document.getElementById('images');
     const imagePreview = document.getElementById('imagePreview');
@@ -169,6 +145,35 @@
             reader.readAsDataURL(file);
         });
     });
+
+
+    const deleteButtons = document.querySelectorAll('.delete-image-btn');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault();
+                const imageIndex = button.getAttribute('data-index');
+                const imageName = button.getAttribute('data-image');
+                const imageContainer = button.closest('.image-container');
+                const productId = '<%= products._id %>';
+
+                const response = await fetch('/admin/delete-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ index: imageIndex, image: imageName,productId })
+                });
+
+                if (response.ok) {                   
+                    imageContainer.remove();                   
+                   
+                } else {
+                    alert('Failed to delete image');
+                }
+            });
+        });
+
 });
 
          // validation scripts

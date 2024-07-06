@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+   <%- include ("../layout/navBarnew.ejs") %>
+  <div class="container-fluid">
+    <div class="container">
+        <h4>Account</h4>
+        <div class="d-flex">
+            <div class="col-4">
+                <p><a href="/profile" class="text-decoration-none fs-5 text-black">Profile</a></p>
+                <p><a href="/addresses" class="text-decoration-none fs-5 text-black">Addresses</a></p>
+            </div>
+        <div class="col-8 border px-5 py-5 shadow">
+        <% if(userData.addresses.length > 0){%>
+            <% userData.addresses.forEach((address,index)=>{%>
+      
+            <p class="fs-6"><%= address.houseNo %></p>
+            <p class="fs-6"><%= address.street %></p>
+            <p class="fs-6"><%= address.city %></p>
+            <p class="fs-6"><%= address.state %></p>
+            <p class="fs-6"><%= address.country %></p>
+            <p class="fs-6"><%= address.zipCode %></p>
+            <a href="/addresses/edit/<%= userData._id %>/<%= index %>">
+                <button class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent" style="color: #BC4C2A; ">EDIT ADDRESS</button>
+              </a>
+        <%})%>
+    <% } else {%>
+        <p>Address not found</p>
+        <%}%>
+        
+        
+        <a href="/addresses/add" class="px-3 text-decoration-none fs-6  border rounded-2 " style="color: #BC4C2A; " >ADD ADDRESS</a>
+        
+    </div>
+    </div>
+    </div>
+  </div>
+</body>
+</html>

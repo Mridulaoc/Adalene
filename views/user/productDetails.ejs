@@ -25,17 +25,24 @@
                 <p>₹<%= products.prod_price %></p>
                 <p>Size : <%= products.prod_size.size %></p>
                 <p>Colour : <%= products.prod_color.color_name %></p>
-                <% if(products.prod_quantity>0){ %> 
-                    <p>Stock : <%= products.prod_quantity %></p>
-                    <%} else { %>
+                <% if(products.prod_quantity>0 && products.prod_quantity<5 ){ %> 
+                    <p>Stock : Only <%= products.prod_quantity %> left </p>
+                    <%} else if(products.prod_quantity <= 0) { %>
                     <p>Stock : OUT OF STOCK</p>
                     <%}%>
                 <p>PRODUCT INFO</p>
                 <hr style="width:60%; height: 2px; color: #BC4C2A;">
-                <p class="fs-5" style="width: 70%;"><%= products.prod_desc %></p>
+                <p class="fs-5" style="width: 70%; margin-bottom: 2rem;"><%= products.prod_desc %></p>
+                <div class="d-flex align-items-center my-3">
+                  <button class="px-3 py-1 fw-bold border border-1" style="background-color: #BC4C2A; color: white;border:none;" onclick="decrementQuantity()">-</button>
+                  <input type="number" id="quantityInput" value="1" min="1" max="2" class="py-1 text-center border border-1" style="border-left: none; border-right: none;outline: none; " readonly>
+                  <button class="px-3 py-1 fw-bold border border-1 " style="background-color: #BC4C2A; color: white;border:none;"  onclick="incrementQuantity()">+</button>
+              </div>
+              <span id="quantity-availablity" class="fs-5 my-3" ></span>
+
                 <div class="d-flex flex-column gap-3">
-                    <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: #BC4C2A;">ADD TO CART</button>
-                    <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: black;">BUY NOW</button>
+                    <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: #BC4C2A;"  onclick="addToCart('<%= products._id %>')">ADD TO CART</button>
+                    <!-- <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: black;">BUY NOW</button> -->
                 </div>
               </div>              
             </div>
@@ -45,7 +52,7 @@
         <h2 class="" style="color:#BC4C2A">Related Products</h2>
         <div class="d-flex justify-content-between my-5 mx-5 gap-5">
             <%if(relatedProducts.length > 0){
-                for(let i=0; i<4; i++){ 
+                for(let i=0; i<relatedProducts.length; i++){ 
                     
                 %>
             <a href="/products/?id=<%= relatedProducts[i]._id %>" class="text-decoration-none" style="width: 22rem; height: 32rem;">
@@ -85,13 +92,61 @@
       const zoomedImage = document.querySelector('.zoomed-image');
       zoomedImage.style.display = 'none';
     }
-  </script>
-  <script>
-    function changeImage(imageUrl) {
-      const mainImage = document.getElementById('mainImage');
-      mainImage.src = '\\upload\\' + imageUrl;
+
+    // functiions for increment decrement 
+
+    function incrementQuantity() {
+        const quantityInput = document.getElementById('quantityInput');
+        let quantity = parseInt(quantityInput.value);
+        let quantityAvailablity = document.getElementById('quantity-availablity');
+        if (quantity < quantityInput.max) {
+            quantityInput.value = quantity + 1;
+        }
+        else{
+            quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
+        }
     }
+
+    function decrementQuantity() {
+        const quantityInput = document.getElementById('quantityInput');
+        let quantity = parseInt(quantityInput.value);
+        if (quantity > 1) {
+            quantityInput.value = quantity - 1;
+        }
+    }
+
+    // add to cart function 
+    async function addToCart(productId) {
+        const quantity = document.getElementById('quantityInput').value;
+        const response = await fetch('/add-to-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, quantity })
+        });
+        console.log(response);
+        if (response.status === 401) {
+        const result = await response.json();
+        if (result.redirectUrl) {
+            window.location.href = result.redirectUrl;
+        }
+        return;
+    }
+        const result = await response.json();
+        if (result.success) {
+            alert('Product added to cart successfully!');
+        } else {
+            alert('Failed to add product to cart.');
+        }
+    }
+
+
+
+
   </script>
+ 
+
 
 
 </body>

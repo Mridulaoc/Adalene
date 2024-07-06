@@ -1,47 +1,14 @@
-// const isSignedIn = async(req,res,next)=>{
-//     try {
-
-//         if(req.session.userId){
-
-//         }else{
-//             res.redirect('/signin');
-//         }
-//         next();
-        
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
-
-
-// const isSignedOut = async(req,res,next)=>{
-//     try {
-//         if(req.session.userId){
-//             res.redirect('/');
-//         }
-//     } catch (error) {
-//         console.log(error)
-//     }
-//     next();
-// }
-
-// module.exports ={isSignedIn, isSignedOut}
-
-
-
-function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next()
+module.exports = {
+  isAuthenticated: (req, res, next) => {
+      if (req.isAuthenticated()) {
+        console.log('user is authenticated');
+          return next();
+      }
+      console.log('user is not authenticated');
+      if (req.xhr || req.headers['content-type'] === 'application/json') {
+        res.status(401).json({ redirectUrl: '/signin' });
+    } else {
+        res.redirect('/signin');
     }
-  
-    res.redirect('/signin')
   }
-  
-  function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return res.redirect('/')
-    }
-    next()
-  }
-
-  module.exports = {checkAuthenticated,checkNotAuthenticated}
+};
