@@ -658,6 +658,15 @@ const updateAddress = async(req, res)=>{
         console.log(req.body.orderId)
         const order = await Order.findById(req.body.orderId);
         if(order){
+            for (let item of order.products) {
+                const product = await Products.findById(item.product);
+                if (product) {
+                    product.prod_quantity += item.quantity;
+                    await product.save();
+                } else {
+                    throw new Error(`Product with id ${item.product} not found`);
+                }
+            }
             order.status = 'Cancelled';
             order.save();
             res.json({success:true});
