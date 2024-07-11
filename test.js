@@ -45,3 +45,6 @@ router.post('/add-to-cart', async (req, res) => {
 });
 
 module.exports = router;
+
+
+const response = await fetch(`/products/category?categoryId=${categoryId}&sortBy=${sortBy}&page=1`);

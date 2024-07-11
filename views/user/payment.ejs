@@ -6,32 +6,33 @@
   <div class="container-fluid">
     <div class="container mt-5" >
         <h2 class="mb-3">Payment</h2>
+      
         <div class="d-flex container">
         <div class="card mb-4 col-6 mx-3">
-            <div class="card-body">
-                <h5>Selected Address</h5>
-                <p class="fs-6"><%= selectedAddress.houseNo, %></p>
-                <p class="fs-6"><%= selectedAddress.street %>,</p>
-                <p class="fs-6"><%= selectedAddress.city %>,</p>
-                <p class="fs-6"> <%= selectedAddress.state %> - <%= selectedAddress.zipCode %>,</p>
-                <p class="fs-6"><%= selectedAddress.country %></p>
-            </div>
+            <% if (selectedAddress){%>
+                <div class="card-body">
+                    <h5>Selected Address</h5>
+                    <% const selectedAddressObj = user.addresses.id(selectedAddress) %>
+                    <p class="fs-6"><%= selectedAddressObj.houseNo %></p>
+                    <p class="fs-6"><%= selectedAddressObj.street %>,</p>
+                    <p class="fs-6"><%= selectedAddressObj.city %>,</p>
+                    <p class="fs-6"> <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,</p>
+                    <p class="fs-6"><%= selectedAddressObj.country %></p>
+                </div>
+            <%}%>
+            
         </div>
         
         <div class="d-flex flex-column align-items-center col-6">
             <% if(cart.products.length >0){%>
             <table class="table table-bordered" >
                 <tr>
-                    <th scope="col">Product</th>
-                    <!-- <th scope="col">Price</th> -->
+                    <th scope="col">Product</th>                   
                     <th scope="col">Quantity</th>
-                    <th scope="col">Total</th> 
-                    <!-- <th scope="col">Actions</th>                           -->
+                    <th scope="col">Total</th>                                             
                 </tr>  
                 <% cart.products.forEach(item =>{%>                 
-                    <tr class="">
-                        
-                                           
+                    <tr class="">                                        
                         <td scope="row" class="text-capitalize">
                         <div class="d-flex align-items-center">
                         <img src="\uploads\<%= item.product.prod_images[0] %>" alt="" height="100px" wight="100px">
@@ -40,19 +41,13 @@
                         <p class="fs-6">Color:<%= item.product.prod_color.color_name %></p>
                         </div>
                         </div>
-                        </td>
-                        <!-- <td class="vertical-align"><%= item.product.prod_price %></td> -->
-                        
-                        <td>
-                            <!-- <div class="d-flex align-items-center my-3">
-                                <button class="px-3 py-1 fw-bold border border-1 " style="background-color: #BC4C2A; color: white;border:none;" onclick="updateQuantity('<%= item.product._id %>','decrement')">-</button> -->
-                                <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="2" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>
-                                <!-- <button class="px-3 py-1 fw-bold border border-1" style="background-color: #BC4C2A; color: white;border:none;"  onclick="updateQuantity('<%= item.product._id %>','increment')">+</button> -->
-                            </div>
+                        </td>                       
+                        <td>                           
+                        <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="2" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>                               
+                        </div>
                         </td>
                         <td><%= item.product.prod_price * item.quantity %></td>
-                        <!-- <td class="text-center"><button class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="removeItem('<%= item.product._id %>')">REMOVE</button></td>                                            -->
-                    </tr>
+                        </tr>
                     <%})%>                                        
             </table>          
         </div>
@@ -79,8 +74,8 @@
                             PayPal
                         </label>
                     </div>
-                </div>
-                <button type="submit" class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent my-3 " style="color: #BC4C2A;">PROCEED TO PAYMENT</button>
+                </div>                
+                <button type="submit" class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent my-3 " style="color: #BC4C2A;">PLACE ORDER</button>
             </form>
             <div class="d-flex flex-column align-items-end container mb-5 col-6">             
             <table class="table border " >
@@ -105,10 +100,7 @@
                     <%}%> 
                             
                 </tr>
-            </table>
-
-        
-            <!-- <button class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="window.location.href='/checkout'">CHECK OUT</button> -->
+            </table>       
             </div>
              
         <%} else {%>    

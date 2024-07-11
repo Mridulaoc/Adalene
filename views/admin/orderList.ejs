@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+   <%- include ("../layout/navBarAdmin.ejs") %>  
+
+<div class="container-fluid">
+    <h2 class="text-center my-5">Product List</h2> 
+            <div class="container">
+            
+            <form action="" class="d-flex my-5" style="width: 40%;">
+                <input type="text" placeholder="Search" value="<%= search %>"  name="search" class="form-control mx-2">
+                <input type="submit" class="border rounded-2 fw-bold" value="Search">
+            </form>
+            <div class="d-flex flex-column align-items-center mb-5">
+                <% if(orders.length > 0){%>
+                <table class="table table-bordered" >
+                    <tr>
+                        <th scope="col">SI No.</th>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Date</th> 
+                        <th scope="col">Status</th> 
+                        <th scope="col">Total</th>
+                        <th scope="col" colspan="2" class="text-center"></th>        
+                    </tr>                
+                       
+                            <% for(let i = 0; i < orders.length; i++){%>
+                                <tr>
+                                    <td><%= i+1 %></td>
+                                    <td><%= orders[i].orderId %></td>
+                                    <td><%= orders[i].user.user_name %></td>
+                                    <td><%= moment(orders[i].orderDate).format('DD/ MM /YYYY')%> </td>
+                                    <td><%= orders[i].status %></td>
+                                    <td><%= orders[i].total %></td>
+                                    <td class="text-center"><a href="/admin/orders/view-order/<%= orders[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A;">VIEW</a></td>
+                                </tr>
+                            <%}%>                       
+                        <%}else{%>            
+                            <td>Orders not found</td>                    
+                        <%}%>                
+                </table>
+                <br>
+                <div class="d-flex gap-3">
+                    <% if (currentPage > 1) { %>
+                    <a href="/admin/products/?search=<%= search %>&page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
+                    <% } %>
+                    <div class="d-flex gap-3">
+                <% for (i = 1; i <= totalPages; i++ ){ %>
+                    <a href="/admin/products/?search=<%= search %>&page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded"><%= i %></a>                    
+                <%}%>
+                </div>
+                <% if (currentPage < totalPages) { %>
+                <a href="/admin/products/?search=<%= search %>&page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                <% } %>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+    <%- include ("../layout/footerAdmin.ejs") %>
+</body>
+</html>

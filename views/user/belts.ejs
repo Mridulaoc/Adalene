@@ -37,24 +37,11 @@
                                 <%}%>
                 
                     </div>
-                    <div class="d-flex flex-column gap-3">
-                      <div class="d-flex gap-3">
-                        <% if (currentPage > 1) { %>
-                        <a href="/belts/?page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
-                        <% } %>
-                        <div class="d-flex gap-3 ">
-                        <% for (i = 1; i <= totalPages; i++ ){ %>
-                        <a href="/belts/?page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
-                        <%}%>
-                      </div>
-                        <% if (currentPage < totalPages) { %>
-                        <a href="/belts/?page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
-                        <% } %>
-                        </div>  
-              </div>              
+                    <%- include ("../layout/pagination.ejs") %>
             </div>
     </div>
 </div>
-<%- include ("../layout/footerUser.ejs") %>
+
 </body>
+<%- include ("../layout/footerUser.ejs") %>
 </html>

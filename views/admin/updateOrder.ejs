@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+   <%- include ("../layout/navBarAdmin.ejs") %>  
+   <div class="container-fluid my-5">
+    <div class="container d-flex">
+        
+        <div class="col-3">
+            Navigation
+        </div>
+        <div class="col-9">
+            <h4>Order Details</h4>
+            <div class="d-flex justify-content-between top-bar">
+                <div>
+                    <p>Ordered Date: <%= moment(order.orderDate).format('DD-MM-YYYY') %></p>
+                    <p>Order ID : <%= order.orderId %></p>
+                </div>
+                <div>
+                    <form action="/admin/orders/view-order/<%= order._id %>?_method=PUT" method="post" enctype="application/x-www-form-urlencoded">
+                        <select name="status">
+                            <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                            <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                            <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                            <option value="PaymentFailed" <%= order.status === 'PaymentFailed' ? 'selected' : '' %>>PaymentFailed</option>
+                        </select>
+                        <input type="submit" class="form-control fs-5"  value="SAVE"   required>
+                    </form> 
+                </div>
+            </div>
+            <div class="d-flex gap-5 details">
+                <div class="border">
+                    <h4>Customer</h4>
+                    <p><%= order.user.user_name %></p>
+                    <p><%= order.user.user_email %></p>
+                    <p><%= order.user.user_contact %></p>
+                </div>
+                <div class="border">
+                    <h4>Order Info</h4>
+                    <p>Shipping : <%= order.status %></p>
+                    <p>Payment Method:<%= order.paymentMethod %></p>
+                </div>
+                <div class="border">
+                    <h4>Deliver To</h4>
+                    <p><%= order.address %></p>
+                </div>
+            </div>
+            <div>
+            <table class="table table-bordered my-3">
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>                    
+                    <th scope="col">Total</th>                        
+                </tr>                
+                <% order.products.forEach(item =>{%>
+                    <tr>
+                        <td class="d-flex flex-column"><img src="/uploads/<%= item.product.prod_images[0]%>" height="50px" width="50px"><%= item.product.prod_name %></td>
+                        <td><%= item.price%></td>
+                        <td><%= item.quantity %></td>
+                        <td><%= item.price * item.quantity %></td>
+                    </tr>
+                <%})%>
+            </table>            
+            </div>
+            <div>                
+                <p>Subtotal</p>
+                <p><%= totalValue %></p>
+                <p>Shipping Cost</p>
+                <p><%= shippingCost %></p>
+                <p>Grand Total:</p>
+                <p><%= totalValue + shippingCost %></p>
+            </div>
+        </div>
+    </div>
+   </div>
+</body>
+</html>

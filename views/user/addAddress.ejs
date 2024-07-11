@@ -50,4 +50,15 @@
     </div>
   </div>
 </body>
+<script>
+  function validateName() {
+          const name = document.getElementById("name").value.trim();
+          const nameError = document.getElementById("nameError");
+
+          if (name.length < 5) {
+            nameError.textContent = "Name must be atleat 5 characters long"
+          }
+
+        }
+</script>
 </html>

@@ -35,23 +35,7 @@
                             
                                 <%}%>                
                 </div>
-                <div class="d-flex flex-column gap-3">
-                  <div class="d-flex gap-3">
-                    <% if (currentPage > 1) { %>
-                    <a href="/shopall/?page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
-                    <% } %>
-                    <div class="d-flex gap-3 ">
-                    <% for (i = 1; i <= totalPages; i++ ){ %>
-                    <a href="/shopall/?page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
-                    <%}%>
-                  </div>
-                    <% if (currentPage < totalPages) { %>
-                    <a href="/shopall/?page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
-                    <% } %>
-                    </div>   
-                     
-                  </div>
-                  
+                <%- include('../layout/pagination.ejs') %>              
               </div>
               <br> 
              
@@ -59,44 +43,6 @@
     </div>
 </div>
 <%- include ("../layout/footerUser.ejs") %>
-<script>
-  let currentPage = 1;
 
-document.addEventListener('DOMContentLoaded', function() {
-fetchProducts();
-});
-
-function fetchProducts(page = 1) {
-const categoryId = document.getElementById('category').value;
-const colorId = document.getElementById('color').value;
-const sizeId = document.getElementById('size').value;
-currentPage = page;
-
-fetch(`/products?categoryId=${category._id}&colorId=${color._id}&sizeId=${size._id}&page=${currentPage}`)
-.then(response => response.json())
-.then(data => {
-  const productsDiv = document.getElementById('products');
-  productsDiv.innerHTML = '';
-  data.products.forEach(product => {
-    const productDiv = document.createElement('div');
-    productDiv.textContent = product.name;
-    productsDiv.appendChild(productDiv);
-  });
-
-  const paginationDiv = document.getElementById('pagination');
-  paginationDiv.innerHTML = '';
-
-  for (let i = 1; i <= data.totalPages; i++) {
-    const pageButton = document.createElement('button');
-    pageButton.textContent = i;
-    pageButton.onclick = () => fetchProducts(i);
-    if (i === currentPage) {
-      pageButton.disabled = true;
-    }
-    paginationDiv.appendChild(pageButton);
-  }
-});
-}
-</script>
 </body>
 </html>

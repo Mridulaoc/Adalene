@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+    <nav class="navbar navbar-expand-lg   d-flex px-3">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">adalene.</a>
+          
+          <div
+            class="offcanvas offcanvas-end"
+            tabindex="-1"
+            id="offcanvasNavbar"
+            aria-labelledby="offcanvasNavbarLabel"
+          >
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+              adalene.
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
+                
+                <li class="nav-item">
+                  <a class="nav-link active mx-lg-2" aria-current="page" href="#" onclick="fetchProductsByCategory('66702daed57b7afd0c8cafe1')"
+                    >Shop All</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-lg-2" href="#" onclick="fetchProductsByCategory('66702daed57b7afd0c8cafe1')">Bags</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-lg-2" href="#" onclick="fetchProductsByCategory('6673eca9e5d3e08f0ce33581')">Wallets</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link mx-lg-2" href="#" onclick="fetchProductsByCategory('6673ecb8e5d3e08f0ce33584')">Belts</a>
+                </li>            
+              </ul>
+            </div>
+          </div>
+          <div class="social-icons">          
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between align-items-center gap-3 fs-5">
+                <li><a href="/profile"><i class="fa-solid fa-user" style="color: #bc4c2a;" ></i></a></li>
+                <li>
+                   
+                        <% if(user){%>
+                          <a href="/signout" class="text-decoration-none" style="color: #bc4c2a;" > Sign Out </a>
+                        <%}else{%>
+                          <a href="/signin" class="text-decoration-none" style="color: #bc4c2a;" >Sign In </a>
+                        <%}%>
+                  
+                </li> 
+                <li><i class="fa-regular fa-heart" style="color: #bc4c2a;"></i></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i></a><span></span>
+              </ul>
+          </div>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>      
+      </nav>
+    <div class="conatiner-fluid">
+        <div class="container " style="margin-top: 5rem;">
+            <p><a href="/" class="text-decoration-none text-black">Home</a>>All Products</p>
+                <div class="container my-5">
+                    <div class="row align-items-start">
+                        <div class="col-4 d-flex flex-column gap-3 ">        
+                          <label for="sortBy">Sort by:</label>
+                            <select id="sortBy" onchange="updateCategoryProducts()">
+                                <option value="popularity" selected>Popularity</option>
+                                <option value="priceAsc">Price: low to high</option>
+                                <option value="priceDesc">Price: high to low</option>
+                                <option value="avgRating">Average ratings</option>
+                                <option value="featured">Featured</option>
+                                <option value="newArrivals">New arrivals</option>
+                                <option value="aToZ">A - Z</option>
+                                <option value="zToA">Z - A</option>
+                            </select>
+                          
+                        </div>
+                </div>
+               
+                <div class="col-8 d-flex flex-column align-items-center">
+                    <div id="productsList"></div>
+                    <div id="paginationControls"></div>
+                </div>
+        </div>
+    </div>
+    <%- include ("../layout/footerUser.ejs") %>  
+   
+    
+</body>
+</html>

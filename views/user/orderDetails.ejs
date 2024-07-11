@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+<body>
+  <%- include ("../layout/navBarnew.ejs") %>
+  <div class="container-fluid" style="height: 100vh;">
+    <div class="container">
+        <h4>Account</h4>
+        <div class="d-flex ">
+            <div class="col-4">
+                <p><a href="/profile" class="text-decoration-none fs-5 text-black">Profile</a></p>
+                <p><a href="/addresses" class="text-decoration-none fs-5 text-black">Addresses</a></p>
+                <p><a href="/order-history" class="text-decoration-none fs-5 text-black">Order</a></p>
+            </div>
+            <div class="col-8">
+                <h3>Order Details</h3>
+                <p>Order Id : <%= order.orderId %></p>
+                <p>Order Date : <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss')  %></p>
+                <p>Order Status: <%= order.status %></p>
+                <p>Shipping Address : <%= order.address %></p>
+                <h3>Products</h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    <% order.products.forEach(item =>{%>
+                        <tr>
+                            <td><%= item.product.prod_name %></td>
+                            <td><%= item.price %></td>
+                            <td><%= item.quantity %></td>
+                            <td><%= item.price * item.quantity %></td>
+                            <td><%= item.productStatus %></td>
+                            <td><% if(item.productStatus === 'Pending'){%>
+                                <button class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
+                                <%}%>
+                            </td>
+                        </tr>
+                    <%})%>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+  <%- include ("../layout/footerUser.ejs") %>
+  <script>
+    async function cancelOrderItem(orderId,productId){
+        await fetch('/cancel-order-item',{
+            method: 'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({orderId,productId})
+        })
+        .then(response => response.json)
+        .then(data =>{
+            if(data.success){
+                alert('Item Cancelled Successfully');
+                location.reload();
+            }else{
+                alert('Failed to cancel the item');
+            }       
+        })
+        .catch(error=>console.log(error));       
+    }
+  </script>
+</body>
+</html>
+                

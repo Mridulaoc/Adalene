@@ -81,7 +81,6 @@ userRoute.post('/forgot-password', userController.requestOtp);
 userRoute.post('/otp',userController.verifyFPOTP);
 userRoute.post('/reset-password', userController.updatePassword);
 userRoute.get('/shopall',userController.loadShopall);
-userRoute.get('/shopall/products',userController.loadFilteredProducts);
 userRoute.get('/bags', userController.loadBags);
 userRoute.get('/wallets',userController.loadWallets);
 userRoute.get('/belts', userController.loadBelts);
@@ -91,10 +90,12 @@ userRoute.post('/add-to-cart', isAuthenticated, userController.addToCart);
 userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
 userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
 userRoute.post('/cart/remove', isAuthenticated, userController.removeCartItem);
+userRoute.get('/cart/count', isAuthenticated, userController.countCartItems);
 userRoute.get('/checkout', isAuthenticated, userController.displayAddressSelection);
 userRoute.post('/checkout', isAuthenticated, userController.selectedAddress);
 userRoute.get('/payment', isAuthenticated, userController.displayPayment);
 userRoute.post('/payment', isAuthenticated, userController.processPayment);
+userRoute.get('/order-confirmation/:orderId', isAuthenticated, userController.displayOrderConfirmation);
 userRoute.get('/profile', isAuthenticated, userController.displayProfile);
 userRoute.get('/profile/edit/:id', isAuthenticated, userController.displayEditProfile);
 userRoute.put('/profile/edit/:id',isAuthenticated, userController.updateProfile);
@@ -103,6 +104,10 @@ userRoute.get('/addresses/add', isAuthenticated, userController.displayAddAddres
 userRoute.post('/addresses/add', isAuthenticated, userController.addAddress);
 userRoute.get('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.displayEditAddress);
 userRoute.put('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.updateAddress);
+userRoute.get('/order-history', isAuthenticated, userController.displayOrderHistory);
+userRoute.post('/cancel-order', isAuthenticated, userController.cancelOrder);
+userRoute.get('/order-details/:orderId', isAuthenticated, userController.displayOrderDetails)
+userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrderItem)
 userRoute.get('/signout',  userController.userSignOut);
 
 userRoute.use((err, req, res, next) => {

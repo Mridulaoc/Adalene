@@ -11,7 +11,8 @@ const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
 const userManagementController = require('../controllers/userManagementController');
-const {isAuthenticated,isNotAuthenticated} = require('../middleware/adminAuth')
+const {isAuthenticated,isNotAuthenticated} = require('../middleware/adminAuth');
+const orderController = require('../controllers/orderController');
 
 // middlewares 
 adminRoute.use(express.static('public'));
@@ -80,6 +81,12 @@ adminRoute.post('/delete-image', isAuthenticated, productController.deleteProduc
 // user routes 
 adminRoute.get('/users',isAuthenticated,userManagementController.loadUserManagement);
 adminRoute.get('/users/block-user',isAuthenticated,userManagementController.blockUser);
+
+// order routes 
+
+adminRoute.get('/orders',isAuthenticated,orderController.displayOrders);
+adminRoute.get('/orders/view-order/:orderId',isAuthenticated,orderController.viewOrder);
+adminRoute.put('/orders/view-order/:orderId',isAuthenticated,orderController.updateStatus)
 
 
 

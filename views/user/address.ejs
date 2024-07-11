@@ -12,9 +12,10 @@
                 <p><a href="/addresses" class="text-decoration-none fs-5 text-black">Addresses</a></p>
             </div>
         <div class="col-8 border px-5 py-5 shadow">
-        <% if(userData.addresses.length > 0){%>
-            <% userData.addresses.forEach((address,index)=>{%>
-      
+        <% if(userData.addresses.length > 0){%>         
+            <% userData.addresses.forEach((address,index)=>{%>          
+            <div class="d-flex gap-5 mb-3">
+            <div>
             <p class="fs-6"><%= address.houseNo %></p>
             <p class="fs-6"><%= address.street %></p>
             <p class="fs-6"><%= address.city %></p>
@@ -24,15 +25,15 @@
             <a href="/addresses/edit/<%= userData._id %>/<%= index %>">
                 <button class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent" style="color: #BC4C2A; ">EDIT ADDRESS</button>
               </a>
+            </div>
+              
         <%})%>
+    </div> 
     <% } else {%>
         <p>Address not found</p>
-        <%}%>
-        
-        
-        <a href="/addresses/add" class="px-3 text-decoration-none fs-6  border rounded-2 " style="color: #BC4C2A; " >ADD ADDRESS</a>
-        
+        <%}%>       
     </div>
+    <a href="/addresses/add" class="px-3 text-decoration-none fs-6  border rounded-2" style="color: #BC4C2A;  " >ADD ADDRESS</a>
     </div>
     </div>
   </div>

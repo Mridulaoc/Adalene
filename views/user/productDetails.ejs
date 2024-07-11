@@ -24,25 +24,25 @@
                 <h3><%= products.prod_name %> (<%= products.prod_rating %> <i class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)</h3>
                 <p>₹<%= products.prod_price %></p>
                 <p>Size : <%= products.prod_size.size %></p>
-                <p>Colour : <%= products.prod_color.color_name %></p>
-                <% if(products.prod_quantity>0 && products.prod_quantity<5 ){ %> 
-                    <p>Stock : Only <%= products.prod_quantity %> left </p>
-                    <%} else if(products.prod_quantity <= 0) { %>
-                    <p>Stock : OUT OF STOCK</p>
-                    <%}%>
+                <p>Colour : <%= products.prod_color.color_name %></p>                
+                <p><% if(products.prod_quantity>0 && products.prod_quantity<6){ %> 
+                    <p style="color:#BC4C2A;" class="fw-bold">Only <%= products.prod_quantity %> left !</p>
+                    <%} else { %>
+                    <p class="fs-5 fw-bold"> OUT OF STOCK</p>
+                    <%}%></p>
                 <p>PRODUCT INFO</p>
                 <hr style="width:60%; height: 2px; color: #BC4C2A;">
                 <p class="fs-5" style="width: 70%; margin-bottom: 2rem;"><%= products.prod_desc %></p>
                 <div class="d-flex align-items-center my-3">
                   <button class="px-3 py-1 fw-bold border border-1" style="background-color: #BC4C2A; color: white;border:none;" onclick="decrementQuantity()">-</button>
-                  <input type="number" id="quantityInput" value="1" min="1" max="2" class="py-1 text-center border border-1" style="border-left: none; border-right: none;outline: none; " readonly>
+                  <input type="number" id="quantityInput" value="1" min="1" max="<%= products.prod_quantity %>" class="py-1 text-center border border-1" style="border-left: none; border-right: none;outline: none; " readonly>
                   <button class="px-3 py-1 fw-bold border border-1 " style="background-color: #BC4C2A; color: white;border:none;"  onclick="incrementQuantity()">+</button>
               </div>
               <span id="quantity-availablity" class="fs-5 my-3" ></span>
 
                 <div class="d-flex flex-column gap-3">
                     <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: #BC4C2A;"  onclick="addToCart('<%= products._id %>')">ADD TO CART</button>
-                    <!-- <button class="px-5 py-3 fs-5 text-white fw-bold" style="border: none;background-color: black;">BUY NOW</button> -->
+                    
                 </div>
               </div>              
             </div>
@@ -55,7 +55,7 @@
                 for(let i=0; i<relatedProducts.length; i++){ 
                     
                 %>
-            <a href="/products/?id=<%= relatedProducts[i]._id %>" class="text-decoration-none" style="width: 22rem; height: 32rem;">
+            <a href="/products/<%= relatedProducts[i]._id %>" class="text-decoration-none" style="width: 22rem; height: 32rem;">
             <div class="card shadow" style="width: 18rem;">
                 <img src="\uploads\<%= relatedProducts[i].prod_images[0] %>" class="card-img-top" alt="...">
                 <div class="card-body d-flex flex-column align-items-center">
@@ -96,16 +96,22 @@
     // functiions for increment decrement 
 
     function incrementQuantity() {
+        let maxQuantityPerUser = 2;
         const quantityInput = document.getElementById('quantityInput');
+        const maxValue = quantityInput.value;
         let quantity = parseInt(quantityInput.value);
         let quantityAvailablity = document.getElementById('quantity-availablity');
-        if (quantity < quantityInput.max) {
+        if (quantity > maxValue) {            
+            quantityAvailablity.innerText = `Only ${maxValue} left `
+        }else if (quantity >= maxQuantityPerUser){
+            quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
+        }else{
             quantityInput.value = quantity + 1;
         }
-        else{
-            quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
         }
-    }
+       
+        
+ 
 
     function decrementQuantity() {
         const quantityInput = document.getElementById('quantityInput');

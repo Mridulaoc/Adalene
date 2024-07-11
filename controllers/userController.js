@@ -8,6 +8,9 @@ const Color = require("../models/color");
 const nodemailer = require("nodemailer");
 const { session } = require("passport");
 const  mongoose  = require("mongoose");
+const Order = require("../models/order");
+const generateOrderId = require("../utils/orderIdGenerator");
+const getSortOption = require('../utils/sortOptions')
 require('dotenv/config')
 var moment = require('moment');
 
@@ -314,148 +317,82 @@ const loadHome = async(req,res)=>{
 const loadShopall = async(req,res) => {
     
         try {
-            console.log(process.env)
+
+            let search = "";
+            if (req.query.search) {
+            search = req.query.search;
+            console.log(search);
+            }
+           
             let page = 1;
             if (req.query.page) {
                 page = req.query.page;
             }
             const limit = 5; 
+            const {sortBy ='popularity', order = 'asc'}=req.query;
+
             const categories = await Category.find();
             const sizes = await Size.find();
-            const colors = await Color.find();        
+            const colors = await Color.find();            
             
-            const products = await Products.find({})
+
+            const sortOption = getSortOption(sortBy, order);
+
+            
+            const products = await Products.find({ prod_name: { $regex: ".*" + search + ".*", $options: 'i' } })
+            .sort(sortOption)
             .limit(limit*1)
             .skip((page-1)*limit)
             .exec();
 
-            const count = await Products.find().countDocuments();
+            const count = await Products.find({ prod_name: { $regex: ".*" + search + ".*", $options: 'i' } }).countDocuments();
             res.render('shopall',{products, totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,
-                categories,sizes,colors,cart:req.cart
+                categories,sizes,colors,cart:req.cart,sortBy,order,search
             });
         } catch (error) {
             console.log(error)
-        }
-       
+        }       
     }
    
 
-const loadFilteredProducts = async(req,res)=>{
-    try {
-        
-        const { categoryId, colorId, sizeId, page = 1, limit = 5, sort } = req.query;
-        const query = {};
-
-        if (categoryId && categoryId !== 'All') query.prod_category = ObjectId(categoryId);
-        if (colorId && colorId !== 'All') query.prod_color = colorId;
-        if (sizeId && sizeId !== 'All') query.prod_size = sizeId;
-
-        let sortQuery = {};
-        switch (sort) {
-          case 'name-asc':
-            sortQuery = { prod_name: 1 };
-            break;
-          case 'name-desc':
-            sortQuery = { prod_name: -1 };
-            break;
-          case 'price-asc':
-            sortQuery = { prod_price: 1 };
-            break;
-          case 'price-desc':
-            sortQuery = { prod_price: -1 };
-            break;
-          default:
-            sortQuery = { prod_name: 1 };
-        }
-
-        const products = await Products.find(query)
-        .populate('prod_category')
-        .populate('prod_color')
-        .populate('prod_size')
-        .sort(sortQuery)
-        .skip((page - 1) * limit)
-        .limit(5);
-
-        const total = await Products.countDocuments(query);
-        const totalPages = Math.ceil(total / limit);
-
-        res.render('shopall',{ products, totalPages });
-      
-        // const page = parseInt(req.query.page) || 1;
-        // const limit = parseInt(req.query.limit) || 5;
-        // const search = req.query.search || "";
-        // let sort = req.query.sort || "price";
-        // let category = req.query.category || "All";
-        // let size = req.query.size || "All";
-        // let color = req.query.color || "All";
-
-        // const categories = await Category.find();
-        // const sizes = await Size.find();
-        // const colors = await Color.find();
-
-        // category === "All" ? (category = categories.map(category => category._id)) : (category = req.query.category.split(","));
-        // size === "All" ? (size = sizes.map(size => size._id)) : (size = req.query.size.split(","));
-        // color === "All" ? (color = colors.map(color => color._id)) : (color = req.query.color.split(","));
-
-        // req.query.sort ? (sort = req.query.sort.split(",")) : (sort = [sort]);
-
-        // let sortBy = {};
-        // if (sort[1]) {
-        //     sortBy[sort[0]] = sort[1];
-        // } else {
-        //     sortBy[sort[0]] = "asc";
-        // }
-
-        // const products = await Products.find({ 
-        //     prod_name: { $regex: search, $options: "i" },
-        //     prod_category: { $in: category },
-        //     prod_size: { $in: size },
-        //     prod_color: { $in: color }
-        // })
-        // .sort(sortBy)
-        // .skip(page * limit)
-        // .limit(limit)
-        // .populate('prod_category')
-        // .populate('prod_size')
-        // .populate('prod_color');
-
-        // const count = await Products.countDocuments({
-        //     prod_category: { $in: category },
-        //     prod_size: { $in: size },
-        //     prod_color: { $in: color },
-        //     prod_name: { $regex: search, $options: "i" },
-        // });
-
-        
-        // res.status(200).render('shopall',{products,categories,sizes,colors,page:page+1,totalPages:Math.ceil(count/limit),currentPage:page,search} )
-    } catch (error) {
-        res.status(500).send({error:error});
-        
-    }
-   
-}
 
 
 
 const loadBags = async(req,res)=>{
     try {
+
+        let search = "";
+            if (req.query.search) {
+            search = req.query.search;
+            console.log(search);
+            }
+
         let page = 1;
         if (req.query.page) {
             page = req.query.page;
         }
         const categories = await Category.find();
         const sizes = await Size.find();
-        const colors = await Color.find();   
+        const colors = await Color.find(); 
+
         const limit = 5; 
+        
+
+        const {sortBy ='popularity', order = 'asc'}=req.query;
+
+        const sortOption = getSortOption(sortBy, order);
+
+
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const bagsData = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'})
+        const bagsData = await Products.find({prod_category:'66702daed57b7afd0c8cafe1',prod_name: { $regex: ".*" + search + ".*", $options: 'i'}})
+        .sort(sortOption)
         .limit(limit*1)
         .skip((page-1)*limit)
         .exec();
        
         const count = await Products.find({prod_category:'66702daed57b7afd0c8cafe1'}).countDocuments();
         
-        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
+        res.render('bags',{products: bagsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart,sortBy,order,search });
     } catch (error) {
         console.log(error)
 
@@ -465,23 +402,39 @@ const loadBags = async(req,res)=>{
 
 const loadWallets = async(req,res)=>{
     try {
+
+        let search = "";
+            if (req.query.search) {
+            search = req.query.search;
+            console.log(search);
+            }
+
+
         let page = 1;
         if (req.query.page) {
             page = req.query.page;
         }
+
         const categories = await Category.find();
         const sizes = await Size.find();
         const colors = await Color.find();   
+
         const limit = 5; 
+
+        const {sortBy ='popularity', order = 'asc'}=req.query;
+
+        const sortOption = getSortOption(sortBy, order);
+
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const walletData = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'})
+        const walletData = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581',prod_name: { $regex: ".*" + search + ".*", $options: 'i'}})
+        .sort(sortOption)
         .limit(limit*1)
         .skip((page-1)*limit)
         .exec();
       
         const count = await Products.find({prod_category:'6673eca9e5d3e08f0ce33581'}).countDocuments();
       
-        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
+        res.render('wallets',{products: walletData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart,sortBy,order,search });
     } catch (error) {
         console.log(error)
 
@@ -491,6 +444,14 @@ const loadWallets = async(req,res)=>{
 }
 const loadBelts = async(req,res)=>{
     try {
+
+        let search = "";
+            if (req.query.search) {
+            search = req.query.search;
+            console.log(search);
+            }
+
+
         let page = 1;
         if (req.query.page) {
             page = req.query.page;
@@ -498,16 +459,23 @@ const loadBelts = async(req,res)=>{
         const categories = await Category.find();
         const sizes = await Size.find();
         const colors = await Color.find();   
-        const limit = 5; 
+
+        const limit = 5;
+
+        const {sortBy ='popularity', order = 'asc'}=req.query;
+
+        const sortOption = getSortOption(sortBy, order);
+
         const products = await Products.find({prod_status:'ACTIVE'}).populate('prod_category');
-        const beltsData = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'})
+        const beltsData = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584',prod_name: { $regex: ".*" + search + ".*", $options: 'i'}})
+        .sort(sortOption)
         .limit(limit*1)
         .skip((page-1)*limit)
         .exec();
       
         const count = await Products.find({prod_category:'6673ecb8e5d3e08f0ce33584'}).countDocuments();
       
-        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart });
+        res.render('belts',{products: beltsData,totalPages:Math.ceil(count/limit), currentPage:page,user:req.user,categories,sizes,colors,cart:req.cart,sortBy,order,search });
     } catch (error) {
         console.log(error)
 
@@ -554,9 +522,9 @@ const displayProfile = async(req,res)=>{
 const displayEditProfile= async(req,res)=>{
     try {
         const id = req.params.id; 
-        console.log(id)
+       
         const userData = await User.findById({_id:id})
-        console.log(userData)
+        
         res.status(200).render('editProfile',{userData:userData, user:req.user});
         
     } catch (error) {
@@ -568,6 +536,7 @@ const updateProfile = async(req,res)=>{
     try {
         const {name,email,mobileno,gender,dateOfBirth}=req.body;
         const id = req.params.id;
+
         const user = await User.findById({_id:id});
         if (!user) {
             return res.status(404).send('User not found');
@@ -673,13 +642,86 @@ const updateAddress = async(req, res)=>{
         }
 }
 
+ const displayOrderHistory = async(req, res)=>{
+    try {
+        const orders = await Order.find({user:req.user.id}).populate('products.product');
+        res.render('orderHistory', {orders,user:req.user,moment})
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error')
+    }
+ }
+
+ const cancelOrder = async(req, res)=>{
+    try {
+        console.log(req.body.orderId)
+        const order = await Order.findById(req.body.orderId);
+        if(order){
+            order.status = 'Cancelled';
+            order.save();
+            res.json({success:true});
+        }else{
+            res.status(404).json({success:false})
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Internal Server Error")
+    }
+ }
+
+ const displayOrderDetails = async(req, res)=>{
+    try {
+        const order = await Order.findById(req.params.orderId).populate('products.product');
+      
+        res.status(200).render('orderDetails', {order,user:req.user,moment})
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error')
+    }
+ }
+
+ const cancelOrderItem = async(req, res)=>{
+    const {orderId,productId} = req.body;
+    console.log(orderId,productId);
+    try {
+       const order = await Order.findById(orderId);
+       console.log(order)
+       if(order){
+        const product = order.products.find(p=>p.product.toString()===productId);
+        if(product){
+            product.productStatus = 'Cancelled';
+
+            order.total = order.products.reduce((total,item)=>{
+                if(item.productStatus !== 'Cancelled'){
+                    return total += item.price * item.quantity;
+                }
+                return total;
+            })
+            await order.save();
+            res.json({success:true})
+        }
+        else{
+            res.status(404).json({success:false});
+        }
+       }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error')
+    }
+ } 
+
+
+
 const addToCart = async(req,res)=>{
 
     if(!req.user){
         res.redirect('/signin');
     }else{
     const { productId, quantity } = req.body;
-    console.log(productId, quantity)    
+     
 
     const userId = req.user.id; 
        try {
@@ -729,19 +771,18 @@ const loadCartPage = async(req,res)=>{
 
 const updateCart = async(req,res)=>{
     try {
-        const {productId, action} = req.body;
-        console.log(productId, action);
+        const {productId, quantity} = req.body;
+       
         const user = await User.findById({_id:req.user.id})
-        const cartItem = user.cart.products.find(item=>item.product.toString()=== productId);
-        if(cartItem){
-            if(action ===  'increment'){
-                cartItem.quantity += 1;
-            }else if(action === 'decrement' && cartItem.quantity>1 ){
-                cartItem.quantity -=1;
-            }
-            await user.save();            
-        }
-        res.json({ success: true });
+        const productIndex = user.cart.products.findIndex(item=>item.product._id.toString()=== productId);
+        if(productIndex !== -1){
+            user.cart.products[productIndex].quantity = quantity;
+            await user.save();      
+            res.json({ success: true });
+        }else{
+            return res.status(404).json({ success: false, message: 'Product not found in cart' });
+        }       
+
     } catch (error) {
         console.log(error)
     }
@@ -761,6 +802,22 @@ const removeCartItem = async(req,res)=>{
     }
 }
 
+const countCartItems = async(req,res)=>{
+    try {
+        const userId = req.user.id;
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const cartCount = user.cart.items.length; 
+        res.json({ count: cartCount });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 const displayAddressSelection = async(req,res)=>{
 
     try {
@@ -774,21 +831,23 @@ const displayAddressSelection = async(req,res)=>{
 }
 
 const selectedAddress = async(req,res)=>{
-    const selectedAddressId = req.body.selectedAddressId;
-    console.log(selectedAddressId,req.user.id)
-    req.session.selectedAddressId = selectedAddressId;
+    const {selectedAddress} = req.body;
+    
+    if(!selectedAddress){
+        res.status(302).redirect('/checkout');
+    }    
+    req.session.selectedAddress = selectedAddress;
     res.redirect('/payment');
     
 }
 
 const displayPayment = async(req,res)=>{
-    const selectedAddressId = req.session.selectedAddressId;
-    if (!selectedAddressId) {
-        res.redirect('/checkout');
-    }
+    const selectedAddressId = req.session.selectedAddress;
+    console.log("checking")
+    console.log(selectedAddressId)    
 
     try {
-        // const user = await User.findById(req.user.id);
+       
         const id = req.user.id;
         const user = await User.findById({_id:id}).populate({
             path: 'cart.products.product',
@@ -802,16 +861,92 @@ const displayPayment = async(req,res)=>{
          user.cart.products.forEach(item => {
              totalValue += item.product.prod_price * item.quantity;
          });
+
         const selectedAddress = user.addresses.id(selectedAddressId);
+        if (!selectedAddress) {
+            res.redirect('/checkout');
+        }
+
         res.render('payment', { user, selectedAddress,cart:user.cart, totalValue:totalValue});
+
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
     }
 }
 
+const processPayment = async (req, res) => {
+    const paymentMethod = req.body.paymentMethod;
+    const selectedAddressId = req.session.selectedAddress;
+    console.log(paymentMethod, selectedAddressId);
+
+    try {
+        const user = await User.findById(req.user.id).populate('cart.products.product');
+        const selectedAddress = user.addresses.id(selectedAddressId);
+        
+
+        let totalValue = 0     
+        user.cart.products.forEach(item => {
+            
+           totalValue += item.product.prod_price * item.quantity;
+        });
+       
+
+        let finalValue = totalValue > 1000 ? totalValue : totalValue + 100;
+
+        
+
+        const newOrder = new Order({
+            orderId:generateOrderId(),
+            user: user._id,
+            address: `${selectedAddress.houseNo},${selectedAddress.street},${selectedAddress.city},${selectedAddress.country},${selectedAddress.zipCode},`,
+            paymentMethod: paymentMethod,
+            products:user.cart.products.map(item =>({
+                product: item.product._id,
+                quantity:item.quantity,
+                price:item.product.prod_price,
+            })),
+            total : finalValue
+        })
 
 
+        console.log(newOrder)
+        await newOrder.save();
+
+        for (let item of user.cart.products) {
+            await Products.findByIdAndUpdate(item.product._id, {
+                $inc: { prod_quantity: -item.quantity }
+            });
+            
+        }
+       
+
+        user.user_orders.push(newOrder._id);
+        user.cart.products = [];
+        user.save();
+
+        res.redirect(`/order-confirmation/${newOrder._id}`);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const displayOrderConfirmation = async(req,res) => {
+    try {
+        const order = await Order.findById(req.params.orderId);
+
+        if(!order) {
+            return res.status(404).json({message: 'Order not found'})
+        }
+
+        res.render('orderConfirmation', {order,user:req.user});
+
+    } catch (error) {
+        console.log(error)
+    }
+
+}
 
 const userSignOut = async(req,res)=>{
     try {
@@ -826,6 +961,44 @@ const userSignOut = async(req,res)=>{
         console.log(error)
     }
    
+}
+
+const getProductsByCategory = async(req,res) => {
+    try {
+        const categories = await Category.find({});
+        const { categoryId, page = 1, limit = 10, sortBy = 'popularity'} = req.query;
+        console.log(categoryId)
+
+        let filter = { is_deleted: false, prod_status: 'ACTIVE', prod_category: ObjectId(categoryId )};
+
+        const sortOptions = {
+            popularity: { prod_rating: -1 },
+            priceAsc: { prod_price: 1 },
+            priceDesc: { prod_price: -1 },
+            avgRating: { prod_rating: -1 },
+            featured: { is_bestseller: -1 },
+            newArrivals: { created_on: -1 },
+            aToZ: { prod_name: 1 },
+            zToA: { prod_name: -1 }
+        };
+
+        const products = await Products.find(filter)
+            .sort(sortOptions[sortBy])
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        const totalProducts = await Products.countDocuments(filter);
+
+        res.json({
+            products,
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: Number(page)
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+    
 }
     
 
@@ -850,8 +1023,7 @@ module.exports = {
     loadWallets,
     loadPhoneCases,
     loadProductDetails,
-    userSignOut,
-    loadFilteredProducts,
+    userSignOut,   
     addToCart,
     loadCartPage,
     updateCart,
@@ -866,6 +1038,14 @@ module.exports = {
     updateAddress,
     displayAddressSelection,
     selectedAddress,
-    displayPayment
+    displayPayment,
+    processPayment,
+    displayOrderConfirmation,
+    displayOrderHistory,
+    cancelOrder,
+    displayOrderDetails,
+    cancelOrderItem,
+    getProductsByCategory,
+    countCartItems
 
 }

@@ -11,17 +11,17 @@
             <% if(cart.products.length >0){%>
             <table class="table table-bordered" >
                 <tr>
-                    <th scope="col">Product</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Total</th> 
-                    <th scope="col">Actions</th>                          
+                    <th scope="col" class="text-center">Product</th>
+                    <th scope="col" class="text-center">Price</th>
+                    <th scope="col" class="text-center">Quantity</th>
+                    <th scope="col" class="text-center">Total</th> 
+                    <th scope="col" class="text-center">Actions</th>                          
                 </tr>  
                 <% cart.products.forEach(item =>{%>                 
                     <tr class="">
                         
                                            
-                        <td scope="row" class="text-capitalize">
+                        <td scope="row" class="text-capitalize text-center">
                         <div class="d-flex align-items-center">
                         <img src="\uploads\<%= item.product.prod_images[0] %>" alt="" height="100px" wight="100px">
                         <div class="d-flex flex-column ">
@@ -35,10 +35,12 @@
                         <td>
                             <div class="d-flex align-items-center my-3">
                                 <button class="px-3 py-1 fw-bold border border-1 " style="background-color: #BC4C2A; color: white;border:none;" onclick="updateQuantity('<%= item.product._id %>','decrement')">-</button>
-                                <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="2" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>
-                                <button class="px-3 py-1 fw-bold border border-1" style="background-color: #BC4C2A; color: white;border:none;"  onclick="updateQuantity('<%= item.product._id %>','increment')">+</button>
+                                <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="<%= item.product.prod_quantity %>" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>
+                                <button class="px-3 py-1 fw-bold border border-1" style="background-color: #BC4C2A; color: white;border:none;"  onclick="updateQuantity('<%= item.product._id %>','increment')">+</button>                               
                             </div>
+                            <span id="quantity-availablity-<%=item.product._id %>" class="fs-5 my-3" style="max-width: 20%;"></span>                           
                         </td>
+                       
                         <td><%= item.product.prod_price * item.quantity %></td>
                         <td class="text-center"><button class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="removeItem('<%= item.product._id %>')">REMOVE</button></td>                                           
                     </tr>
@@ -82,25 +84,29 @@
     
  </div>
 <script>
-
+    
             
-            
-            async function updateQuantity(productId, action) {
-                console.log(`Updating quantity for product ID: ${productId}, action: ${action}`);
+            function updateQuantity(productId, action) {
+             let maxQuantityPerUser = 2;
+             console.log(`quantityInput-${productId}`)  
             const quantityInput = document.getElementById(`quantityInput-${productId}`);
-            console.log(quantityInput)
-            let quantity = parseInt(quantityInput.value);
-            console.log(quantity)
+            if (!quantityInput) {
+            console.error(`No input field found for product ID: ${productId}`);
+            return;
+        }
+            let quantity = parseInt(quantityInput.value);           
             const maxQuantity = parseInt(quantityInput.max);
             console.log(maxQuantity)
-
+            let quantityAvailablity = document.getElementById(`quantity-availablity-${productId}`);
 
             if(action==='increment') {
-                if(quantity < maxQuantity){
-                    quantity += 1;
-                }else{
-                    quantity = maxQuantity;
-                }
+                 if (quantity > maxQuantity) {            
+                    quantityAvailablity.innerText = `Only ${maxQuantity} left `
+                 }else if (quantity >= maxQuantityPerUser){
+                     quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
+                 }else{
+                    quantity= quantity + 1;
+                 }
             }else if(action==='decrement'){
                 if(quantity > 1){
                     quantity -= 1;
@@ -110,6 +116,13 @@
             }
 
             quantityInput.value = quantity;
+            console.log(quantityInput.value)
+
+            updateCart(productId, quantity)
+        }
+
+
+           async function updateCart(productId, quantity){
 
             try {
                 const response = await fetch('/cart/update', {
@@ -120,7 +133,9 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
-                        action: action
+                        quantity:quantity
+
+
                     })
                 });
 

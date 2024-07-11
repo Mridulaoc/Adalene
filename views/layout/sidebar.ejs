@@ -1,40 +1,21 @@
 <div class="row align-items-start">
-    <div class="col-4 d-flex flex-column gap-3 ">
-      <!-- <div class="d-flex flex-column gap-3">
-      <% categories.forEach(function(category) { %>
-        <a href="/shopall/products?categoryId=<%= category._id %>"><%= category.cat_name %></a>
-      <% }); %>
-      </div> -->
+    <div class="col-4 d-flex flex-column gap-3 "> 
+      <form action="" class="d-flex my-5" style="width: 100%;">
+        <input type="text" placeholder="Search" value="<%= search %>"  name="search" class="form-control mx-2" id="search">
+        <input type="submit" class="border rounded-2 fw-bold" value="Search">
+    </form>       
+      <label for="sortBy" class="fs-5 fw-bold">Sort by:</label>
+        <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 90%;">
+          <option value="popularity" <%= sortBy === 'popularity' ? 'selected' : '' %>>Popularity</option>
+          <option value="priceAsc" <%= sortBy === 'priceAsc' ? 'selected' : '' %>>Price: low to high</option>
+          <option value="priceDesc" <%= sortBy === 'priceDesc' ? 'selected' : '' %>>Price: high to low</option>
+          <option value="avgRating" <%= sortBy === 'avgRating' ? 'selected' : '' %>>Average ratings</option>
+          <option value="featured" <%= sortBy === 'featured' ? 'selected' : '' %>>Featured</option>
+          <option value="newArrivals" <%= sortBy === 'newArrivals' ? 'selected' : '' %>>New arrivals</option>
+          <option value="aToZ" <%= sortBy === 'aToZ' ? 'selected' : '' %>>A - Z</option>
+          <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Z - A</option>
+        </select>
 
-      <p>Browse By</p>
-      <select name="category" id="category" onchange="fetchProducts()" class="form-control" style="width: 50%;">
-        <option value="All">All Categories</option>
-        <% categories.forEach(function(category) { %>
-          <option value="<%= category._id %>"><%= category.cat_name %></option>
-        <% }); %>
-      </select>
-
-      <p>Filter By</p>
-      <select name="color" id="color" onchange="fetchProducts()" style="width: 50%;" class="form-control">
-        <option value="All">All Colors</option>
-        <% colors.forEach(function(color) { %>
-          <option value="<%= color._id %>"><%= color.color_name %></option>
-        <% }); %>
-      </select>
-
-      <select name="size" id="size" onchange="fetchProducts()" style="width: 50%;" class="form-control">
-        <option value="All">All Sizes</option>
-        <% sizes.forEach(function(size) { %>
-          <option value="<%= size._id %>"><%= size.size %></option>
-        <% }); %>
-      </select>
-
-      <p>Sort By</p>
-      <select name="sort" id="sort" onchange="fetchProducts()" style="width: 50%;" class="form-control">
-        <option value="name-asc">A-Z</option>
-        <option value="name-desc">Z-A</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-      </select>
+      
       
     </div>
