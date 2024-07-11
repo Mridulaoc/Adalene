@@ -7,34 +7,34 @@
     <div class="container mt-5" >
         <h2 class="mb-3">Payment</h2>
       
-        <div class="d-flex container">
-        <div class="card mb-4 col-6 mx-3">
-            <% if (selectedAddress){%>
+    <div class="d-flex container gap-3">
+            <div class="card mb-3 col-3 mx-3 shadow">
+                    <% if (selectedAddress){%>
                 <div class="card-body">
                     <h5>Selected Address</h5>
                     <% const selectedAddressObj = user.addresses.id(selectedAddress) %>
-                    <p class="fs-6"><%= selectedAddressObj.houseNo %></p>
-                    <p class="fs-6"><%= selectedAddressObj.street %>,</p>
-                    <p class="fs-6"><%= selectedAddressObj.city %>,</p>
-                    <p class="fs-6"> <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,</p>
-                    <p class="fs-6"><%= selectedAddressObj.country %></p>
+                    <p ><%= selectedAddressObj.houseNo %></p>
+                    <p><%= selectedAddressObj.street %>,</p>
+                    <p ><%= selectedAddressObj.city %>,</p>
+                    <p> <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,</p>
+                    <p ><%= selectedAddressObj.country %></p>
                 </div>
             <%}%>
             
-        </div>
+            </div>
         
-        <div class="d-flex flex-column align-items-center col-6">
-            <% if(cart.products.length >0){%>
-            <table class="table table-bordered" >
+            <div class="d-flex flex-column align-items-center rounded col-6">
+                <% if(cart.products.length >0){%>
+                <table class="table shadow  " >
                 <tr>
-                    <th scope="col">Product</th>                   
+                    <th scope="col ">Product</th>                   
                     <th scope="col">Quantity</th>
-                    <th scope="col">Total</th>                                             
+                    <th scope="col ">Total</th>                                             
                 </tr>  
                 <% cart.products.forEach(item =>{%>                 
                     <tr class="">                                        
                         <td scope="row" class="text-capitalize">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex gap-2 align-items-center">
                         <img src="\uploads\<%= item.product.prod_images[0] %>" alt="" height="100px" wight="100px">
                         <div class="d-flex flex-column ">
                         <p class="fs-5"><%= item.product.prod_name %></p>
@@ -49,66 +49,69 @@
                         <td><%= item.product.prod_price * item.quantity %></td>
                         </tr>
                     <%})%>                                        
-            </table>          
-        </div>
-    </div>  
-        <div class="d-flex  justify-content-center ">
-            <form action="/payment" method="POST" class="col-6 mx-3">
+                </table>          
+            </div>
+        <div class="col-3 shadow mb-4 card">    
+            <div class="d-flex flex-column align-items-end container mb-4 ">             
+                <table class="table  " >
+                <tr>
+                    <td class="fs-5 py-3">Sub Total:</td>
+                    <td class="fs-5 py-3">₹<%= totalValue %></td>
+                </tr>
+                <tr>
+                    <td class="fs-5 py-3">Shipping:</td>
+                    <% if (totalValue > 1000) {%>
+                        <td class="fs-5 py-3">₹0</td>
+                    <%} else {%>
+                        <td class="fs-5 py-3">₹100</td>
+                    <%}%>                        
+                </tr>
+                <tr>
+                    <td class="fs-5 py-3">Total:</td>
+                    <% if (totalValue > 1000) {%>
+                    <td class="fs-5 py-3">₹<%= totalValue + 0  %></td>
+                    <%} else {%>
+                    <td class="fs-5 py-3">₹<%= totalValue  + 100 %></td> 
+                    <%}%> 
+                            
+                </tr>
+                </table>       
+            </div> 
+        
+            <form action="/payment" method="POST" class=" mx-3 ">
                 <div class="form-group">
-                    <label>Select Payment Method</label><br>
+                    <label><h5>Select Payment Method</h5></label><br>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
                         <label class="form-check-label" for="cod">
-                            Cash on Delivery
+                            <p style="font-size: 1rem;">Cash on Delivery</p>
                         </label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard">
                         <label class="form-check-label" for="creditCard">
-                            Credit Card
+                           <p style="font-size: 1rem;">Credit Card</p> 
                         </label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
                         <label class="form-check-label" for="paypal">
-                            PayPal
+                            <p style="font-size: 1rem;">PayPal</p>
                         </label>
                     </div>
                 </div>                
-                <button type="submit" class="px-3 text-decoration-none fs-5  border rounded-2 bg-transparent my-3 " style="color: #BC4C2A;">PLACE ORDER</button>
+                <button type="submit" class="px-3 text-decoration-none fs-5 fw-bold  border rounded-2 bg-transparent my-3 " style="color: #BC4C2A;">PLACE ORDER</button>
             </form>
-            <div class="d-flex flex-column align-items-end container mb-5 col-6">             
-            <table class="table border " >
-                <tr>
-                    <td class="fs-5">Sub Total:</td>
-                    <td class="fs-5">₹<%= totalValue %></td>
-                </tr>
-                <tr>
-                    <td class="fs-5">Shipping:</td>
-                    <% if (totalValue > 1000) {%>
-                        <td class="fs-5">₹0</td>
-                    <%} else {%>
-                        <td class="fs-5">₹100</td>
-                    <%}%>                        
-                </tr>
-                <tr>
-                    <td class="fs-5">Total:</td>
-                    <% if (totalValue > 1000) {%>
-                    <td class="fs-5">₹<%= totalValue + 0  %></td>
-                    <%} else {%>
-                    <td class="fs-5">₹<%= totalValue  + 100 %></td> 
-                    <%}%> 
-                            
-                </tr>
-            </table>       
-            </div>
-             
+        </div>
+        </div>
+    </div>   
+ 
         <%} else {%>    
             <h3>Your cart is empty</h3>
             <%}%>    
             
-        </div>
-        </div>
+        </div> 
+        
   </div>
 </body>
 </html>

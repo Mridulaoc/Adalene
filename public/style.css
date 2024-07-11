@@ -8,6 +8,7 @@
 }
 body{
    overflow-x: hidden;
+   
 }
 
 html{
@@ -15,7 +16,7 @@ html{
 
 }
 p{
- font-size: 1.6rem;
+ font-size: 1.2rem;
 }
 
 .form{

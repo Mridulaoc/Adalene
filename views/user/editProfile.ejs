@@ -42,7 +42,7 @@
               </div>
               <div class="form-group mb-3">
                 <label for="dateOfBirth">Date of Birth</label>
-                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="<%= user.user_dob %>" required>
+                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="<%= user.birthdate ? user.birthdate.toISOString().substring(0, 10) : '' %>" required>
             </div>
               <div class="mb-3 " style="border-color: #BC4C2A;">       
                 <input type="submit" class="form-control  fs-6"  value="SAVE DETAILS" style="color: #BC4C2A;"  required>
@@ -50,5 +50,6 @@
             </form>      
     </div>
   </div>
+  <%- include ("../layout/footerAdmin.ejs") %>
 </body>
 </html>

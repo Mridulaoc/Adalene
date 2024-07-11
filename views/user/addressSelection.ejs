@@ -5,13 +5,13 @@
   <%- include ("../layout/navBarnew.ejs") %>
    
   <div class="container-fluid">
-    <div class="container border py-3 " style="width: 50%; margin: 1rem auto;">
+    <div class="container border py-3 shadow rounded " style="width: 50%; margin: 1rem auto;">
         <h4 class="py-3 px-3">Select Address</h4>
         <div class="d-flex justify-content-end px-3">
         <a href="/addresses/add" class=" text-decoration-none fs-6  border rounded-2 px-2 py-1" style="color: #BC4C2A; " >ADD ADDRESS</a>
         </div>
         
-        <form action="/checkout" method="POST" class="my-3 px-3 px-5 py-5" id="selectAddressForm" >
+        <form action="/checkout" method="POST" class="my-3 px-3 px-5 py-5 " id="selectAddressForm" >
             
             <div  class="d-flex justify-content-between"> 
                 
@@ -32,12 +32,13 @@
                 <% }) %>
             </div>
             <div>
-                <button type="submit" class=" text-decoration-none fs-6 bg-transparent  border rounded-2 px-2 py-1" style="color: #BC4C2A; ">CONTINUE TO PAYMENT</button>
+                <button type="submit" class=" text-decoration-none fs-5 bg-transparent fw-bold border rounded-2 px-2 py-1" style="color: #BC4C2A; ">CONTINUE TO PAYMENT</button>
             </div>
         </form>
         
 
     </div>
   </div> 
+  <%- include ("../layout/footerAdmin.ejs") %>
 </body>
 </html>

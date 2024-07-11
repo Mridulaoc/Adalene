@@ -4,12 +4,16 @@
 <body>
   <%- include ("../layout/navBarnew.ejs") %>
 
-  <div class="container-fluid">
-    <div class="container">
-        <h3>Order Confirmation</h3>
+  <div class="container-fluid" >
+    <div class="container d-flex flex-column justify-content-center align-items-center" style="height: 70vh;">
+        
+        <h2>Order Confirmation</h2>
         <p>Your order has been successfully placed.</p>
-        <p>Order Number : <%= order.orderId %></p>
+        <p>Order Number : <span class="fw-bold"><%= order.orderId %></span></p>
+        <button type="submit" class="px-3 text-decoration-none fs-5 fw-bold  border rounded-2 bg-transparent my-3 " ><a href="/shopall" class="text-decoration-none" style="color: #BC4C2A;">CONTINUE SHOPPING</a></button>
+      </div>
     </div>
   </div>
+  <%- include ("../layout/footerUser.ejs") %>
 </body>
 </html>
