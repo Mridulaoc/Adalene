@@ -13,27 +13,41 @@ const loadProductList = async (req, res) => {
     if (req.session.userid) {
       let search = "";
       if (req.query.search) {
-          search = req.query.search;
-          console.log(search);
+        search = req.query.search;
+        console.log(search);
       }
       let page = 1;
       if (req.query.page) {
-          page = req.query.page;
+        page = req.query.page;
       }
       const limit = 5;
-      
-      const productsData = await Product.find({ prod_name: { $regex: ".*" + search + ".*", $options: 'i' } })
-      .populate("prod_category")
-      .limit(limit*1)
-      .skip((page-1)*limit)
-      .exec();  
-      
-      const count = await Product.find({ prod_name: { $regex: ".*" + search + ".*", $options: 'i' } }).countDocuments();
-      res.render("productList", { products: productsData,search,totalPages:Math.ceil(count/limit), currentPage:page });
+
+      const productsData = await Product.find({
+        prod_name: { $regex: ".*" + search + ".*", $options: "i" },
+      })
+        .populate("prod_category")
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .sort({ created_on: -1 })
+        .lean()
+        .exec();
+
+      const count = await Product.find({
+        prod_name: { $regex: ".*" + search + ".*", $options: "i" },
+      }).countDocuments();
+
+      const productsWithOfferStatus = productsData.map(product => ({
+        ...product,
+        has_offer: !!product.offer && new Date(product.offer.end_date) > new Date()
+      }));
+
+      res.render("productList", {
+        products: productsWithOfferStatus,
+        search,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
+      });
     }
-
-   
-
   } catch (error) {
     console.log(error);
   }
@@ -54,6 +68,7 @@ const addNewProduct = async (req, res) => {
   const {
     name,
     price,
+    mPrice,
     description,
     quantity,
     categoryId,
@@ -84,10 +99,11 @@ const addNewProduct = async (req, res) => {
   });
 
   await Promise.all(uploadPromises);
- 
+
   const product = new Product({
     prod_name: name,
     prod_price: price,
+    prod_mrp: mPrice,
     prod_desc: description,
     prod_quantity: quantity,
     prod_images: imagePaths,
@@ -104,18 +120,17 @@ const addNewProduct = async (req, res) => {
 
 const loadEditProduct = async (req, res) => {
   try {
-    if(req.session.userid){
+    if (req.session.userid) {
       const products = await Product.findById({ _id: req.params.id })
-      .populate("prod_category")
-      .populate("prod_size")
-      .populate("prod_color");
-    const categories = await Category.find();
-    const colors = await Color.find();
-    const sizes = await Size.find();
+        .populate("prod_category")
+        .populate("prod_size")
+        .populate("prod_color");
+      const categories = await Category.find();
+      const colors = await Color.find();
+      const sizes = await Size.find();
 
-    res.render("editProduct", { categories, colors, sizes, products });
+      res.render("editProduct", { categories, colors, sizes, products });
     }
-    
   } catch (error) {
     console.log(error);
   }
@@ -126,6 +141,7 @@ const updateProduct = async (req, res) => {
     const {
       name,
       price,
+      mPrice,
       description,
       quantity,
       categoryId,
@@ -156,14 +172,12 @@ const updateProduct = async (req, res) => {
       (product.prod_name = name), (product.prod_category = categoryId);
       product.prod_desc = description;
       product.prod_price = price;
-      product.prod_color = colorId;
+      (product.prod_mrp = mPrice), (product.prod_color = colorId);
       product.prod_images = updatedImages;
       product.prod_size = sizeId;
       product.prod_quantity = quantity;
       product.prod_rating = rating;
       await product.save();
-
-      
 
       res.redirect("/admin/products");
     } else {
@@ -193,52 +207,51 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProductImage = async (req, res) => {
+  const { index, image, productId } = req.body;
+  console.log(index, image, productId);
 
-    const {index,image,productId} = req.body;
-    console.log(index,image,productId);
-        
   try {
-    
     const product = await Product.findById(productId);
-    
+
     if (!product) {
-      return res.status(404).send('Product not found');
-  }
-
-  const imagePath = path.join(__dirname, '../public/uploads', image);
-  
-
-  fs.unlink(imagePath, (err) => {
-    if (err) {
-        return res.status(500).send('Failed to delete image file');
+      return res.status(404).send("Product not found");
     }
-    product.prod_images.splice(index, 1);
-     product.save();
 
-  })   
+    const imagePath = path.join(__dirname, "../public/uploads", image);
+
+    fs.unlink(imagePath, (err) => {
+      if (err) {
+        return res.status(500).send("Failed to delete image file");
+      }
+      product.prod_images.splice(index, 1);
+      product.save();
+    });
   } catch (error) {
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 };
 
-
-
 const deleteProduct = async (req, res) => {
   try {
-
     const id = req.query.id;
-    const productData = await Product.findById({_id:id});
-    if(productData.is_deleted){
-      await Product.findByIdAndUpdate({_id:id},{$set:{is_deleted:false}});
+    const productData = await Product.findById({ _id: id });
+    if (productData.is_deleted) {
+      await Product.findByIdAndUpdate(
+        { _id: id },
+        { $set: { is_deleted: false } }
+      );
       res.status(301).redirect("/admin/products");
-    }else{
-      await Product.findByIdAndUpdate({_id:id},{$set:{is_deleted:true}});
-      res.status(301).redirect("/admin/products");    
-    }      
+    } else {
+      await Product.findByIdAndUpdate(
+        { _id: id },
+        { $set: { is_deleted: true } }
+      );
+      res.status(301).redirect("/admin/products");
+    }
   } catch (error) {
     console.log(error);
-
-}};
+  }
+};
 
 module.exports = {
   loadProductList,

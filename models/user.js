@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const product = require('./product');
 const passportLocalMongoose = require('passport-local-mongoose');
-const { type } = require('express/lib/response');
+
 
 const userSchema = mongoose.Schema({
     user_email :{
@@ -61,6 +61,10 @@ const userSchema = mongoose.Schema({
             required: true
           }        
     }],
+    wallet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Wallet'
+    },
     otp:{
         type:'string',
     },
@@ -98,7 +102,19 @@ const userSchema = mongoose.Schema({
          type: String,
          enum: ['local', 'google'],
           required: true
-         }
+    },
+    referralCode: { 
+        type: String,      
+        unique: true
+    },
+    referredBy: {
+         type: mongoose.Schema.Types.ObjectId,
+         ref: 'User'
+    },
+    referrals: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 
 })
 

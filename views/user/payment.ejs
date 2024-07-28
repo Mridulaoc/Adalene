@@ -1,117 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-  <%- include ("../layout/navBarnew.ejs") %>
-  <div class="container-fluid">
-    <div class="container mt-5" >
-        <h2 class="mb-3">Payment</h2>
-      
-    <div class="d-flex container gap-3">
-            <div class="card mb-3 col-3 mx-3 shadow">
-                    <% if (selectedAddress){%>
-                <div class="card-body">
-                    <h5>Selected Address</h5>
-                    <% const selectedAddressObj = user.addresses.id(selectedAddress) %>
-                    <p ><%= selectedAddressObj.houseNo %></p>
-                    <p><%= selectedAddressObj.street %>,</p>
-                    <p ><%= selectedAddressObj.city %>,</p>
-                    <p> <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,</p>
-                    <p ><%= selectedAddressObj.country %></p>
-                </div>
-            <%}%>
-            
-            </div>
-        
-            <div class="d-flex flex-column align-items-center rounded col-6">
-                <% if(cart.products.length >0){%>
-                <table class="table shadow  " >
-                <tr>
-                    <th scope="col ">Product</th>                   
-                    <th scope="col">Quantity</th>
-                    <th scope="col ">Total</th>                                             
-                </tr>  
-                <% cart.products.forEach(item =>{%>                 
-                    <tr class="">                                        
-                        <td scope="row" class="text-capitalize">
-                        <div class="d-flex gap-2 align-items-center">
-                        <img src="\uploads\<%= item.product.prod_images[0] %>" alt="" height="100px" wight="100px">
-                        <div class="d-flex flex-column ">
-                        <p class="fs-5"><%= item.product.prod_name %></p>
-                        <p class="fs-6">Color:<%= item.product.prod_color.color_name %></p>
+
+    <body>
+        <%- include ("../layout/navBarnew.ejs") %>
+            <div class="container-fluid">
+                <div class="container mt-5">
+                    <h2 class="mb-3">Payment</h2>
+
+                    <div class="d-flex container gap-3">
+                        <div class="card mb-3 col-3 mx-3 shadow">
+                            <% if (selectedAddress){%>
+                                <div class="card-body">
+                                    <h5>Selected Address</h5>
+                                    <% const selectedAddressObj=user.addresses.id(selectedAddress) %>
+                                        <p>
+                                            <%= selectedAddressObj.houseNo %>
+                                        </p>
+                                        <p>
+                                            <%= selectedAddressObj.street %>,
+                                        </p>
+                                        <p>
+                                            <%= selectedAddressObj.city %>,
+                                        </p>
+                                        <p>
+                                            <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,
+                                        </p>
+                                        <p>
+                                            <%= selectedAddressObj.country %>
+                                        </p>
+                                </div>
+                                <%}%>
+
                         </div>
-                        </div>
-                        </td>                       
-                        <td>                           
-                        <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="2" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>                               
+
+                        <div class="d-flex flex-column align-items-center rounded col-6">
+                            <% if(cart.products.length>0){%>
+                                <table class="table shadow  ">
+                                    <tr>
+                                        <th scope="col ">Product</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col ">Total</th>
+                                    </tr>
+                                    <% cart.products.forEach(item=>{%>
+                                        <tr class="">
+                                            <td scope="row" class="text-capitalize">
+                                                <div class="d-flex gap-2 align-items-center">
+                                                    <img src="\uploads\<%= item.product.prod_images[0] %>" alt=""
+                                                        height="100px" wight="100px">
+                                                    <div class="d-flex flex-column ">
+                                                        <p class="fs-5">
+                                                            <%= item.product.prod_name %>
+                                                        </p>
+                                                        <p class="fs-6">Color:<%= item.product.prod_color.color_name %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" id="quantityInput-<%= item.product._id %>"
+                                                    value="<%= item.quantity %>" min="1" max="2"
+                                                    class="py-1 border border-1 text-center"
+                                                    style="border-left: none; border-right: none;" readonly>
                         </div>
                         </td>
-                        <td><%= item.product.prod_price * item.quantity %></td>
+                        <td>
+                            <%= item.product.prod_price * item.quantity %>
+                        </td>
                         </tr>
-                    <%})%>                                        
-                </table>          
+                        <%})%>
+                            </table>
+                    </div>
+                    <div class="col-3 shadow mb-4 card">
+                        <div class="d-flex flex-column align-items-end container mb-4 ">
+                            <table class="table  ">
+                                <tr>
+                                    <td class="fs-5 py-3 ">Sub Total:</td>
+                                    <td class="fs-5 py-3 sub_total">₹<%= totalValue %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fs-5 py-3">Shipping:</td>
+                                    <% if (totalValue> 1000) {%>
+                                        <td class="fs-5 py-3">₹0</td>
+                                        <%} else {%>
+                                            <td class="fs-5 py-3">₹100</td>
+                                            <%}%>
+                                </tr>
+                                <tr>
+                                    <td class="fs-5 py-3 ">Total:</td>
+                                    <% if (totalValue> 1000) {%>
+                                        <td class="fs-5 py-3 total">₹<%= totalValue + 0 %>
+                                        </td>
+                                        <%} else {%>
+                                            <td class="fs-5 py-3 total">₹<%= totalValue + 100 %>
+                                            </td>
+                                            <%}%>
+
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="mb-3 mx-3">
+                            <h5><label for="couponCode" class="form-label">Coupon Code</label></h5>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="couponCode" name="couponCode"
+                                    placeholder="Enter coupon code">
+                                <button class="btn btn-outline-secondary" type="button" id="couponBtn">Apply</button>
+                            </div>
+                            <div id="couponMessage" class="mt-2"></div>
+                        </div>
+                        <form action="/payment" method="post" class=" mx-3 " id="paymentForm"
+                            data-selected-address="<%= selectedAddress %>">
+                            <h5>Wallet Balance: ₹<span id="walletBalance"></span></h5>
+                            <label for="useWalletAmount">Use from wallet:</label>
+                            <input type="number" id="useWalletAmount" name="useWalletAmount" min="0" step="0.01">
+                            <div class="form-group">
+                                <label>
+                                    <h5>Select Payment Method</h5>
+                                </label><br>
+                                <div class="form-check">
+                                    <input class="form-check-input payment-method" type="radio" name="paymentMethod"
+                                        id="cod" value="cod" checked>
+                                    <label class="form-check-label" for="cod">
+                                        <p style="font-size: 1rem;">Cash on Delivery</p>
+                                    </label>
+                                </div>
+                                <div class="form-check payment-method">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypal"
+                                        value="paypal">
+                                    <label class="form-check-label" for="paypal">
+                                        <p style="font-size: 1rem;">PayPal</p>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" id="placeOrderBtn"
+                                class="px-3 text-decoration-none fs-5 fw-bold  border rounded-2 bg-transparent my-3 "
+                                style="color: #BC4C2A;">PLACE ORDER</button>
+                        </form>
+                        <div id="paypal-button-container"></div>
+                    </div>
+                </div>
             </div>
-        <div class="col-3 shadow mb-4 card">    
-            <div class="d-flex flex-column align-items-end container mb-4 ">             
-                <table class="table  " >
-                <tr>
-                    <td class="fs-5 py-3">Sub Total:</td>
-                    <td class="fs-5 py-3">₹<%= totalValue %></td>
-                </tr>
-                <tr>
-                    <td class="fs-5 py-3">Shipping:</td>
-                    <% if (totalValue > 1000) {%>
-                        <td class="fs-5 py-3">₹0</td>
-                    <%} else {%>
-                        <td class="fs-5 py-3">₹100</td>
-                    <%}%>                        
-                </tr>
-                <tr>
-                    <td class="fs-5 py-3">Total:</td>
-                    <% if (totalValue > 1000) {%>
-                    <td class="fs-5 py-3">₹<%= totalValue + 0  %></td>
-                    <%} else {%>
-                    <td class="fs-5 py-3">₹<%= totalValue  + 100 %></td> 
-                    <%}%> 
-                            
-                </tr>
-                </table>       
-            </div> 
-        
-            <form action="/payment" method="POST" class=" mx-3 ">
-                <div class="form-group">
-                    <label><h5>Select Payment Method</h5></label><br>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
-                        <label class="form-check-label" for="cod">
-                            <p style="font-size: 1rem;">Cash on Delivery</p>
-                        </label>
+
+            <%} else {%>
+                <h3>Your cart is empty</h3>
+                <%}%>
+
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard">
-                        <label class="form-check-label" for="creditCard">
-                           <p style="font-size: 1rem;">Credit Card</p> 
-                        </label>
+
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
-                        <label class="form-check-label" for="paypal">
-                            <p style="font-size: 1rem;">PayPal</p>
-                        </label>
-                    </div>
-                </div>                
-                <button type="submit" class="px-3 text-decoration-none fs-5 fw-bold  border rounded-2 bg-transparent my-3 " style="color: #BC4C2A;">PLACE ORDER</button>
-            </form>
-        </div>
-        </div>
-    </div>   
- 
-        <%} else {%>    
-            <h3>Your cart is empty</h3>
-            <%}%>    
-            
-        </div> 
-        
-  </div>
-</body>
+                    <script>
+
+                    </script>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const paymentForm = document.getElementById('paymentForm');
+                            console.log(paymentForm)
+                            const paymentMethods = document.querySelectorAll('.payment-method');
+                            const placeOrderBtn = document.getElementById('placeOrderBtn');
+                            const paypalButtonContainer = document.getElementById('paypal-button-container');
+                            const walletBalanceSpan = document.getElementById('walletBalance');
+                            const useWalletAmountInput = document.getElementById('useWalletAmount');
+                            const couponCodeInput = document.getElementById('couponCode');
+                            const couponBtn = document.getElementById('couponBtn');
+                            const couponMessage = document.getElementById('couponMessage');
+
+                            let appliedCoupon = null;
+
+                            couponBtn.addEventListener('click', function () {
+                                if (appliedCoupon) {
+                                    removeCoupon();
+                                } else {
+                                    applyCoupon();
+                                }
+                            });
+
+                            function applyCoupon() {
+                                const couponCode = couponCodeInput.value.trim();
+                                if (couponCode) {
+                                    fetch('/apply-coupon', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ couponCode }),
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                appliedCoupon = data.coupon;
+                                                couponMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                                                updateTotalAmount(data.newSubTotal, data.grandTotal);
+                                                couponBtn.textContent = 'Remove';
+                                                couponBtn.classList.replace('btn-outline-secondary', 'btn-outline-danger');
+                                                couponCodeInput.disabled = true;
+                                            } else {
+                                                couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            couponMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+                                        });
+                                }
+                            }
+
+
+                            function removeCoupon() {
+                                fetch('/remove-coupon', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            appliedCoupon = null;
+                                            couponMessage.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
+                                            updateTotalAmount(data.newSubTotal, data.grandTotal);
+                                            couponBtn.textContent = 'Apply';
+                                            couponBtn.classList.replace('btn-outline-danger', 'btn-outline-secondary');
+                                            couponCodeInput.disabled = false;
+                                            couponCodeInput.value = '';
+                                        } else {
+                                            couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        couponMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+                                    });
+                            }
+
+                            function updateTotalAmount(newSubTotal, grandTotal) {
+                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
+                                document.querySelector('.total').textContent = `₹${grandTotal}`;
+                            }
+
+
+                            fetch('/my-wallet/balance')
+                                .then(response => response.json())
+                                .then(data => {
+                                    walletBalanceSpan.textContent = data.balance.toFixed(2);
+                                    useWalletAmountInput.max = data.balance;
+                                });
+
+
+                            let paypalButtonsRendered = false;
+
+                            function updateButtonVisibility() {
+                                const isPayPalSelected = document.getElementById('paypal').checked;
+                                paypalButtonContainer.style.display = isPayPalSelected ? 'block' : 'none';
+                                placeOrderBtn.style.display = isPayPalSelected ? 'none' : 'block';
+
+                                if (isPayPalSelected && !paypalButtonsRendered) {
+
+                                    renderPayPalButtons();
+                                }
+                            }
+
+                            paymentMethods.forEach(method => {
+                                method.addEventListener('change', updateButtonVisibility);
+                            });
+
+
+                            updateButtonVisibility();
+
+                            function renderPayPalButtons() {
+                                console.log('Rendering PayPal buttons');
+                                paypal.Buttons({
+                                    createOrder: function (data, actions) {
+                                        console.log('CreateOrder function called');
+                                        return fetch('/create-paypal-order', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                selectedAddress: paymentForm.dataset.selectedAddress,
+                                                useWalletAmount: useWalletAmountInput.value
+                                            }),
+                                        }).then(function (res) {
+                                            console.log('Server response received');
+                                            return res.json();
+                                        }).then(function (orderData) {
+                                            console.log('Order created:', orderData);
+
+                                            if (!orderData.id) {
+                                                throw new Error('Order ID missing in response');
+                                            }
+                                            return orderData.id;
+
+                                        }).catch(function (error) {
+                                            console.error('Error creating order:', error);
+                                        });
+                                    },
+                                    onApprove: function (data, actions) {
+                                        return actions.order.capture().then(function (details) {
+                                            console.log('Capture result', details, JSON.stringify(details, null, 2));
+                                            // Call your server to save the transaction
+                                            return fetch('/paypal-success', {
+                                                method: 'post',
+                                                headers: {
+                                                    'content-type': 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    orderID: data.orderID,
+                                                    payerID: data.payerID,
+                                                    paymentID: details.id
+                                                })
+                                            });
+                                        }).then(function () {
+                                            window.location.href = '/order-confirmation/' + data.orderID;
+                                        });
+                                    },
+                                    onError: function (err) {
+                                        console.error('PayPal button error:', err);
+                                    }
+                                }).render('#paypal-button-container').then(function () {
+                                    paypalButtonsRendered = true;
+                                }).catch(function (error) {
+                                    console.error('PayPal button render error:', error);
+                                });
+                            }
+
+
+                        })
+                    </script>
+    </body>
+
 </html>

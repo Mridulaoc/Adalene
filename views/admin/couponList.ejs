@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <h2 class="text-center my-5">Coupon List</h2>
+
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="d-flex justify-content-end mb-5">
+                        <a href="/admin/coupons/add-coupon"
+                            class="px-3 mx-5 text-decoration-none fs-6   border rounded-2 p-2"
+                            style="background-color: #BC4C2A; color: white;">ADD NEW COUPON</a>
+                    </div>
+                    <div class="d-flex flex-column align-items-center mb-5">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th scope="col">SI No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Expiry</th>
+                                <th scope="col">Value</th>
+                                <th scope="col">Minimum Purchase</th>
+                                <th scope="col" colspan="2" class="text-center">Actions</th>
+                            </tr>
+                            <%if(coupons.length> 0){
+                                for(let i=0; i<coupons.length; i++){ %>
+
+                                    <tr>
+                                        <td>
+                                            <%= i+1 %>
+                                        </td>
+                                        <td scope="row" class="text-capitalize">
+                                            <%= coupons[i].Name %>
+                                        </td>
+                                        <td>
+                                            <%= coupons[i].expiryDate.toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <%= coupons[i].Value %>
+                                        </td>
+                                        <td>
+                                            <%= coupons[i].MinPurchase %>
+                                        </td>
+                                        <td><a href="coupons/edit-coupon/<%= coupons[i]._id %>"
+                                                class="px-3 text-decoration-none fs-5  border rounded-2 "
+                                                style="color: #BC4C2A;">EDIT</a></td>
+                                        <td><button class="px-3 fs-5  border rounded-2 bg-transparent "
+                                                style="color: #BC4C2A;"
+                                                onclick="confirmDelete('<%= coupons[i]._id %>')">
+                                                <%= coupons[i].isDeleted ? 'LIST' : 'UNLIST' %>
+                                            </button></td>
+                                    </tr>
+
+                                    <%}%>
+                                        <%}else{%>
+
+                                            <td>Data not found</td>
+
+                                            <%}%>
+
+                        </table>
+
+                        <br>
+                        <div class="d-flex gap-3">
+                            <% if (currentPage> 1) { %>
+                                <a href="/admin/coupons/?page=<%= currentPage - 1 %>"
+                                    class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
+                                <% } %>
+                                    <div class="d-flex gap-3">
+                                        <% for (i=1; i <=totalPages; i++ ){ %>
+                                            <a href="/admin/coupons/?page=<%= i %>"
+                                                class="text-decoration-none fw-bold fs-5 button rounded">
+                                                <%= i %>
+                                            </a>
+                                            <%}%>
+                                    </div>
+                                    <% if (currentPage < totalPages) { %>
+                                        <a href="/admin/coupons/?page=<%= Number(currentPage) + 1 %>"
+                                            class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                                        <% } %>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>
+                <script>
+                    function confirmDelete(couponId) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`/admin/coupons/delete-coupon?id=${couponId}`, {
+                                    method: 'GET'
+                                }).then(response => {
+                                    if (response.redirected) {
+                                        window.location.href = response.url;
+                                    } else {
+                                        Swal.fire(
+                                            'Error!',
+                                            'There was an issue deleting the coupon.',
+                                            'error'
+                                        );
+                                    }
+                                }).catch(error => {
+                                    Swal.fire(
+                                        'Error!',
+                                        'There was an issue deleting the coupon.',
+                                        'error'
+                                    );
+                                });
+                            }
+                        });
+                    }
+                </script>
+    </body>
+
+</html>

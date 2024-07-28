@@ -27,6 +27,7 @@
                     <a href="/addresses/edit/<%= userData._id %>/<%= index %>">
                     <button class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent" style="color: #BC4C2A; ">EDIT ADDRESS</button>
                     </a>
+                    <button class="px-3 text-decoration-none fs-6 border rounded-2 bg-transparent delete-address" style="color: #BC4C2A;" data-id="<%= userData._id %>" data-index="<%= index %>">DELETE ADDRESS</button>
                 </div>
                               
                 <%})%>
@@ -34,13 +35,58 @@
             <% } else {%>
             <p>Address not found</p>
             <%}%>       
-        </div> 
+        
         <div class="text-center my-5">
         <a href="/addresses/add" class="px-3 py-2 text-decoration-none text-center fs-6  border rounded-2" style="background-color: #BC4C2A;width: 50%; margin:0 auto; color: white;  " >ADD ADDRESS</a>  
+    </div> 
     </div>
     </div>
     </div>
   </div>
   <%- include ("../layout/footerAdmin.ejs") %>
+  <script>
+    document.querySelectorAll('.delete-address').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.id;
+                const addressIndex = this.dataset.index;
+                
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        
+                        fetch(`/addresses/delete/${userId}/${addressIndex}`, {
+                            method: 'DELETE',
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    'The address has been deleted.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload(); 
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Failed!',
+                                    'Failed to delete address.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+  </script>
 </body>
 </html>

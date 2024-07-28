@@ -26,7 +26,20 @@ const categorySchema = mongoose.Schema({
         type: 'string',
         enum:['ACTIVE','INACTIVE'],
         default: 'ACTIVE'
-    }
+    },
+    offer: {
+        discount_percentage: {
+            type: Number,
+            min: 0,
+            max: 100
+        },
+        start_date: Date,
+        end_date: Date,
+        is_active: {
+            type: Boolean,
+            default: false
+        }
+    },
 })
 
 module.exports = mongoose.model('Category', categorySchema);

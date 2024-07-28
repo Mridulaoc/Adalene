@@ -68,7 +68,7 @@ const updateCategory = async(req,res)=>{
         const categoryData = await Category.findByIdAndUpdate({_id:id},{$set:{cat_name:req.body.category, cat_desc:req.body.description}})
         res.redirect('/admin/categories')
     } catch (error) {
-        
+        console.log(error)
     }
 }
 const deleteCategory = async(req,res)=>{

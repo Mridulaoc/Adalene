@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <div class="container-fluid">
+                <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"
+                    style="height: 90vh;">
+                    <h2 class="mb-5 text-center fs-5"> ADD NEW COUPON</h2>
+
+
+                    <form action="/admin/coupons/add-coupon" method="post" autocomplete="off" style="width: 90%;">
+                        <% if (locals.error) { %>
+                            <div class="alert alert-danger">
+                                <%= error %>
+                            </div>
+                            <%}%>
+
+                                <div class="mb-3 ">
+                                    <label for="coupon" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="coupon" placeholder="Enter coupon name"
+                                        name="coupon" required onchange="validateCouponName()">
+                                    <span id="nameError" style="color: red;"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" name="description" required
+                                        minlength="10" maxlength="200" onchange="validateCouponDesc()"></textarea>
+                                    <span id="descError" style="color: red;"></span>
+                                </div>
+                                <div class="mb-3 ">
+                                    <label for="expiryDate" class="form-label">Expiry</label>
+                                    <input type="date" class="form-control" id="expiryDate"
+                                        placeholder="Enter coupon name" name="expiryDate" required>
+                                    <!-- <span id="nameError" style="color: red;"></span> -->
+                                </div>
+                                <div class="mb-3 ">
+                                    <label for="value" class="form-label">Value</label>
+                                    <input type="number" class="form-control" id="value" name="value" required onchange="validateValue()">
+                                    <span id="valueError" style="color: red;"></span>
+                                </div>
+                                <div class="mb-3 ">
+                                    <label for="minPurchase" class="form-label">Minimum Purchase</label>
+                                    <input type="number" class="form-control" id="minPurchase" name="minPurchase"
+                                        required onchange="validateMinPurchase()">
+                                    <span id="minPurchaseError" style="color: red;"></span>
+                                </div>
+                                <div class="mb-3 ">
+                                    <input type="submit" class="form-control  fs-6" value="ADD NEW COUPON" required>
+                                </div>
+                    </form>
+                    <div class="mb-3 border text-center py-1 rounded" style="width: 90%;">
+                        <a href="/admin/coupons" class="fs-6 text-decoration-none text-black"> CANCEL</a>
+                    </div>
+
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>
+
+
+
+
+
+                <!-- Validation Scripts -->
+                <script>
+                    function validateCouponName() {
+                        const couponName = document.getElementById("coupon").value.trim();
+                        const nameError = document.getElementById("nameError");
+
+                        if (couponName.length < 1 || couponName.length === 0) {
+                            nameError.textContent = "Coupon name must not be empty";
+                        }
+                    }
+
+                    function validateCouponDesc() {
+                        var couponDescription = document.getElementById('description').value.trim();
+                        const descError = document.getElementById("descError");
+
+
+                        if (couponDescription.length < 10 || couponDescription.length > 200) {
+                            descError.textContent = "Coupon description must be between 10 and 200 characters";
+                        }
+                    };
+
+                    function validateValue() {
+                        const valueInput = document.getElementById('value').value;
+                        const valueError = document.getElementById('valueError');
+                        // errorSpan.textContent = ''; // Clear previous error message
+                        if (isNaN(valueInput) || valueInput <= 0) {
+                        valueError.textContent = 'Please enter a valid amount greater than 0.';
+                        }
+                    }
+
+                    function validateMinPurchase() {
+                        const minPurchase = document.getElementById('minPurchase').value;
+                        const minPurchaseError = document.getElementById('minPurchaseError');
+                        // errorSpan.textContent = ''; // Clear previous error message
+                        if (isNaN(minPurchase) || minPurchase <= 0) {
+                        minPurchaseError.textContent = 'Please enter a valid amount greater than 0.';
+                        }
+                    }
+
+
+                </script>
+    </body>
+
+</html>

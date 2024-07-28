@@ -13,6 +13,8 @@ const productController = require('../controllers/productController');
 const userManagementController = require('../controllers/userManagementController');
 const {isAuthenticated,isNotAuthenticated} = require('../middleware/adminAuth');
 const orderController = require('../controllers/orderController');
+const couponController = require('../controllers/couponController');
+const offerController = require('../controllers/offerController');
 
 // middlewares 
 adminRoute.use(express.static('public'));
@@ -87,6 +89,24 @@ adminRoute.get('/users/block-user',isAuthenticated,userManagementController.bloc
 adminRoute.get('/orders',isAuthenticated,orderController.displayOrders);
 adminRoute.get('/orders/view-order/:orderId',isAuthenticated,orderController.viewOrder);
 adminRoute.put('/orders/view-order/:orderId',isAuthenticated,orderController.updateStatus)
+
+// coupon routes 
+
+adminRoute.get('/coupons',isAuthenticated,couponController.loadCouponList);
+adminRoute.get('/coupons/add-coupon',isAuthenticated,couponController.loadAddCoupon);
+adminRoute.post('/coupons/add-coupon',isAuthenticated,couponController.addNewCoupon);
+adminRoute.get('/coupons/edit-coupon/:id', isAuthenticated, couponController.loadEditCoupon);
+adminRoute.put('/coupons/edit-coupon/:id',  isAuthenticated,couponController.updateCoupon);
+adminRoute.get('/coupons/delete-coupon',  isAuthenticated, couponController.deleteCoupon);
+
+//offer routes
+
+adminRoute.get('/productOffer', isAuthenticated, offerController.getProductOffer);
+adminRoute.get('/productOffer/add-offer/:id', isAuthenticated, offerController.getAddProductOffer);
+adminRoute.post('/productOffer/add-offer', isAuthenticated, offerController.addNewproductOffer);
+adminRoute.get('/productOffer/edit-offer/:id', isAuthenticated, offerController.getEditProductOffer);
+// adminRoute.put('/offers/productOffer/edit-offer/:id', isAuthenticated, offerController.updateProductOffer);
+
 
 
 

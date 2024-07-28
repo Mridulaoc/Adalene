@@ -3,7 +3,7 @@
       <form action="" class="d-flex my-5" style="width: 100%;">
         <input type="text" placeholder="Search" value="<%= search %>"  name="search" class="form-control mx-2" id="search">
         <input type="submit" class="border rounded-2 fw-bold" value="Search">
-    </form>       
+      </form>       
       <label for="sortBy" class="fs-5 fw-bold">Sort by:</label>
         <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 90%;">
           <option value="popularity" <%= sortBy === 'popularity' ? 'selected' : '' %>>Popularity</option>
@@ -14,8 +14,10 @@
           <option value="newArrivals" <%= sortBy === 'newArrivals' ? 'selected' : '' %>>New arrivals</option>
           <option value="aToZ" <%= sortBy === 'aToZ' ? 'selected' : '' %>>A - Z</option>
           <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Z - A</option>
-        </select>
-
-      
-      
+        </select>  
+        <div>          
+          <input type="checkbox" id="showOutOfStock" onchange="updateProducts()">
+          <label for="showOutOfStock">Exclude out of stock</label>
+      </div>   
     </div>
+   

@@ -1,52 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body >
-  <%- include ("../layout/navBarnew.ejs") %>
-  <div class="container-fluid mb-5" style="height: 100vh;">
-    <div class="container">
-        <h4>Account</h4>
-        <div class="d-flex gap-5 ">
-            <div class="col-3 border px-5 py-5 rounded" >
-              <p><a href="/profile" class="text-decoration-none fs-4 " style="color: #888888;" >Profile</a></p>
-              <p><a href="/addresses" class="text-decoration-none fs-4 " style="color: #888888;" >Addresses</a></p>
-              <p><a href="/order-history" class="text-decoration-none fs-4 " style="color: #888888;" >Order</a></p>
-            </div>
-            <div class="col-7 border shadow rounded">
-              <h4 style="padding: 1.5rem 10rem;">Profile Details</h4>
-              <hr style="width: 80%;margin: auto;">
-              <div style="padding: 3rem 10rem;"> 
-                <table class="table table-borderless fs-5">
-                  <tr>
-                    <td>Full Name</td>
-                    <td><%= userData.user_name %></td>
-                  </tr>
-                  <tr>
-                    <td>Mobile Number</td>
-                    <td><%= userData.user_contact %></td>
-                  </tr>
-                  <tr>
-                    <td>Email Id</td>
-                    <td><%= userData.user_email %></td>
-                  </tr>
-                  <tr>
-                    <td>Gender</td>
-                    <td><%= userData.user_gender ? userData.user_gender : '-Not Added-'%></td>
-                  </tr>  
-                  <tr>
-                    <td>Date Of Birth</td>
-                    <td><%= userData.user_dob ? moment(userData.user_dob).format('MMMM Do YYYY') : '-Not Added-'%></td>
-                  </tr>                                    
-                </table>                
+
+  <body>
+    <%- include ("../layout/navBarnew.ejs") %>
+      <div class="container-fluid mb-5" style="height: 100vh;">
+        <div class="container">
+          <h4>Account</h4>
+          <div class="d-flex gap-5 ">
+            <%- include ("../layout/profileSidebar.ejs") %>
+              <div class="col-7 border shadow rounded">
+                <h4 style="padding: 1.5rem 10rem;">Profile Details</h4>
+                <hr style="width: 80%;margin: auto;">
+                <div style="padding: 3rem 10rem;">
+                  <table class="table table-borderless fs-5">
+                    <tr>
+                      <td>Full Name</td>
+                      <td>
+                        <%= userData.user_name %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Mobile Number</td>
+                      <td>
+                        <%= userData.user_contact %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Email Id</td>
+                      <td>
+                        <%= userData.user_email %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Gender</td>
+                      <td>
+                        <%= userData.user_gender ? userData.user_gender : '-Not Added-' %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Date Of Birth</td>
+                      <td>
+                        <%= userData.user_dob ? moment(userData.user_dob).format('MMMM Do YYYY') : '-Not Added-' %>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div style="width: 100%; text-align: center; padding: 0 0 2rem 0;margin:0 auto;">
+                  <a href="/profile/edit/<%= userData._id%>"
+                    class=" text-decoration-none text-center fs-6  border rounded-2"
+                    style="background-color: #BC4C2A; color: white; padding: .5rem 10rem;  "> EDIT DETAILS</a>
+                </div>
               </div>
-              <div style="width: 100%; text-align: center; padding: 0 0 2rem 0;margin:0 auto;">
-              <a href="/profile/edit/<%= userData._id%>" class=" text-decoration-none text-center fs-6  border rounded-2" style="background-color: #BC4C2A; color: white; padding: .5rem 10rem;  " > EDIT DETAILS</a>
-            </div>    
-            </div>
+          </div>
         </div>
-    </div>
-  </div>
-  
-  <%- include ("../layout/footerAdmin.ejs") %>
-</body>
+      </div>
+
+      <%- include ("../layout/footerAdmin.ejs") %>
+  </body>
+
 </html>

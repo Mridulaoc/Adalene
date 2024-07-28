@@ -4,6 +4,8 @@ const session = require("express-session");
 const noCache = require('nocache');
 const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
+const walletController = require('../controllers/walletController')
+const couponController = require('../controllers/couponController');
 const passport = require('passport');
 require('../passport')
 // const userAuth = require('../middleware/userAuth');
@@ -94,7 +96,12 @@ userRoute.get('/cart/count', isAuthenticated, userController.countCartItems);
 userRoute.get('/checkout', isAuthenticated, userController.displayAddressSelection);
 userRoute.post('/checkout', isAuthenticated, userController.selectedAddress);
 userRoute.get('/payment', isAuthenticated, userController.displayPayment);
+userRoute.post('/apply-coupon', isAuthenticated, couponController.applyCoupon);
+userRoute.post('/remove-coupon', isAuthenticated, couponController.removeCoupon);
+userRoute.post('/paypal-success', isAuthenticated, userController.paypalSuccess);
+userRoute.post('/paypal-cancel', isAuthenticated, userController.paypalCancel);
 userRoute.post('/payment', isAuthenticated, userController.processPayment);
+userRoute.post('/create-paypal-order',isAuthenticated, userController.createPaypalOrder);
 userRoute.get('/order-confirmation/:orderId', isAuthenticated, userController.displayOrderConfirmation);
 userRoute.get('/profile', isAuthenticated, userController.displayProfile);
 userRoute.get('/profile/edit/:id', isAuthenticated, userController.displayEditProfile);
@@ -104,10 +111,22 @@ userRoute.get('/addresses/add', isAuthenticated, userController.displayAddAddres
 userRoute.post('/addresses/add', isAuthenticated, userController.addAddress);
 userRoute.get('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.displayEditAddress);
 userRoute.put('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.updateAddress);
+userRoute.delete('/addresses/delete/:id/:addressIndex', isAuthenticated, userController.deleteAddress)
+userRoute.get('/change-password', isAuthenticated, userController.displayChangePassword);
+userRoute.post('/change-password', isAuthenticated, userController.changePassword);
 userRoute.get('/order-history', isAuthenticated, userController.displayOrderHistory);
 userRoute.post('/cancel-order', isAuthenticated, userController.cancelOrder);
 userRoute.get('/order-details/:orderId', isAuthenticated, userController.displayOrderDetails)
-userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrderItem)
+userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrderItem);
+userRoute.post('/return-order-item', isAuthenticated, userController.returnOrderItem);
+userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
+userRoute.get('/my-wallet', isAuthenticated, walletController.loadMyWallet);
+userRoute.get('/my-wallet/balance', isAuthenticated, walletController.getWalletBalance);
+userRoute.get('/my-wallet/transactions', isAuthenticated, walletController.getWalletTransactions);
+userRoute.get('/wishlist',isAuthenticated,userController.getWishlist);
+userRoute.post('/wishlist/add', isAuthenticated, userController.addToWishlist);
+userRoute.post('/wishlist/remove', isAuthenticated, userController.removeFromWishlist);
+userRoute.get('/my-referrals', isAuthenticated, userController.getReferrals);
 userRoute.get('/signout',  userController.userSignOut);
 
 userRoute.use((err, req, res, next) => {

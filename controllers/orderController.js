@@ -20,6 +20,7 @@ const displayOrders = async(req,res)=>{
             .populate('products.product')
             .limit(limit*1)
             .skip((page-1)*limit)
+            .sort({ orderDate: -1 })
             .exec();
             const count = await Order.find({orderId:{$regex:".*" + search + ".*", $options:'i' }}).countDocuments();
             res.render('orderList', {orders,search,totalPages:Math.ceil(count/limit), currentPage:page,moment})
@@ -59,6 +60,9 @@ const updateStatus = async (req, res) => {
                 res.status(404).send('Order not found');
             }
             order.status = status;
+            order.products.forEach(product => {
+                product.productStatus = status;
+            })
             await order.save();
             res.redirect('/admin/orders')
 

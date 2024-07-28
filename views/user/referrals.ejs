@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+  <body>
+    <%- include ("../layout/navBarnew.ejs") %>
+      <div class="container-fluid mb-5" style="height: 100vh;">
+        <div class="container">
+          <h4>Account</h4>
+          <div class="d-flex gap-5 ">
+            <%- include ("../layout/profileSidebar.ejs") %>
+              <div class="col-7 border shadow rounded">
+                <h4 style="padding: 1.5rem 10rem;">Referral Details</h4>
+                <hr style="width: 80%;margin: auto;">
+                <div style="padding: 3rem 10rem;">
+                 <h6>Your Referral Code is <%= user.referralCode %></h6>
+                </div>
+                
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <%- include ("../layout/footerAdmin.ejs") %>
+  </body>
+
+</html>

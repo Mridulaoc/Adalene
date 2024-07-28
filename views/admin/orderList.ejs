@@ -32,7 +32,7 @@
                                     <td><%= orders[i].user.user_name %></td>
                                     <td><%= moment(orders[i].orderDate).format('DD/ MM /YYYY')%> </td>
                                     <td><%= orders[i].status %></td>
-                                    <td><%= orders[i].total %></td>
+                                    <td>₹<%= orders[i].total %></td>
                                     <td class="text-center"><a href="/admin/orders/view-order/<%= orders[i]._id %>" class="px-3 text-decoration-none fs-5  border rounded-2 " style="color: #BC4C2A;">VIEW</a></td>
                                 </tr>
                             <%}%>                       
@@ -43,15 +43,15 @@
                 <br>
                 <div class="d-flex gap-3">
                     <% if (currentPage > 1) { %>
-                    <a href="/admin/products/?search=<%= search %>&page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
+                    <a href="/admin/orders/?search=<%= search %>&page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
                     <% } %>
                     <div class="d-flex gap-3">
                 <% for (i = 1; i <= totalPages; i++ ){ %>
-                    <a href="/admin/products/?search=<%= search %>&page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded"><%= i %></a>                    
+                    <a href="/admin/orders/?search=<%= search %>&page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded"><%= i %></a>                    
                 <%}%>
                 </div>
                 <% if (currentPage < totalPages) { %>
-                <a href="/admin/products/?search=<%= search %>&page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                <a href="/admin/orders/?search=<%= search %>&page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
                 <% } %>
                 </div>
                 

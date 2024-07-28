@@ -11,37 +11,37 @@
         <div class="d-flex gap-3">
         <div class="mb-3 ">           
           <label for="houseNo" class="form-label">House No</label>
-          <input type="text" class="form-control" id="houseNo" name="houseNo" onchange="validateName()" value="<%= address.houseNo %>" required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="houseNo" name="houseNo" onchange="validateName('houseNo')" value="<%= address.houseNo %>" required >
+          <span id="houseNoError" style="color: red;"></span>
         </div>
         <div class="mb-3 ">           
           <label for="street" class="form-label">Street</label>
-          <input type="text" class="form-control" id="street" name="street" onchange="validateName()"  value="<%= address.street %>"  required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="street" name="street" onchange="validateName('street')"  value="<%= address.street %>"  required >
+          <span id="streetError" style="color: red;"></span>
         </div>
       </div>
       <div class="d-flex gap-3">
         <div class="mb-3 ">           
           <label for="city" class="form-label">City</label>
-          <input type="text" class="form-control" id="city" name="city" onchange="validateName()"  value="<%= address.city %>"  required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="city" name="city" onchange="validateName('city')"  value="<%= address.city %>"  required >
+          <span id="cityError" style="color: red;"></span>
         </div>
         <div class="mb-3 ">           
           <label for="state" class="form-label">State</label>
-          <input type="text" class="form-control" id="state" name="state" onchange="validateName()"  value="<%= address.state %>"  required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="state" name="state" onchange="validateName('state')"  value="<%= address.state %>"  required >
+          <span id="stateError" style="color: red;"></span>
         </div>
       </div>
       <div class="d-flex gap-3">
         <div class="mb-3 ">           
           <label for="country" class="form-label">Country</label>
-          <input type="text" class="form-control" id="country" name="country" onchange="validateName()"  value="<%= address.country %>"  required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="country" name="country" onchange="validateName('country')"  value="<%= address.country %>"  required >
+          <span id="countryError" style="color: red;"></span>
         </div>
         <div class="mb-3 ">           
           <label for="zipcode" class="form-label">Zipcode</label>
-          <input type="text" class="form-control" id="zipcode" name="zipcode" onchange="validateName()"  value="<%= address.zipCode %>"  required >
-          <span id="nameError" style="color: red;"></span>
+          <input type="text" class="form-control" id="zipcode" name="zipcode" onchange="validateName('zipcode')"  value="<%= address.zipCode %>"  required >
+          <span id="zipcodeError" style="color: red;"></span>
         </div>
       </div>
       <div class="mb-3">
@@ -53,12 +53,12 @@
   <%- include ("../layout/footerAdmin.ejs") %>
 </body>
 <script>
-  function validateName() {
-          const name = document.getElementById("name").value.trim();
-          const nameError = document.getElementById("nameError");
+  function validateName(fieldId) {
+          const fieldValue= document.getElementById(fieldId).value.trim();
+          const nameError = document.getElementById(`${fieldId}Error`);
 
-          if (name.length < 5) {
-            nameError.textContent = "Name must be atleat 5 characters long"
+          if (fieldValue.length < 5) {
+            nameError.innerHTML = `Must be atleat 5 characters long`
           }
 
         }

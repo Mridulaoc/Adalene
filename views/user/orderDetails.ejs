@@ -33,11 +33,13 @@
                             <td class="py-5"><%= item.product.prod_name %></td>
                             <td class="py-5"><%= item.price %></td>
                             <td class="py-5"><%= item.quantity %></td>
-                            <td class="py-5"><%= item.price * item.quantity %></td>
-                            <td class="py-5"><%= item.productStatus %></td>
+                            <td class="py-5"><%= item.price * item.quantity %></td>                            
+                            <td class="py-5"><%= item.productStatus %></td>                         
                             <td class="py-5"><% if(item.productStatus === 'Pending'){%>
                                 <button class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
-                                <%}%>
+                                <%} else if (item.productStatus === 'Delivered'){ %>
+                                  <button class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="returnOrderItem('<%= order._id %>','<%= item.product._id %>')">RETURN</button> 
+                                  <%}%>
                             </td>
                         </tr>
                     <%})%>
@@ -49,6 +51,16 @@
   <%- include ("../layout/footerUser.ejs") %>
   <script>
     async function cancelOrderItem(orderId,productId){
+        const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to cancel this item?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, cancel it!',
+        cancelButtonText: 'No, keep it'
+      });
+
+       if(result.isConfirmed){
         await fetch('/cancel-order-item',{
             method: 'POST',
             headers:{
@@ -56,17 +68,64 @@
             },
             body: JSON.stringify({orderId,productId})
         })
-        .then(response => response.json)
+        .then(response => response.json())
         .then(data =>{
             if(data.success){
-                alert('Item Cancelled Successfully');
-                location.reload();
+            Swal.fire({
+            icon: 'success',
+            text: 'Item cancelled successfully',
+          }).then(()=>{
+            location.reload();
+          })                
             }else{
-                alert('Failed to cancel the item');
+               
+            Swal.fire({
+            icon: 'Failure',
+            text: 'Failed to cancel the item',
+          })
             }       
         })
         .catch(error=>console.log(error));       
     }
+}
+
+async function returnOrderItem(orderId, productId) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to return this item?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, return it!',
+            cancelButtonText: 'No, keep it'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch('/return-order-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, productId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire('Returned!', 'The item has been returned.', 'success')
+                        .then(() => {
+                            location.reload();
+                        });
+                } else {
+                    Swal.fire('Failed!', data.message || 'Failed to return the item.', 'error');
+                }
+            } catch (error) {
+                console.log(error);
+                Swal.fire('Error!', 'An error occurred while returning the item.', 'error');
+            }
+        }
+    }
+
   </script>
 </body>
 </html>

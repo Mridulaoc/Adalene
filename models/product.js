@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
@@ -9,9 +10,13 @@ const productSchema = mongoose.Schema({
         type: 'string',
         required:true,
     },
-    prod_price:{
+    prod_mrp:{
         type: 'number',
         required:true,
+    },
+    prod_price:{
+        type: 'number',
+       
     },
     prod_category:{
         type: mongoose.Schema.Types.ObjectId,
@@ -57,6 +62,24 @@ const productSchema = mongoose.Schema({
         type: 'string',
         enum:['ACTIVE','INACTIVE'],
         default: 'ACTIVE'
+    },
+    offer: {
+        name:{
+            type:'string',
+            
+        },
+        description:{
+            type:'string',
+            
+        },
+        discount_percentage: {
+            type: Number,
+            min: 0,
+            max: 100
+        },
+        start_date: Date,
+        end_date: Date,
+        
     }
 })
 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <h2 class="text-center my-5">Product Offer List</h2>
+
+            <div class="container-fluid">
+                <div class="container">
+                    
+                    <div class="d-flex flex-column align-items-center mb-5">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th scope="col">SI No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Start Date</th>
+                                <th scope="col">End Date</th>
+                                <th scope="col">Percentage</th>
+                                <th scope="col" class="text-center"></th>
+                            </tr>
+                            <%if(productOffer.length> 0){
+                                for(let i=0; i<productOffer.length; i++){ %>
+
+                                    <tr>
+                                        <td>
+                                            <%= i+1 %>
+                                        </td>
+                                        <td scope="row" class="text-capitalize">
+                                            <%= productOffer[i].offer.name %>
+                                        </td>
+                                        <td>
+                                            <%= productOffer[i].offer.start_date.toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <%= productOffer[i].offer.end_date.toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <%= productOffer[i].offer.discount_percentage %>
+                                        </td>
+                                        
+                                        <td><a href="productOffer/edit-offer/<%= productOffer[i]._id %>"
+                                                class="px-3 text-decoration-none fs-5  border rounded-2 "
+                                                style="color: #BC4C2A;">EDIT</a></td>
+                                        
+                                    </tr>
+
+                                    <%}%>
+                                        <%}else{%>
+
+                                            <td>Data not found</td>
+
+                                            <%}%>
+
+                        </table>
+
+                        <br>
+                        <div class="d-flex gap-3">
+                            <% if (page> 1) { %>
+                                <a href="/admin/productOffer/?page=<%= page - 1 %>"
+                                    class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
+                                <% } %>
+                                    <div class="d-flex gap-3">
+                                        <% for (i=1; i <=totalPage; i++ ){ %>
+                                            <a href="/admin/productOffer/?page=<%= i %>"
+                                                class="text-decoration-none fw-bold fs-5 button rounded">
+                                                <%= i %>
+                                            </a>
+                                            <%}%>
+                                    </div>
+                                    <% if (page < totalPage) { %>
+                                        <a href="/admin/productOffer/?page=<%= Number(page) + 1 %>"
+                                            class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                                        <% } %>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>
+                <script>
+                    function confirmDelete(couponId) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`/admin/coupons/delete-coupon?id=${couponId}`, {
+                                    method: 'GET'
+                                }).then(response => {
+                                    if (response.redirected) {
+                                        window.location.href = response.url;
+                                    } else {
+                                        Swal.fire(
+                                            'Error!',
+                                            'There was an issue deleting the coupon.',
+                                            'error'
+                                        );
+                                    }
+                                }).catch(error => {
+                                    Swal.fire(
+                                        'Error!',
+                                        'There was an issue deleting the coupon.',
+                                        'error'
+                                    );
+                                });
+                            }
+                        });
+                    }
+                </script>
+    </body>
+
+</html>

@@ -43,6 +43,10 @@ const orderSchema = mongoose.Schema({
         }
     ],
 
+    subtotal:{
+        type: Number,
+        required: true,
+    },
     total: {
         type: Number,
         required: true,
@@ -54,6 +58,32 @@ const orderSchema = mongoose.Schema({
     status:{
         type: String,
         default: 'Pending'
+    },
+    paypalOrderId: {
+         type: String 
+    },
+    refundId: {
+        type: String,
+    },
+    refundStatus: {
+        type: String,
+        enum: ['Not Applicable', 'Pending', 'Completed', 'Failed'],
+        default: 'Not Applicable'
+    },
+    refundAmount: {
+        type: Number,
+    },
+    refundDate: {
+        type: Date,
+    },
+    refundError: {
+        type: String,
+    },
+    walletAmountUsed:{
+        type:Number,
+    },
+    discount:{
+        type: Number,
     }
 })
 

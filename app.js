@@ -6,6 +6,7 @@ const path = require('path');
 require('dotenv/config')
 const mongoose = require('mongoose');
 const { attachCartData } = require('./middleware/cartMiddleware');
+const paypal = require('./utils/paypal')
 
 
 mongoose.connect(process.env.CONNECTION_STRING)

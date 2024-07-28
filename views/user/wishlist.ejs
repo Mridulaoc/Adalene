@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("../layout/header.ejs") %>
+
+<body>
+  <%- include("../layout/navBarnew.ejs") %>
+  <div class="container mt-5">
+    <h2>Your Wishlist</h2>
+    <div class="row">
+      <% if (wishlist && wishlist.products.length > 0) { %>
+        <% wishlist.products.forEach(product => { %>
+          <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+              <img src="/uploads/<%= product.prod_images[0] %>" alt="<%= product.prod_name %>" class="card-img-top" />
+              <div class="card-body">
+                <h5 class="card-title"><%= product.prod_name %></h5>
+                <p class="card-text">Price: ₹<%= product.prod_price %></p>
+                <button class="removeFromWishlistBtn btn btn-danger" data-product-id="<%= product._id %>">Remove from Wishlist</button>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>Your wishlist is empty.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.removeFromWishlistBtn').forEach(button => {
+      button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        
+        fetch('/wishlist/remove', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            console.error(data.error);
+            alert("Failed to remove product from wishlist.");
+          } else {
+            alert("Product removed from wishlist.");
+            window.location.reload();
+          }
+        })
+        .catch(error => {
+          console.error('Error removing product from wishlist:', error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

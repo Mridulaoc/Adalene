@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+  <body>
+    <%- include ("../layout/navBarnew.ejs") %>
+      <div class="container-fluid mb-5" style="height: 100vh;">
+        <div class="container">
+          <h4>Account</h4>
+          <div class="d-flex gap-5 ">
+            <%- include ("../layout/profileSidebar.ejs") %>
+              <div class="col-7 border shadow rounded">
+                <h4 style="padding: 1.5rem 10rem;">My Wallet</h4>
+                <hr style="width: 80%;margin: auto;">
+                </hr>
+                <div class="mx-auto py-3" style="width: 80%;">
+                  <p>Current Balance: ₹<span id="walletBalance"></span></p>
+                  <h5>Transaction History</h5>
+                  <table id="transactionTable" class="table mx-auto">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody id="transactionBody"></tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <%- include ("../layout/footerAdmin.ejs") %>
+        <script> 
+        document.addEventListener("DOMContentLoaded", () => {
+  fetchWalletBalance();
+  fetchTransactions();
+});
+
+function fetchWalletBalance() {
+  fetch("/my-wallet/balance")
+    .then((response) => response.json())
+    .then((data) => {
+      document.getElementById("walletBalance").textContent =
+        data.balance.toFixed(2);
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
+function fetchTransactions() {
+  fetch("/my-wallet/transactions")
+    .then((response) => response.json())
+    .then((data) => {
+      const transactionBody = document.getElementById("transactionBody");
+      transactionBody.innerHTML = "";
+      data.transactions.forEach((transaction) => {
+        const row = `
+                    <tr>
+                        <td>${new Date(
+                          transaction.date
+                        ).toLocaleDateString()}</td>
+                        <td>${transaction.type}</td>
+                        <td>₹${transaction.amount.toFixed(2)}</td>
+                        <td>${transaction.description}</td>
+                    </tr>
+                `;
+        transactionBody.innerHTML += row;
+      });
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
+          
+
+        </script>
+  </body>
+
+</html>
