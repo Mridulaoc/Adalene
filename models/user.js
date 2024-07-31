@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const product = require('./product');
 const passportLocalMongoose = require('passport-local-mongoose');
+const { type } = require('express/lib/response');
 
 
 const userSchema = mongoose.Schema({
@@ -95,6 +96,9 @@ const userSchema = mongoose.Schema({
                 type:'Number',
                 default:1,
                 required:true
+            },
+            price:{
+                type:'Number',
             }
         }]
     },

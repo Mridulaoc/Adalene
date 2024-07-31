@@ -73,9 +73,27 @@ const getEditProductOffer = async (req, res) => {
     }
 }
 
+const updateProductOffer = async (req, res) => {
+    try {
+      const {name,description,startDate,endDate,percentage,productId} = req.body;
+      const product = await Product.findById({_id:productId});
+        product.offer = {
+            name:name,
+            description:description,
+            discount_percentage:percentage,
+            start_date:startDate,
+            end_date:endDate
+        }
+        await product.save();
+        res.redirect('/admin/products')
+      
+    } catch (error) {}
+  };
+
 module.exports = {
     getProductOffer,
     getAddProductOffer,
     addNewproductOffer,
-    getEditProductOffer
+    getEditProductOffer,
+    updateProductOffer,
 }

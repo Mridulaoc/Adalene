@@ -9,12 +9,13 @@
            return;
        }
        const sortBy = sortByElement.value;
-       const showOutOfStock = showOutOfStockElement ? showOutOfStockElement.checked : false;
+       const excludeOutOfStock = showOutOfStockElement ? showOutOfStockElement.checked : false;
+       
        const order = 'asc';
        const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
        const category = window.location.pathname.split('/').pop();
 
-       window.location.href = `/${category}?page=${currentPage}&sortBy=${sortBy}&order=${order}&search=${search}&showOutOfStock=${showOutOfStock}`;
+       window.location.href = `/${category}?page=${currentPage}&sortBy=${sortBy}&order=${order}&search=${search}&excludeOutOfStock=${excludeOutOfStock}`;
    }
 
  

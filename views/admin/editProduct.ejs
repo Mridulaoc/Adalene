@@ -43,6 +43,12 @@
                       </select>
                     </div>                    
                 </div>
+                <div class="mb-3 d-flex flex-column" style="width: 25%">
+                    <label for="price" class="form-label">MRP</label>
+                    <input type="number" class="form-control" id="price" name="mPrice" required
+                      onchange="validatePrice()" />
+                    <span id="error" style="color: red"></span>
+                  </div>
                 <div class="mb-3 d-flex justify-content-between align-items-center" >
                     <div class="mb-3 d-flex flex-column " style="width: 25%">           
                         <label for="price" class="form-label">Price</label>

@@ -16,8 +16,9 @@
           <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Z - A</option>
         </select>  
         <div>          
-          <input type="checkbox" id="showOutOfStock" onchange="updateProducts()">
+          <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%= excludeOutOfStock ? 'checked' : '' %>>
           <label for="showOutOfStock">Exclude out of stock</label>
+         
       </div>   
     </div>
    

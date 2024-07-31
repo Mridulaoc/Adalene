@@ -35,6 +35,7 @@ const loadProductList = async (req, res) => {
       const count = await Product.find({
         prod_name: { $regex: ".*" + search + ".*", $options: "i" },
       }).countDocuments();
+      console.log(count)
 
       const productsWithOfferStatus = productsData.map(product => ({
         ...product,

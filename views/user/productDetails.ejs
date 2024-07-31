@@ -30,44 +30,57 @@
                                     <%= products.prod_name %> (<%= products.prod_rating %> <i
                                                 class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)
                                 </h3>
-                                <p>₹<%= products.prod_price %>
-                                </p>
-                                <p>Size : <%= products.prod_size.size %>
-                                </p>
-                                <p>Colour : <%= products.prod_color.color_name %>
-                                </p>
-                                <p>
-                                    <% if(products.prod_quantity>0 && products.prod_quantity<6){ %>
-                                            <p style="color:#BC4C2A;" class="fw-bold">Only <%= products.prod_quantity %>
-                                                    left !</p>
-                                            <%} else if(products.prod_quantity===0) { %>
-                                                <p class="fs-5 fw-bold"> OUT OF STOCK</p>
-                                                <%}%>
-                                </p>
-                                <p>PRODUCT INFO</p>
-                                <hr style="width:60%; height: 2px; color: #BC4C2A;">
-                                <p class="fs-5" style="width: 70%; margin-bottom: 2rem;">
-                                    <%= products.prod_desc %>
-                                </p>
-                                <div class="d-flex align-items-center my-3">
-                                    <button class="px-3 py-1 fw-bold border border-1"
-                                        style="background-color: #BC4C2A; color: white;border:none;"
-                                        onclick="decrementQuantity()">-</button>
-                                    <input type="number" id="quantityInput" value="1" min="1"
-                                        max="<%= products.prod_quantity %>" class="py-1 text-center border border-1"
-                                        style="border-left: none; border-right: none;outline: none; " readonly>
-                                    <button class="px-3 py-1 fw-bold border border-1 "
-                                        style="background-color: #BC4C2A; color: white;border:none;"
-                                        onclick="incrementQuantity()">+</button>
-                                </div>
-                                <span id="quantity-availablity" class="fs-5 my-3"></span>
+                                <% if(products.offer && new Date() <=products.offer.end_date){ %>
+                                    <p class="text-decoration-line-through">Original Price: ₹<%= products.prod_mrp %>
+                                    </p>
+                                    <p class="text-danger">Offer Price: ₹<%= discountedPrice %> (<%=
+                                                products.offer.discount_percentage %>% off)</p>
 
-                                <div class="d-flex flex-column gap-3">
-                                    <button class="px-5 py-3 fs-5 text-white fw-bold"
-                                        style="border: none;background-color: #BC4C2A;"
-                                        onclick="addToCart('<%= products._id %>')">ADD TO CART</button>
+                                    <%} else {%>
+                                        <p>Price: ₹<%= products.prod_mrp %>
+                                        </p>
+                                        <%} %>
 
-                                </div>
+
+                                            <p>Size : <%= products.prod_size.size %>
+                                            </p>
+                                            <p>Colour : <%= products.prod_color.color_name %>
+                                            </p>
+                                            <p>
+                                                <% if(products.prod_quantity>0 && products.prod_quantity<6){ %>
+                                                        <p style="color:#BC4C2A;" class="fw-bold">Only <%=
+                                                                products.prod_quantity %>
+                                                                left !</p>
+                                                        <%} else if(products.prod_quantity===0) { %>
+                                                            <p class="fs-5 fw-bold"> OUT OF STOCK</p>
+                                                            <%}%>
+                                            </p>
+                                            <p>PRODUCT INFO</p>
+                                            <hr style="width:60%; height: 2px; color: #BC4C2A;">
+                                            <p class="fs-5" style="width: 70%; margin-bottom: 2rem;">
+                                                <%= products.prod_desc %>
+                                            </p>
+                                            <div class="d-flex align-items-center my-3">
+                                                <button class="px-3 py-1 fw-bold border border-1"
+                                                    style="background-color: #BC4C2A; color: white;border:none;"
+                                                    onclick="decrementQuantity()">-</button>
+                                                <input type="number" id="quantityInput" value="1" min="1"
+                                                    max="<%= products.prod_quantity %>"
+                                                    class="py-1 text-center border border-1"
+                                                    style="border-left: none; border-right: none;outline: none; "
+                                                    readonly>
+                                                <button class="px-3 py-1 fw-bold border border-1 "
+                                                    style="background-color: #BC4C2A; color: white;border:none;"
+                                                    onclick="incrementQuantity()">+</button>
+                                            </div>
+                                            <span id="quantity-availablity" class="fs-5 my-3"></span>
+
+                                            <div class="d-flex flex-column gap-3">
+                                                <button class="px-5 py-3 fs-5 text-white fw-bold"
+                                                    style="border: none;background-color: #BC4C2A;"
+                                                    onclick="addToCart('<%= products._id %>')">ADD TO CART</button>
+
+                                            </div>
                             </div>
                         </div>
                     </div>
@@ -126,9 +139,11 @@
                             let maxQuantityPerUser = 5;
                             const quantityInput = document.getElementById('quantityInput');
                             const maxValue = quantityInput.max;
+                            console.log(maxValue)
                             let quantity = parseInt(quantityInput.value);
+                            console.log(quantity)
                             let quantityAvailablity = document.getElementById('quantity-availablity');
-                            if (quantity > maxValue) {
+                            if (quantity+1 > maxValue) {
                                 quantityAvailablity.innerText = `Only ${maxValue} stocks left `
                             } else if (quantity >= maxQuantityPerUser) {
                                 quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
@@ -150,15 +165,18 @@
 
                         // add to cart function 
                         async function addToCart(productId) {
-                            const quantity = document.getElementById('quantityInput').value;
+                            const quantityInput = document.getElementById('quantityInput');
+                            const quantity = quantityInput.value;
+                            const maxValue = quantityInput.max;
+                            console.log(maxValue)
                             const response = await fetch('/add-to-cart', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ productId, quantity })
+                                body: JSON.stringify({ productId, quantity,maxValue })
                             });
-                            console.log(response);
+
                             if (response.status === 401) {
                                 const result = await response.json();
                                 if (result.redirectUrl) {
@@ -168,37 +186,58 @@
                             }
                             const result = await response.json();
                             if (result.success) {
-                                alert('Product added to cart successfully!');
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Product added to cart successfully!',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
                             } else {
-                                alert('Failed to add product to cart.');
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Failed to add product to cart.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
                             }
                         }
 
-                        // add to wishlist 
+                            // add to wishlist 
 
-                        document.getElementById('addToWishlistBtn').addEventListener('click', function () {
-                            const productId = this.dataset.productId;
+                            document.getElementById('addToWishlistBtn').addEventListener('click', function () {
+                                const productId = this.dataset.productId;
 
-                            fetch('/wishlist/add', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ productId: productId })
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.error) {
-                                        console.error(data.error);
-                                        alert("Failed to add product to wishlist.");
-                                    } else {
-                                        alert("Product added to wishlist.");
-                                    }
+                                fetch('/wishlist/add', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ productId: productId })
                                 })
-                                .catch(error => {
-                                    console.error('Error adding product to wishlist:', error);
-                                });
-                        });
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.error) {
+                                            console.error(data.error);
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: 'Failed to add product to wishlist.',
+                                                icon: 'error',
+                                                confirmButtonText: 'OK'
+                                            });
+
+                                        } else {
+                                            Swal.fire({
+                                                title: 'Success!',
+                                                text: 'Product added to wishlist successfully!',
+                                                icon: 'success',
+                                                confirmButtonText: 'OK'
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error adding product to wishlist:', error);
+                                    });
+                            });
 
 
 

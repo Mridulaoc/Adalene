@@ -15,6 +15,8 @@ const {isAuthenticated,isNotAuthenticated} = require('../middleware/adminAuth');
 const orderController = require('../controllers/orderController');
 const couponController = require('../controllers/couponController');
 const offerController = require('../controllers/offerController');
+const salesController = require('../controllers/salesController');
+const { routes } = require('./userRouter');
 
 // middlewares 
 adminRoute.use(express.static('public'));
@@ -105,7 +107,11 @@ adminRoute.get('/productOffer', isAuthenticated, offerController.getProductOffer
 adminRoute.get('/productOffer/add-offer/:id', isAuthenticated, offerController.getAddProductOffer);
 adminRoute.post('/productOffer/add-offer', isAuthenticated, offerController.addNewproductOffer);
 adminRoute.get('/productOffer/edit-offer/:id', isAuthenticated, offerController.getEditProductOffer);
-// adminRoute.put('/offers/productOffer/edit-offer/:id', isAuthenticated, offerController.updateProductOffer);
+adminRoute.post('/productOffer/edit-offer', isAuthenticated, offerController.updateProductOffer);
+
+// sales routes 
+adminRoute.get('/sales',isAuthenticated, salesController.getSalesPage)
+adminRoute.get('/salesReport', isAuthenticated, salesController.getSalesReport)
 
 
 

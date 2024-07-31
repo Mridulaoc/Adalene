@@ -138,7 +138,7 @@ const applyCoupon = async (req, res) => {
 
     let totalValue = 0;
     user.cart.products.forEach((item) => {
-      totalValue += item.product.prod_price * item.quantity;
+      totalValue += item.price * item.quantity;
     });
 
     
@@ -191,7 +191,7 @@ const removeCoupon = async(req,res)=>{
 
     let totalValue = 0;
     user.cart.products.forEach((item) => {
-        totalValue += item.product.prod_price * item.quantity;
+        totalValue += item.price * item.quantity;
     });
 
     const shippingCost = totalValue > 1000 ? 0 : 100;

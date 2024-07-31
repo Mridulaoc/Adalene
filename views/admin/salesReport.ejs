@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <h2 class="text-center my-5">Sales Report</h2>
+
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="my-5">
+                        <select id="dateRangeDropdown">
+                            <option value="1day">Last 1 Day</option>
+                            <option value="1week">Last 1 Week</option>
+                            <option value="1month">Last 1 Month</option>
+                            <option value="1year">Last 1 Year</option>
+                        </select>
+                        <button id="fetchSalesDataBtn" onclick="fetchSalesData(value)">Fetch Sales Data</button>
+                        <button id="exportCsvBtn">Export as CSV</button>
+                    </div>
+                    <div id="statistics my-5">
+                        <p id="overallSales">Overall Sales:</p>
+                        <p id="overallOrderAmount">Overall Order Amount:</p>
+                        <p id="overallDiscount">Overall Discount: </p>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Coupon</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesDataTableBody">
+                            <!-- Sales data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>
+                <script>
+
+                   
+
+
+                </script>
+
+    </body>
+
+</html>

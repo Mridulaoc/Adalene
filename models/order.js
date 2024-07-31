@@ -84,6 +84,9 @@ const orderSchema = mongoose.Schema({
     },
     discount:{
         type: Number,
+    },
+    coupon:{
+        type: String,
     }
 })
 

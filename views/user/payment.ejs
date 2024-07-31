@@ -65,7 +65,7 @@
                         </div>
                         </td>
                         <td>
-                            <%= item.product.prod_price * item.quantity %>
+                            <%= item.price * item.quantity %>
                         </td>
                         </tr>
                         <%})%>
@@ -78,6 +78,10 @@
                                     <td class="fs-5 py-3 ">Sub Total:</td>
                                     <td class="fs-5 py-3 sub_total">₹<%= totalValue %>
                                     </td>
+                                </tr>
+                                <tr id="couponDiscountRow" >
+                                    <td class="fs-5 py-3">Coupon Discount:</td>
+                                    <td class="fs-5 py-3 coupon-discount">₹0</td>
                                 </tr>
                                 <tr>
                                     <td class="fs-5 py-3">Shipping:</td>
@@ -111,6 +115,7 @@
                         </div>
                         <form action="/payment" method="post" class=" mx-3 " id="paymentForm"
                             data-selected-address="<%= selectedAddress %>">
+                            <input type="hidden" id="appliedCouponCode" name="couponCode" value="">
                             <h5>Wallet Balance: ₹<span id="walletBalance"></span></h5>
                             <label for="useWalletAmount">Use from wallet:</label>
                             <input type="number" id="useWalletAmount" name="useWalletAmount" min="0" step="0.01">
@@ -164,6 +169,7 @@
                             const couponCodeInput = document.getElementById('couponCode');
                             const couponBtn = document.getElementById('couponBtn');
                             const couponMessage = document.getElementById('couponMessage');
+                            const appliedCouponCodeInput = document.getElementById('appliedCouponCode');
 
                             let appliedCoupon = null;
 
@@ -189,8 +195,9 @@
                                         .then(data => {
                                             if (data.success) {
                                                 appliedCoupon = data.coupon;
+                                                appliedCouponCodeInput.value = couponCode;
                                                 couponMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                                                updateTotalAmount(data.newSubTotal, data.grandTotal);
+                                                updateTotalAmount(data.newSubTotal, data.grandTotal, data.coupon.discount);
                                                 couponBtn.textContent = 'Remove';
                                                 couponBtn.classList.replace('btn-outline-secondary', 'btn-outline-danger');
                                                 couponCodeInput.disabled = true;
@@ -217,8 +224,9 @@
                                     .then(data => {
                                         if (data.success) {
                                             appliedCoupon = null;
+                                            appliedCouponCodeInput.value = '';
                                             couponMessage.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
-                                            updateTotalAmount(data.newSubTotal, data.grandTotal);
+                                            updateTotalAmount(data.newSubTotal, data.grandTotal, 0);
                                             couponBtn.textContent = 'Apply';
                                             couponBtn.classList.replace('btn-outline-danger', 'btn-outline-secondary');
                                             couponCodeInput.disabled = false;
@@ -233,9 +241,20 @@
                                     });
                             }
 
-                            function updateTotalAmount(newSubTotal, grandTotal) {
+                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
                                 document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
                                 document.querySelector('.total').textContent = `₹${grandTotal}`;
+
+                                const couponDiscountRow = document.getElementById('couponDiscountRow');
+                                const couponDiscountElement = document.querySelector('.coupon-discount')
+                                if (couponDiscount > 0) {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
+                                } else {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = '₹0';
+                                }
+
                             }
 
 
@@ -279,7 +298,8 @@
                                             },
                                             body: JSON.stringify({
                                                 selectedAddress: paymentForm.dataset.selectedAddress,
-                                                useWalletAmount: useWalletAmountInput.value
+                                                useWalletAmount: useWalletAmountInput.value,
+                                                couponCode: appliedCouponCodeInput.value
                                             }),
                                         }).then(function (res) {
                                             console.log('Server response received');

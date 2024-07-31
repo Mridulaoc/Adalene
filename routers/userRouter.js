@@ -13,6 +13,7 @@ const {isAuthenticated} = require('../middleware/userAuth')
 const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 const checkBlocked = require('../middleware/checkBlocked');
+const checkOfferExpiry = require('../middleware/offerCheckMiddleware');
 
 
 
@@ -87,7 +88,7 @@ userRoute.get('/bags', userController.loadBags);
 userRoute.get('/wallets',userController.loadWallets);
 userRoute.get('/belts', userController.loadBelts);
 userRoute.get('/phonecases', userController.loadPhoneCases);
-userRoute.get('/products/:id', userController.loadProductDetails);
+userRoute.get('/products/:id', checkOfferExpiry, userController.loadProductDetails);
 userRoute.post('/add-to-cart', isAuthenticated, userController.addToCart);
 userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
 userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
