@@ -3,7 +3,7 @@
 <%- include ("../layout/header.ejs") %>
 <body>
   <%- include ("../layout/navBarnew.ejs") %>
-  <div class="container-fluid mb-5" style="height: 100vh;" >
+  <div class="container-fluid mb-5"  >
     <div class="container">
         <h4>Account</h4>
         <div class="d-flex gap-5 ">
@@ -18,12 +18,15 @@
                 <p>Order Date : <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss')  %></p>
                 <p>Order Status: <%= order.status %></p>
                 <p>Shipping Address : <%= order.address %></p>
+                <p>Payment Method : <%= order.paymentMethod %></p>
+                <p>Wallet Amount Used : ₹<%= order.walletAmountUsed %></p>
+                <p>Coupon Discount: <%= order.discount %></p>
                 <h4 class="text-center" style="padding: 1.5rem 10rem;">Products</h4>
                 <table class="table">
                     <tr>
                         <th>Product Name</th>
                         <th>Price</th>
-                        <th>Quantity</th>
+                        <th>Quantity</th>                        
                         <th>Total</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -31,9 +34,9 @@
                     <% order.products.forEach(item =>{%>
                         <tr>
                             <td class="py-5"><%= item.product.prod_name %></td>
-                            <td class="py-5"><%= item.price %></td>
+                            <td class="py-5"><%= item.price %></td>                            
                             <td class="py-5"><%= item.quantity %></td>
-                            <td class="py-5"><%= item.price * item.quantity %></td>                            
+                            <td class="py-5"><%= (item.price * item.quantity).toFixed(2) %></td>                            
                             <td class="py-5"><%= item.productStatus %></td>                         
                             <td class="py-5"><% if(item.productStatus === 'Pending'){%>
                                 <button class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>

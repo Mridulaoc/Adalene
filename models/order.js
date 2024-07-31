@@ -35,6 +35,13 @@ const orderSchema = mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            originalPrice:{
+                type: Number,
+                required: true,
+            },
+            offerApplied:{
+                type:Boolean,
+            },
             productStatus: {
                 type: String,
                 default: 'Pending'
@@ -84,6 +91,7 @@ const orderSchema = mongoose.Schema({
     },
     discount:{
         type: Number,
+        default: 0,
     },
     coupon:{
         type: String,

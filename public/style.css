@@ -131,6 +131,11 @@ p{
     text-align: center; /* Optional: center-align text horizontally */
 }
 
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 @media screen and (max-width: 768px) {
     html{
         font-size:62.5%

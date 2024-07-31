@@ -902,6 +902,7 @@ const cancelOrderItem = async (req, res) => {
       );
       console.log(product);
       if (product) {
+        const refundAmount = product.price * product.quantity;
         product.productStatus = "Cancelled";
 
         order.total = order.products.reduce((total, item) => {
@@ -924,9 +925,44 @@ const cancelOrderItem = async (req, res) => {
           productInStock.prod_quantity += product.quantity;
           await productInStock.save();
         }
+
+        if (order.paymentMethod === "PayPal") {
+          // // Refund to wallet for PayPal payment
+          // await addToWallet(
+          //   order.user,
+          //   refundAmount,
+          //   `Refund for cancelled item in order ${order._id}`
+          // );
+        
+
+        if (order.walletAmountUsed > 0) {
+          const walletRefundAmount = Math.min(order.walletAmountUsed, refundAmount);
+          const wallet = await Wallet.findOne({ user: order.user });
+          wallet.balance += walletRefundAmount;
+          wallet.transactions.push({
+            type: "CREDIT",
+            amount: walletRefundAmount,
+            description: `Refund for cancelled item in order ${order._id} (from wallet balance)`,
+          });
+          let finalRefundAmount;
+          if (order.walletAmountUsed < refundAmount) {
+            finalRefundAmount = refundAmount-order.walletAmountUsed;
+            await addToWallet(
+              order.user,
+              refundAmount,
+              `Refund for cancelled item in order ${order._id}`
+            );
+          }
+          await wallet.save();
+
+          // Adjust the walletAmountUsed in the order
+          order.walletAmountUsed -= walletRefundAmount;
+        }
+
         await order.save();
 
         res.json({ success: true });
+      }
       } else {
         res.status(404).json({ success: false });
       }
@@ -972,6 +1008,7 @@ const returnOrderItem = async (req, res) => {
         .json({ success: false, message: "Return window expired" });
     }
 
+    const refundAmount = product.price * product.quantity;
     product.productStatus = "Returned";
 
     order.total = order.products.reduce((total, item) => {
@@ -996,6 +1033,14 @@ const returnOrderItem = async (req, res) => {
     if (productInStock) {
       productInStock.quantity += product.quantity;
       await productInStock.save();
+    }
+
+    const description = `Refund for returned item in order ${orderId}`;
+    await addToWallet(order.user, refundAmount, description);
+
+    if (order.walletAmountUsed > 0) {
+      const walletRefund = Math.min(order.walletAmountUsed, refundAmount);
+      order.walletAmountUsed -= walletRefund;
     }
 
     await order.save();
@@ -1035,6 +1080,8 @@ const returnOrder = async (req, res) => {
     let refundAmount;
     if (order.subtotal < 1000) {
       refundAmount = order.total - 100;
+    }else {
+      refundAmount = order.total
     }
     await addToWallet(
       order.user,
@@ -1349,15 +1396,31 @@ const processPayment = async (req, res) => {
     const selectedAddress = user.addresses.id(selectedAddressId);
 
     let subTotal = 0;
-    user.cart.products.forEach((item) => {
-      subTotal += item.price * item.quantity;
+    const productsForOrder = user.cart.products.map((item) => {
+      let price = item.product.prod_mrp;
+      
+    
+      if (item.product.offer && new Date() <= item.product.offer.end_date) {
+        const discountAmount = (item.product.prod_mrp * item.product.offer.discount_percentage) / 100;
+        price = item.product.prod_mrp - discountAmount;
+      }
+    
+      subTotal += price * item.quantity;
+    
+      return {
+        product: item.product._id,
+        quantity: item.quantity,
+        price: price, 
+        originalPrice: item.product.prod_mrp,
+        offerApplied: price !== item.product.prod_mrp
+      };
     });
 
     let discount = 0;
     if (req.session.appliedCoupon) {
       discount = req.session.appliedCoupon.discount;
       
-      // Remove the coupon from the session after using it
+     
       delete req.session.appliedCoupon;
     }
 
@@ -1387,15 +1450,11 @@ const processPayment = async (req, res) => {
       user: user._id,
       address: `${selectedAddress.houseNo},${selectedAddress.street},${selectedAddress.city},${selectedAddress.country},${selectedAddress.zipCode}`,
       paymentMethod: paymentMethod,
-      products: user.cart.products.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        price: item.product.prod_price,
-      })),
+      products: productsForOrder,
       subtotal: subTotal,
       discount: discount,
       shippingCost: shippingCost,
-      total: finalValue,
+      total: finalValue.toFixed(2),
       coupon: couponCode,
       walletAmountUsed: walletAmountToUse,
     });
@@ -1446,8 +1505,24 @@ const createPaypalOrder = async (req, res) => {
     let wallet = await Wallet.findOne({ user: req.user.id });
 
     let subTotal = 0;
-    user.cart.products.forEach((item) => {
-      subTotal += item.price* item.quantity;
+    const productsForOrder = user.cart.products.map((item) => {
+      let price = item.product.prod_mrp;
+      
+    
+      if (item.product.offer && new Date() <= item.product.offer.end_date) {
+        const discountAmount = (item.product.prod_mrp * item.product.offer.discount_percentage) / 100;
+        price = item.product.prod_mrp - discountAmount;
+      }
+    
+      subTotal += price * item.quantity;
+    
+      return {
+        product: item.product._id,
+        quantity: item.quantity,
+        price: price, 
+        originalPrice: item.product.prod_mrp,
+        offerApplied: price !== item.product.prod_mrp
+      };
     });
 
     let discount = 0;
@@ -1499,11 +1574,7 @@ const createPaypalOrder = async (req, res) => {
 
     const newOrder = new Order({
       user: req.user.id,
-      products: user.cart.products.map((item) => ({
-        product: item.product._id,
-        quantity: item.quantity,
-        price: item.product.prod_price, // Add the price here
-      })),
+      products: productsForOrder,
       subtotal: subTotal,
       discount: discount,
       shippingCost: shippingCost,
