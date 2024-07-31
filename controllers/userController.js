@@ -383,6 +383,84 @@ const loadShopall = async (req, res) => {
   }
 };
 
+
+// const loadShopall = async(req,res) => {
+//   try {
+//     let {
+//       search = "",
+//       page = 1,
+//       sortBy = "popularity",
+//       order = "asc",
+//       excludeOutOfStock = false,
+//       category = "",
+//       colors = "",
+//       maxPrice = "",
+//     } = req.query;
+
+//     const limit = 5 ;
+
+//     const categories = await Category.find();
+//     const allColors = await Color.find();
+
+//     const sortOption = getSortOption(sortBy, order);
+//     let filter = { prod_name: { $regex: ".*" + search + ".*", $options: "i" } };
+    
+//     if (excludeOutOfStock === "true") {
+//       filter.prod_quantity = { $gt: 0 };
+//     }
+
+//     if (category) {
+//       filter.category = category;
+//     }
+
+//     if (colors) {
+//       filter.color = { $in: colors.split(',') };
+//     }
+
+//     if (maxPrice) {
+//       filter.prod_price = { $lte: Number(maxPrice) };
+//     }
+
+//     const products = await Products.find(filter)
+//       .sort(sortOption)
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .exec();
+
+//       const count = await Products.find(filter).countDocuments();
+
+//       if (req.xhr) {
+//         // If it's an AJAX request, only send the necessary HTML
+//         return res.render("layout/productList", {
+//           products,
+//           totalPages: Math.ceil(count / limit),
+//           currentPage: page,
+//         });
+//       }
+
+//       res.render("shopall", {
+//         products,
+//         totalPages: Math.ceil(count / limit),
+//         currentPage: page,
+//         user: req.user,
+//         categories,
+//         colors: allColors,
+//         cart: req.cart,
+//         sortBy,
+//         order,
+//         search,
+//         excludeOutOfStock: excludeOutOfStock === "true",
+//         selectedCategory: category,
+//         selectedColors: colors.split(','),
+//         maxPrice,
+//       });
+
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).send("An error occurred");
+//   }
+// }
+
 const loadBags = async (req, res) => {
   try {
     let search = "";
@@ -1044,10 +1122,10 @@ const returnOrder = async (req, res) => {
     if (order.walletAmountUsed > 0) {
       // Refund the wallet amount
       const wallet = await Wallet.findOne({ user: order.user });
-      wallet.balance += order.walletAmountUsed;
+      wallet.balance += order.Number(walletAmountUsed);
       wallet.transactions.push({
         type: "CREDIT",
-        amount: order.walletAmountUsed,
+        amount: order.Number(walletAmountUsed),
         description: "Order cancellation refund (from wallet balance)",
       });
       await wallet.save();

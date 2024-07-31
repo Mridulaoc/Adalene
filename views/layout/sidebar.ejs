@@ -1,24 +1,24 @@
 <div class="row align-items-start">
-    <div class="col-4 d-flex flex-column gap-3 "> 
-      <form action="" class="d-flex my-5" style="width: 100%;">
-        <input type="text" placeholder="Search" value="<%= search %>"  name="search" class="form-control mx-2" id="search">
-        <input type="submit" class="border rounded-2 fw-bold" value="Search">
-      </form>       
-      <label for="sortBy" class="fs-5 fw-bold">Sort by:</label>
-        <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 90%;">
-          <option value="popularity" <%= sortBy === 'popularity' ? 'selected' : '' %>>Popularity</option>
-          <option value="priceAsc" <%= sortBy === 'priceAsc' ? 'selected' : '' %>>Price: low to high</option>
-          <option value="priceDesc" <%= sortBy === 'priceDesc' ? 'selected' : '' %>>Price: high to low</option>
-          <option value="avgRating" <%= sortBy === 'avgRating' ? 'selected' : '' %>>Average ratings</option>
-          <option value="featured" <%= sortBy === 'featured' ? 'selected' : '' %>>Featured</option>
-          <option value="newArrivals" <%= sortBy === 'newArrivals' ? 'selected' : '' %>>New arrivals</option>
-          <option value="aToZ" <%= sortBy === 'aToZ' ? 'selected' : '' %>>A - Z</option>
-          <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Z - A</option>
-        </select>  
-        <div>          
-          <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%= excludeOutOfStock ? 'checked' : '' %>>
-          <label for="showOutOfStock">Exclude out of stock</label>
-         
-      </div>   
+  <div class="col-4 d-flex flex-column gap-3 ">
+    <form action="" class="d-flex my-5" style="width: 100%;">
+      <input type="text" placeholder="Search" value="<%= search %>" name="search" class="form-control mx-2" id="search">
+      <input type="submit" class="border rounded-2 fw-bold" value="Search">
+    </form>
+    <label for="sortBy" class="fs-5 fw-bold">Sort by:</label>
+    <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 90%;">
+      <option value="popularity" <%=sortBy==='popularity' ? 'selected' : '' %>>Popularity</option>
+      <option value="priceAsc" <%=sortBy==='priceAsc' ? 'selected' : '' %>>Price: low to high</option>
+      <option value="priceDesc" <%=sortBy==='priceDesc' ? 'selected' : '' %>>Price: high to low</option>
+      <option value="avgRating" <%=sortBy==='avgRating' ? 'selected' : '' %>>Average ratings</option>
+      <option value="featured" <%=sortBy==='featured' ? 'selected' : '' %>>Featured</option>
+      <option value="newArrivals" <%=sortBy==='newArrivals' ? 'selected' : '' %>>New arrivals</option>
+      <option value="aToZ" <%=sortBy==='aToZ' ? 'selected' : '' %>>A - Z</option>
+      <option value="zToA" <%=sortBy==='zToA' ? 'selected' : '' %>>Z - A</option>
+    </select>    
+    <div>
+    <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
+    <label for="showOutOfStock">Exclude out of stock</label>
+  </div>
     </div>
-   
+
+  </div>

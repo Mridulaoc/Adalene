@@ -131,6 +131,29 @@ p{
     text-align: center; /* Optional: center-align text horizontally */
 }
 
+.color-radio {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .color-radio input[type="radio"] {
+    display: none;
+  }
+  
+  .color-radio label {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+  }
+  
+  .color-radio input[type="radio"]:checked + label {
+    border: 2px solid #333;
+    box-shadow: 0 0 0 2px #fff inset;
+  }
+
 @media screen and (max-width: 768px) {
     html{
         font-size:62.5%
