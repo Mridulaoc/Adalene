@@ -79,7 +79,7 @@
                                     <td class="fs-5 py-3 sub_total">₹<%= totalValue %>
                                     </td>
                                 </tr>
-                                <tr id="couponDiscountRow" >
+                                <tr id="couponDiscountRow">
                                     <td class="fs-5 py-3">Coupon Discount:</td>
                                     <td class="fs-5 py-3 coupon-discount">₹0</td>
                                 </tr>
@@ -241,35 +241,39 @@
                                     });
                             }
 
-                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
-                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
-                                document.querySelector('.total').textContent = `₹${grandTotal}`;
-
-                                const couponDiscountRow = document.getElementById('couponDiscountRow');
-                                const couponDiscountElement = document.querySelector('.coupon-discount')
-                                if (couponDiscount > 0) {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
-                                } else {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = '₹0';
-                                }
-
-                            }
-
-
-                            fetch('/my-wallet/balance')
-                                .then(response => response.json())
-                                .then(data => {
-                                    walletBalanceSpan.textContent = data.balance.toFixed(2);
-                                    useWalletAmountInput.max = data.balance;
-                                });
-
+                            const codRadio = document.getElementById('cod');
+                            const paypalRadio = document.getElementById('paypal');
+                            const totalElement = document.querySelector('.total');
+                            const codMessageDiv = document.createElement('div');
+                            codMessageDiv.id = 'codMessage';
+                            codRadio.parentNode.appendChild(codMessageDiv);
 
                             let paypalButtonsRendered = false;
 
+                            function updateCODAvailability() {
+                                const totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
+
+                                if (totalValue > 1000) {
+                                    codRadio.disabled = true;
+                                    codMessageDiv.textContent = 'Cash on Delivery is not available for orders above ₹1000.';
+                                    codMessageDiv.style.color = 'red';
+                                    if (codRadio.checked) {
+                                        paypalRadio.checked = true;
+                                        
+                                } else {
+                                    codRadio.disabled = false;
+                                    codMessageDiv.textContent = '';
+                                }
+
+                                updateButtonVisibility();
+                            }
+                        }
+
+                            
+
                             function updateButtonVisibility() {
-                                const isPayPalSelected = document.getElementById('paypal').checked;
+                                const isPayPalSelected = paypalRadio.checked;
                                 paypalButtonContainer.style.display = isPayPalSelected ? 'block' : 'none';
                                 placeOrderBtn.style.display = isPayPalSelected ? 'none' : 'block';
 
@@ -278,13 +282,6 @@
                                     renderPayPalButtons();
                                 }
                             }
-
-                            paymentMethods.forEach(method => {
-                                method.addEventListener('change', updateButtonVisibility);
-                            });
-
-
-                            updateButtonVisibility();
 
                             function renderPayPalButtons() {
                                 console.log('Rendering PayPal buttons');
@@ -345,6 +342,49 @@
                                 });
                             }
 
+
+                            codRadio.addEventListener('change', updateButtonVisibility);
+                            paypalRadio.addEventListener('change', updateButtonVisibility);                            
+
+                            updateCODAvailability()
+
+                            placeOrderBtn.addEventListener('click', function (event) {
+                                const totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
+
+                                if (codRadio.checked && totalValue > 1000) {
+                                    event.preventDefault();
+                                    alert('Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.');
+                                    paypalRadio.checked = true;
+                                    updateButtonVisibility();
+                                }
+                            });
+
+                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
+                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
+                                document.querySelector('.total').textContent = `₹${grandTotal}`;
+
+                                const couponDiscountRow = document.getElementById('couponDiscountRow');
+                                const couponDiscountElement = document.querySelector('.coupon-discount')
+                                if (couponDiscount > 0) {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
+                                } else {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = '₹0';
+                                }
+                                updateCODAvailability();
+                            }
+
+
+                            fetch('/my-wallet/balance')
+                                .then(response => response.json())
+                                .then(data => {
+                                    walletBalanceSpan.textContent = data.balance.toFixed(2);
+                                    useWalletAmountInput.max = data.balance;
+                                });                            
+
+                            
 
                         })
                     </script>

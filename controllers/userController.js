@@ -343,6 +343,7 @@ const loadShopall = async (req, res) => {
       sortBy = "popularity",
       order = "asc",
       excludeOutOfStock = false,
+      category = "",
     } = req.query;
 
     const categories = await Category.find();
@@ -350,20 +351,31 @@ const loadShopall = async (req, res) => {
     const colors = await Color.find();
 
     const sortOption = getSortOption(sortBy, order);
+
     let filter = { prod_name: { $regex: ".*" + search + ".*", $options: "i" } };
+
     if (excludeOutOfStock === "true") {
       filter.prod_quantity = { $gt: 0 };
     }
 
+    if (category) {
+      const categoryDoc = await Category.findOne({ cat_name: category });
+      if (categoryDoc) {
+        filter.prod_category = categoryDoc._id;
+      }
+    }
+
     const products = await Products.find(filter)
+      .populate('prod_category')
+      .populate('prod_size')
+      .populate('prod_color')
       .sort(sortOption)
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
 
-    const count = await Products.find({
-      prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-    }).countDocuments();
+    const count = await Products.find(filter).countDocuments();
+
     res.render("shopall", {
       products,
       totalPages: Math.ceil(count / limit),
@@ -377,6 +389,7 @@ const loadShopall = async (req, res) => {
       order,
       search,
       excludeOutOfStock: excludeOutOfStock === "true",
+      currentCategory: category,
     });
   } catch (error) {
     console.log(error);
@@ -652,6 +665,15 @@ const loadPhoneCases = async (req, res) => {
 const loadProductDetails = async (req, res) => {
   try {
     let id = req.params.id;
+    const userId = req.user ? req.user.id : null;
+    let isInWishlist = false;
+
+    console.log(id,userId,isInWishlist);
+
+    if(userId){
+      const wishlist = await Wishlist. findOne({user:userId});
+      isInWishlist = wishlist && wishlist.products.includes(id);
+    }
     const products = await Products.findById({ _id: id })
       .populate("prod_category")
       .populate("prod_size")
@@ -673,13 +695,14 @@ const loadProductDetails = async (req, res) => {
       _id: { $ne: products._id },
     }).populate("prod_category").limit(3);
 
-    console.log(relatedProducts);
+    
     res.render("productDetails", {
       products,
       relatedProducts,
       discountedPrice: discountedPrice,
       user: req.user,
       cart: req.cart,
+      isInWishlist
     });
   } catch (error) {
     console.log(error);
@@ -1624,29 +1647,34 @@ const paypalSuccess = async (req, res) => {
     const order = await client.execute(request);
 
     const { purchase_units } = order.result;
-
-    const user = await User.findById(req.user.id).populate(
-      "cart.products.product"
-    );
+    const userEmail = order.result.payer.email_address;
+    // const user = await User.findById(req.user.id).populate(
+    //   "cart.products.product"
+    // );
+    const user = await User.findOne({ email: userEmail }).populate("cart.products.product");
 
     const existingOrder = await Order.findOne({ paypalOrderId: orderID });
 
     if (existingOrder) {
       // If the order already exists, update it
-      existingOrder.status = "COMPLETED";
-      await existingOrder.save();
+      if(order.result.status === 'COMPLETED'){
+        existingOrder.status = "COMPLETED";
 
-      if (existingOrder.walletAmountUsed > 0) {
-        const wallet = await Wallet.findOne({ user: existingOrder.user });
-        // Ensure the wallet balance is correctly deducted
-        wallet.transactions.push({
-          type: "DEBIT",
-          amount: existingOrder.walletAmountUsed,
-          description: "Purchase payment (PayPal)",
-        });
-        await wallet.save();
+        if (existingOrder.walletAmountUsed > 0) {
+          const wallet = await Wallet.findOne({ user: existingOrder.user });
+          // Ensure the wallet balance is correctly deducted
+          wallet.transactions.push({
+            type: "DEBIT",
+            amount: existingOrder.walletAmountUsed,
+            description: "Purchase payment (PayPal)",
+          });
+          await wallet.save();
+        }
+      }else{
+        existingOrder.status = "Payment Pending";
       }
-
+      
+      await existingOrder.save();      
       res.redirect(`/order-confirmation/${existingOrder._id}`);
     } else {
       const userEmail = order.result.payer.email_address;
@@ -1666,18 +1694,22 @@ const paypalSuccess = async (req, res) => {
         })),
         total: purchase_units[0].amount.value,
         paypalOrderId: orderID,
+        status: order.result.status === 'COMPLETED' ? "COMPLETED" : "Payment Pending",
       });
 
-      for (let item of user.cart.products) {
-        await Products.findByIdAndUpdate(item.product._id, {
-          $inc: { prod_quantity: -item.quantity },
-        });
-      }
-
+      if(order.result.status === 'COMPLETED'){
+        for (let item of user.cart.products) {
+          await Products.findByIdAndUpdate(item.product._id, {
+            $inc: { prod_quantity: -item.quantity },
+          });
+        }
+        
       user.user_orders.push(newOrder._id);
       user.cart.products = [];
       await user.save();
-
+      }
+      
+      await newOrder.save()
       res.redirect(`/order-confirmation/${newOrder._id}`);
     }
   } catch (error) {

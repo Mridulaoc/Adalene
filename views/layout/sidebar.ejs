@@ -1,5 +1,5 @@
 <div class="row align-items-start">
-  <div class="col-4 d-flex flex-column gap-3 ">
+  <div class="d-flex flex-column gap-3 ">
     <form action="" class="d-flex my-5" style="width: 100%;">
       <input type="text" placeholder="Search" value="<%= search %>" name="search" class="form-control mx-2" id="search">
       <input type="submit" class="border rounded-2 fw-bold" value="Search">
@@ -14,11 +14,10 @@
       <option value="newArrivals" <%=sortBy==='newArrivals' ? 'selected' : '' %>>New arrivals</option>
       <option value="aToZ" <%=sortBy==='aToZ' ? 'selected' : '' %>>A - Z</option>
       <option value="zToA" <%=sortBy==='zToA' ? 'selected' : '' %>>Z - A</option>
-    </select>    
+    </select>
     <div>
-    <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
-    <label for="showOutOfStock">Exclude out of stock</label>
-  </div>
+      <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
+      <label for="showOutOfStock">Exclude out of stock</label>
     </div>
-
   </div>
+</div>
