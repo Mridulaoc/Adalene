@@ -142,8 +142,8 @@ p{
   
   .color-radio label {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 1.8rem;
+    height: 1.8rem;
     border-radius: 50%;
     border: 2px solid #ddd;
     cursor: pointer;

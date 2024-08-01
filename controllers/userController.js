@@ -344,6 +344,8 @@ const loadShopall = async (req, res) => {
       order = "asc",
       excludeOutOfStock = false,
       category = "",
+      maxPrice = 10000,
+      color = "",
     } = req.query;
 
     const categories = await Category.find();
@@ -352,7 +354,7 @@ const loadShopall = async (req, res) => {
 
     const sortOption = getSortOption(sortBy, order);
 
-    let filter = { prod_name: { $regex: ".*" + search + ".*", $options: "i" } };
+    let filter = { prod_name: { $regex: ".*" + search + ".*", $options: "i" },prod_price: { $lte: parseInt(maxPrice) } };
 
     if (excludeOutOfStock === "true") {
       filter.prod_quantity = { $gt: 0 };
@@ -363,6 +365,10 @@ const loadShopall = async (req, res) => {
       if (categoryDoc) {
         filter.prod_category = categoryDoc._id;
       }
+    }
+
+    if (color) {
+      filter.prod_color = color;
     }
 
     const products = await Products.find(filter)
@@ -390,6 +396,8 @@ const loadShopall = async (req, res) => {
       search,
       excludeOutOfStock: excludeOutOfStock === "true",
       currentCategory: category,
+      maxPrice: parseInt(maxPrice),
+      selectedColors: color,
     });
   } catch (error) {
     console.log(error);
@@ -397,82 +405,7 @@ const loadShopall = async (req, res) => {
 };
 
 
-// const loadShopall = async(req,res) => {
-//   try {
-//     let {
-//       search = "",
-//       page = 1,
-//       sortBy = "popularity",
-//       order = "asc",
-//       excludeOutOfStock = false,
-//       category = "",
-//       colors = "",
-//       maxPrice = "",
-//     } = req.query;
 
-//     const limit = 5 ;
-
-//     const categories = await Category.find();
-//     const allColors = await Color.find();
-
-//     const sortOption = getSortOption(sortBy, order);
-//     let filter = { prod_name: { $regex: ".*" + search + ".*", $options: "i" } };
-    
-//     if (excludeOutOfStock === "true") {
-//       filter.prod_quantity = { $gt: 0 };
-//     }
-
-//     if (category) {
-//       filter.category = category;
-//     }
-
-//     if (colors) {
-//       filter.color = { $in: colors.split(',') };
-//     }
-
-//     if (maxPrice) {
-//       filter.prod_price = { $lte: Number(maxPrice) };
-//     }
-
-//     const products = await Products.find(filter)
-//       .sort(sortOption)
-//       .limit(limit * 1)
-//       .skip((page - 1) * limit)
-//       .exec();
-
-//       const count = await Products.find(filter).countDocuments();
-
-//       if (req.xhr) {
-//         // If it's an AJAX request, only send the necessary HTML
-//         return res.render("layout/productList", {
-//           products,
-//           totalPages: Math.ceil(count / limit),
-//           currentPage: page,
-//         });
-//       }
-
-//       res.render("shopall", {
-//         products,
-//         totalPages: Math.ceil(count / limit),
-//         currentPage: page,
-//         user: req.user,
-//         categories,
-//         colors: allColors,
-//         cart: req.cart,
-//         sortBy,
-//         order,
-//         search,
-//         excludeOutOfStock: excludeOutOfStock === "true",
-//         selectedCategory: category,
-//         selectedColors: colors.split(','),
-//         maxPrice,
-//       });
-
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send("An error occurred");
-//   }
-// }
 
 const loadBags = async (req, res) => {
   try {

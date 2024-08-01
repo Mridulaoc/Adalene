@@ -1,15 +1,17 @@
 <div class="d-flex flex-column gap-3">
     <div class="d-flex gap-3">
       <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
+      <a href="?page=<%= currentPage - 1 %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %><%= selectedColors ? '&color=' + selectedColors : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= excludeOutOfStock ? '&excludeOutOStock=true' : '' %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
       <% } %>
       <div class="d-flex gap-3 ">
       <% for (let i = 1; i <= totalPages; i++ ){ %>
-      <a href="?page=<%= i %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
+      <a href="?page=<%= i %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %><%= selectedColors ? '&color=' + selectedColors : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= excludeOutOfStock ? '&excludeOutOStock=true' : '' %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
       <%}%>
       </div>
       <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= Number(currentPage) + 1 %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+      <a href="?page=<%= Number(currentPage) + 1 %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %><%= selectedColors ? '&color=' + selectedColors : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %><%= excludeOutOfStock ? '&excludeOutOStock=true' : '' %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
       <% } %>
     </div>   
   </div>    
+
+  

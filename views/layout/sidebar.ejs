@@ -1,11 +1,19 @@
-<div class="row align-items-start">
-  <div class="d-flex flex-column gap-3 ">
-    <form action="" class="d-flex my-5" style="width: 100%;">
+<!-- <div class="row align-items-start"> -->
+  <div class="col-4 d-flex flex-column gap-3 my-5 ">
+    <form action="" class="d-flex my-5" style="width: 80%;">
       <input type="text" placeholder="Search" value="<%= search %>" name="search" class="form-control mx-2" id="search">
       <input type="submit" class="border rounded-2 fw-bold" value="Search">
     </form>
+    <div>
+      <h4>Browse By</h4>
+      <% categories.forEach(category =>{%>
+        <a class="nav-link mx-lg-2" href="/shopall?category=<%= category.cat_name %>"><%= category.cat_name %></a>
+      
+      <%})%>
+    </div>
+
     <label for="sortBy" class="fs-5 fw-bold">Sort by:</label>
-    <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 90%;">
+    <select id="sortBy" onchange="updateProducts()" class="form-control mx-2" style="width: 80%;">
       <option value="popularity" <%=sortBy==='popularity' ? 'selected' : '' %>>Popularity</option>
       <option value="priceAsc" <%=sortBy==='priceAsc' ? 'selected' : '' %>>Price: low to high</option>
       <option value="priceDesc" <%=sortBy==='priceDesc' ? 'selected' : '' %>>Price: high to low</option>
@@ -16,8 +24,26 @@
       <option value="zToA" <%=sortBy==='zToA' ? 'selected' : '' %>>Z - A</option>
     </select>
     <div>
-      <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
-      <label for="showOutOfStock">Exclude out of stock</label>
+      <label class="fs-5 fw-bold">Color:</label>
+      <div class="d-flex flex-wrap gap-2">
+        <% colors.forEach(color=> { %>
+          <div class="color-radio">
+            <input type="radio" name="color" value="<%= color._id %>" id="color<%= color._id %>"
+              onchange="updateProducts()" <%=selectedColors===color._id.toString() ? 'checked' : '' %>>
+            <label for="color<%= color._id %>" style="background-color: <%= color.hex_value %>;"
+              title="<%= color.color_name %>"></label>
+          </div>
+          <% }); %>
+      </div>
     </div>
-  </div>
-</div>
+    <div>
+      <label for="priceRange" class="fs-5 fw-bold">Price Range: <span id="priceValue"></span></label>
+      <input type="range" class="form-range" id="priceRange" min="0" max="10000" step="100"
+        value="<%= maxPrice %>" oninput="updatePriceValue(this.value)" onchange="updateProducts()" style="width: 80%;">
+    </div>   
+      <div>
+        <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
+        <label for="showOutOfStock">Exclude out of stock</label>
+      </div>
+    </div>
+<!-- </div> -->
