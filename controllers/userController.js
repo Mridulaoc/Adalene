@@ -65,22 +65,35 @@ const loadSignUp = (req, res) => {
 
 const verifySignUp = async (req, res) => {
   try {
-    const { name, email, mobileno, password, confirmPassword, authMethod } =
-      req.body;
-    console.log(password, confirmPassword);
+    const {
+      name,
+      email,
+      mobileno,
+      password,
+      confirmPassword,
+      authMethod,
+      referralCode,
+    } = req.body;
     const isExist = await User.findOne({ user_email: email });
-    console.log(isExist);
+
     if (isExist) {
       res.render("signup", {
         message:
           "Email id already exists in the database. Use another for registration",
       });
     } else {
+      let referrer;
+      if (referralCode) {
+        referrer = await User.findOne({ referralCode });
+        if (!referrer) {
+          return res.status(400).json({ message: "Invalid referral code" });
+        }
+      }
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
       const otpExpiry = new Date(Date.now() + 1 * 60000);
 
       const sPassword = await securePassword(password);
-      const user = new User({
+      const newUser = new User({
         user_name: name,
         user_email: email,
         user_contact: mobileno,
@@ -89,8 +102,44 @@ const verifySignUp = async (req, res) => {
         otp_expiry: otpExpiry,
         authMethod: authMethod,
         referralCode: referralCodeGenerator(),
+        referredBy: referrer ? referrer._id : null,
       });
-      await user.save();
+      await newUser.save();
+
+      const newWallet = new Wallet({
+        user: newUser._id,
+        balance: referrer ? 100 : 0, // Give 100 to new user if they used a referral code
+      });
+
+      if (referrer) {
+        newWallet.transactions.push({
+          type: "CREDIT",
+          amount: 100,
+          description: "Referral signup bonus",
+        });
+      }
+
+      await newWallet.save();
+      newUser.wallet = newWallet._id;
+      await newUser.save();
+
+      if (referrer) {
+        const referrerWallet = await Wallet.findOne({ user: referrer._id });
+        if (referrerWallet) {
+          referrerWallet.balance += 200; // Increase referrer's wallet by 200
+          referrerWallet.transactions.push({
+            type: "CREDIT",
+            amount: 200,
+            description: "Referral reward",
+          });
+          await referrerWallet.save();
+        }
+
+        await User.findByIdAndUpdate(referrer._id, {
+          $push: { referrals: newUser._id },
+        });
+      }
+
       const mailOptions = {
         from: "mridulagirish2024@gmail.com",
         to: email,
@@ -406,203 +455,6 @@ const loadShopall = async (req, res) => {
     console.log(error);
   }
 };
-
-// const loadBags = async (req, res) => {
-//   try {
-//     let search = "";
-//     if (req.query.search) {
-//       search = req.query.search;
-//       console.log(search);
-//     }
-
-//     let page = 1;
-//     if (req.query.page) {
-//       page = req.query.page;
-//     }
-//     const categories = await Category.find();
-//     const sizes = await Size.find();
-//     const colors = await Color.find();
-
-//     const limit = 5;
-
-//     const {
-//       sortBy = "popularity",
-//       order = "asc",
-//       excludeOutOfStock = false,
-//     } = req.query;
-
-//     const sortOption = getSortOption(sortBy, order);
-
-//     let filter = {
-//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-//       prod_category: "66702daed57b7afd0c8cafe1",
-//     };
-//     if (excludeOutOfStock === "true") {
-//       filter.prod_quantity = { $gt: 0 };
-//     }
-
-//     const bagsData = await Products.find(filter)
-//       .sort(sortOption)
-//       .limit(limit * 1)
-//       .skip((page - 1) * limit)
-//       .populate("prod_category")
-//       .exec();
-
-//     const count = await Products.find(filter).countDocuments();
-
-//     res.render("bags", {
-//       products: bagsData,
-//       totalPages: Math.ceil(count / limit),
-//       currentPage: page,
-//       user: req.user,
-//       categories,
-//       sizes,
-//       colors,
-//       cart: req.cart,
-//       sortBy,
-//       order,
-//       search,
-//       excludeOutOfStock: excludeOutOfStock === "true",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// const loadWallets = async (req, res) => {
-//   try {
-//     let search = "";
-//     if (req.query.search) {
-//       search = req.query.search;
-//       console.log(search);
-//     }
-
-//     let page = 1;
-//     if (req.query.page) {
-//       page = req.query.page;
-//     }
-
-//     const categories = await Category.find();
-//     const sizes = await Size.find();
-//     const colors = await Color.find();
-
-//     const limit = 5;
-
-//     const {
-//       sortBy = "popularity",
-//       order = "asc",
-//       excludeOutOfStock = false,
-//     } = req.query;
-
-//     const sortOption = getSortOption(sortBy, order);
-
-//     let filter = {
-//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-//       prod_category: "6673eca9e5d3e08f0ce33581",
-//     };
-//     if (excludeOutOfStock === "true") {
-//       filter.prod_quantity = { $gt: 0 };
-//     }
-//     const walletData = await Products.find(filter)
-//       .sort(sortOption)
-//       .limit(limit * 1)
-//       .skip((page - 1) * limit)
-//       .populate("prod_category")
-//       .exec();
-
-//     const count = await Products.find(filter).countDocuments();
-
-//     res.render("wallets", {
-//       products: walletData,
-//       totalPages: Math.ceil(count / limit),
-//       currentPage: page,
-//       user: req.user,
-//       categories,
-//       sizes,
-//       colors,
-//       cart: req.cart,
-//       sortBy,
-//       order,
-//       search,
-//       excludeOutOfStock: excludeOutOfStock === "true",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-// const loadBelts = async (req, res) => {
-//   try {
-//     let search = "";
-//     if (req.query.search) {
-//       search = req.query.search;
-//       console.log(search);
-//     }
-
-//     let page = 1;
-//     if (req.query.page) {
-//       page = req.query.page;
-//     }
-//     const categories = await Category.find();
-//     const sizes = await Size.find();
-//     const colors = await Color.find();
-
-//     const limit = 5;
-
-//     const {
-//       sortBy = "popularity",
-//       order = "asc",
-//       excludeOutOfStock = false,
-//     } = req.query;
-
-//     const sortOption = getSortOption(sortBy, order);
-
-//     let filter = {
-//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-//       prod_category: "6673ecb8e5d3e08f0ce33584",
-//     };
-//     if (excludeOutOfStock === "true") {
-//       filter.prod_quantity = { $gt: 0 };
-//     }
-//     const beltsData = await Products.find(filter)
-//       .sort(sortOption)
-//       .limit(limit * 1)
-//       .skip((page - 1) * limit)
-//       .exec();
-
-//     const count = await Products.find(filter).countDocuments();
-
-//     res.render("belts", {
-//       products: beltsData,
-//       totalPages: Math.ceil(count / limit),
-//       currentPage: page,
-//       user: req.user,
-//       categories,
-//       sizes,
-//       colors,
-//       cart: req.cart,
-//       sortBy,
-//       order,
-//       search,
-//       excludeOutOfStock: excludeOutOfStock === "true",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// const loadPhoneCases = async (req, res) => {
-//   try {
-//     const products = await Products.find({ prod_status: "ACTIVE" }).populate(
-//       "prod_category"
-//     );
-//     const phoneCases = products.filter(
-//       (product) => product.prod_category.cat_name === "Phone Cases"
-//     );
-//     res.render("phonecases", { products: phoneCases });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const loadProductDetails = async (req, res) => {
   try {
@@ -1214,7 +1066,9 @@ const addToCart = async (req, res) => {
     const userId = req.user.id;
     try {
       let user = await User.findOne({ _id: userId });
-      const product = await Products.findById(productId).populate('prod_category');
+      const product = await Products.findById(productId).populate(
+        "prod_category"
+      );
 
       if (!user || !product) {
         return res
@@ -1236,15 +1090,13 @@ const addToCart = async (req, res) => {
       ) {
         discountPercentage = product.offer.discount_percentage;
         offerApplied = true;
-        console.log(discountPercentage)
+        console.log(discountPercentage);
       }
 
-      
       // Check category offer
       if (
-        
         product.prod_category &&
-        product.prod_category.offer &&       
+        product.prod_category.offer &&
         now >= new Date(product.prod_category.offer.start_date) &&
         now <= new Date(product.prod_category.offer.end_date)
       ) {
@@ -1325,7 +1177,9 @@ const updateCart = async (req, res) => {
 
     const user = await User.findById({ _id: req.user.id });
 
-    const product = await Products.findById(productId).populate('prod_category');
+    const product = await Products.findById(productId).populate(
+      "prod_category"
+    );
 
     if (!user || !product) {
       return res
@@ -1334,43 +1188,41 @@ const updateCart = async (req, res) => {
     }
 
     let price = product.prod_mrp;
-      let offerApplied = false;
-      let discountPercentage = 0;
+    let offerApplied = false;
+    let discountPercentage = 0;
 
-      const now = new Date();
+    const now = new Date();
 
-      // Check product offer
+    // Check product offer
+    if (
+      product.offer &&
+      now >= new Date(product.offer.start_date) &&
+      now <= new Date(product.offer.end_date)
+    ) {
+      discountPercentage = product.offer.discount_percentage;
+      offerApplied = true;
+      console.log(discountPercentage);
+    }
+
+    // Check category offer
+    if (
+      product.prod_category &&
+      product.prod_category.offer &&
+      now >= new Date(product.prod_category.offer.start_date) &&
+      now <= new Date(product.prod_category.offer.end_date)
+    ) {
       if (
-        product.offer &&
-        now >= new Date(product.offer.start_date) &&
-        now <= new Date(product.offer.end_date)
+        product.prod_category.offer.discount_percentage > discountPercentage
       ) {
-        discountPercentage = product.offer.discount_percentage;
+        discountPercentage = product.prod_category.offer.discount_percentage;
         offerApplied = true;
-        console.log(discountPercentage)
       }
+    }
 
-      
-      // Check category offer
-      if (
-        
-        product.prod_category &&
-        product.prod_category.offer &&       
-        now >= new Date(product.prod_category.offer.start_date) &&
-        now <= new Date(product.prod_category.offer.end_date)
-      ) {
-        if (
-          product.prod_category.offer.discount_percentage > discountPercentage
-        ) {
-          discountPercentage = product.prod_category.offer.discount_percentage;
-          offerApplied = true;
-        }
-      }
-
-      // Apply the highest discount
-      if (offerApplied) {
-        price = product.prod_mrp * (1 - discountPercentage / 100);
-      }
+    // Apply the highest discount
+    if (offerApplied) {
+      price = product.prod_mrp * (1 - discountPercentage / 100);
+    }
 
     const productIndex = user.cart.products.findIndex(
       (item) => item.product._id.toString() === productId
