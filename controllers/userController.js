@@ -407,202 +407,202 @@ const loadShopall = async (req, res) => {
   }
 };
 
-const loadBags = async (req, res) => {
-  try {
-    let search = "";
-    if (req.query.search) {
-      search = req.query.search;
-      console.log(search);
-    }
+// const loadBags = async (req, res) => {
+//   try {
+//     let search = "";
+//     if (req.query.search) {
+//       search = req.query.search;
+//       console.log(search);
+//     }
 
-    let page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-    const categories = await Category.find();
-    const sizes = await Size.find();
-    const colors = await Color.find();
+//     let page = 1;
+//     if (req.query.page) {
+//       page = req.query.page;
+//     }
+//     const categories = await Category.find();
+//     const sizes = await Size.find();
+//     const colors = await Color.find();
 
-    const limit = 5;
+//     const limit = 5;
 
-    const {
-      sortBy = "popularity",
-      order = "asc",
-      excludeOutOfStock = false,
-    } = req.query;
+//     const {
+//       sortBy = "popularity",
+//       order = "asc",
+//       excludeOutOfStock = false,
+//     } = req.query;
 
-    const sortOption = getSortOption(sortBy, order);
+//     const sortOption = getSortOption(sortBy, order);
 
-    let filter = {
-      prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-      prod_category: "66702daed57b7afd0c8cafe1",
-    };
-    if (excludeOutOfStock === "true") {
-      filter.prod_quantity = { $gt: 0 };
-    }
+//     let filter = {
+//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
+//       prod_category: "66702daed57b7afd0c8cafe1",
+//     };
+//     if (excludeOutOfStock === "true") {
+//       filter.prod_quantity = { $gt: 0 };
+//     }
 
-    const bagsData = await Products.find(filter)
-      .sort(sortOption)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .populate("prod_category")
-      .exec();
+//     const bagsData = await Products.find(filter)
+//       .sort(sortOption)
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .populate("prod_category")
+//       .exec();
 
-    const count = await Products.find(filter).countDocuments();
+//     const count = await Products.find(filter).countDocuments();
 
-    res.render("bags", {
-      products: bagsData,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      user: req.user,
-      categories,
-      sizes,
-      colors,
-      cart: req.cart,
-      sortBy,
-      order,
-      search,
-      excludeOutOfStock: excludeOutOfStock === "true",
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     res.render("bags", {
+//       products: bagsData,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//       user: req.user,
+//       categories,
+//       sizes,
+//       colors,
+//       cart: req.cart,
+//       sortBy,
+//       order,
+//       search,
+//       excludeOutOfStock: excludeOutOfStock === "true",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-const loadWallets = async (req, res) => {
-  try {
-    let search = "";
-    if (req.query.search) {
-      search = req.query.search;
-      console.log(search);
-    }
+// const loadWallets = async (req, res) => {
+//   try {
+//     let search = "";
+//     if (req.query.search) {
+//       search = req.query.search;
+//       console.log(search);
+//     }
 
-    let page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
+//     let page = 1;
+//     if (req.query.page) {
+//       page = req.query.page;
+//     }
 
-    const categories = await Category.find();
-    const sizes = await Size.find();
-    const colors = await Color.find();
+//     const categories = await Category.find();
+//     const sizes = await Size.find();
+//     const colors = await Color.find();
 
-    const limit = 5;
+//     const limit = 5;
 
-    const {
-      sortBy = "popularity",
-      order = "asc",
-      excludeOutOfStock = false,
-    } = req.query;
+//     const {
+//       sortBy = "popularity",
+//       order = "asc",
+//       excludeOutOfStock = false,
+//     } = req.query;
 
-    const sortOption = getSortOption(sortBy, order);
+//     const sortOption = getSortOption(sortBy, order);
 
-    let filter = {
-      prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-      prod_category: "6673eca9e5d3e08f0ce33581",
-    };
-    if (excludeOutOfStock === "true") {
-      filter.prod_quantity = { $gt: 0 };
-    }
-    const walletData = await Products.find(filter)
-      .sort(sortOption)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .populate("prod_category")
-      .exec();
+//     let filter = {
+//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
+//       prod_category: "6673eca9e5d3e08f0ce33581",
+//     };
+//     if (excludeOutOfStock === "true") {
+//       filter.prod_quantity = { $gt: 0 };
+//     }
+//     const walletData = await Products.find(filter)
+//       .sort(sortOption)
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .populate("prod_category")
+//       .exec();
 
-    const count = await Products.find(filter).countDocuments();
+//     const count = await Products.find(filter).countDocuments();
 
-    res.render("wallets", {
-      products: walletData,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      user: req.user,
-      categories,
-      sizes,
-      colors,
-      cart: req.cart,
-      sortBy,
-      order,
-      search,
-      excludeOutOfStock: excludeOutOfStock === "true",
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-const loadBelts = async (req, res) => {
-  try {
-    let search = "";
-    if (req.query.search) {
-      search = req.query.search;
-      console.log(search);
-    }
+//     res.render("wallets", {
+//       products: walletData,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//       user: req.user,
+//       categories,
+//       sizes,
+//       colors,
+//       cart: req.cart,
+//       sortBy,
+//       order,
+//       search,
+//       excludeOutOfStock: excludeOutOfStock === "true",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+// const loadBelts = async (req, res) => {
+//   try {
+//     let search = "";
+//     if (req.query.search) {
+//       search = req.query.search;
+//       console.log(search);
+//     }
 
-    let page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-    const categories = await Category.find();
-    const sizes = await Size.find();
-    const colors = await Color.find();
+//     let page = 1;
+//     if (req.query.page) {
+//       page = req.query.page;
+//     }
+//     const categories = await Category.find();
+//     const sizes = await Size.find();
+//     const colors = await Color.find();
 
-    const limit = 5;
+//     const limit = 5;
 
-    const {
-      sortBy = "popularity",
-      order = "asc",
-      excludeOutOfStock = false,
-    } = req.query;
+//     const {
+//       sortBy = "popularity",
+//       order = "asc",
+//       excludeOutOfStock = false,
+//     } = req.query;
 
-    const sortOption = getSortOption(sortBy, order);
+//     const sortOption = getSortOption(sortBy, order);
 
-    let filter = {
-      prod_name: { $regex: ".*" + search + ".*", $options: "i" },
-      prod_category: "6673ecb8e5d3e08f0ce33584",
-    };
-    if (excludeOutOfStock === "true") {
-      filter.prod_quantity = { $gt: 0 };
-    }
-    const beltsData = await Products.find(filter)
-      .sort(sortOption)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec();
+//     let filter = {
+//       prod_name: { $regex: ".*" + search + ".*", $options: "i" },
+//       prod_category: "6673ecb8e5d3e08f0ce33584",
+//     };
+//     if (excludeOutOfStock === "true") {
+//       filter.prod_quantity = { $gt: 0 };
+//     }
+//     const beltsData = await Products.find(filter)
+//       .sort(sortOption)
+//       .limit(limit * 1)
+//       .skip((page - 1) * limit)
+//       .exec();
 
-    const count = await Products.find(filter).countDocuments();
+//     const count = await Products.find(filter).countDocuments();
 
-    res.render("belts", {
-      products: beltsData,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      user: req.user,
-      categories,
-      sizes,
-      colors,
-      cart: req.cart,
-      sortBy,
-      order,
-      search,
-      excludeOutOfStock: excludeOutOfStock === "true",
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     res.render("belts", {
+//       products: beltsData,
+//       totalPages: Math.ceil(count / limit),
+//       currentPage: page,
+//       user: req.user,
+//       categories,
+//       sizes,
+//       colors,
+//       cart: req.cart,
+//       sortBy,
+//       order,
+//       search,
+//       excludeOutOfStock: excludeOutOfStock === "true",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-const loadPhoneCases = async (req, res) => {
-  try {
-    const products = await Products.find({ prod_status: "ACTIVE" }).populate(
-      "prod_category"
-    );
-    const phoneCases = products.filter(
-      (product) => product.prod_category.cat_name === "Phone Cases"
-    );
-    res.render("phonecases", { products: phoneCases });
-  } catch (error) {
-    console.log(error);
-  }
-};
+// const loadPhoneCases = async (req, res) => {
+//   try {
+//     const products = await Products.find({ prod_status: "ACTIVE" }).populate(
+//       "prod_category"
+//     );
+//     const phoneCases = products.filter(
+//       (product) => product.prod_category.cat_name === "Phone Cases"
+//     );
+//     res.render("phonecases", { products: phoneCases });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 const loadProductDetails = async (req, res) => {
   try {
@@ -1897,10 +1897,10 @@ module.exports = {
   verifyFPOTP,
   updatePassword,
   loadShopall,
-  loadBags,
-  loadBelts,
-  loadWallets,
-  loadPhoneCases,
+  // loadBags,
+  // loadBelts,
+  // loadWallets,
+  // loadPhoneCases,
   loadProductDetails,
   userSignOut,
   addToCart,

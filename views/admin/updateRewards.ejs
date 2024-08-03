@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ("../layout/header.ejs") %>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <div class="container-fluid">
+                <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form">
+                    <h2 class="mb-5 text-center fs-5">UPDATE REFERRAL REWARDS</h2>
+                    <form action="/admin/referralOffer/update-rewards" method="post"
+                        autocomplete="off" style="width: 90%;">
+                        <h2></h2>
+                        <div class="mb-3 ">                            
+                          <div class="form-group">
+                            <label for="newUserReward">New User Reward (₹)</label>
+                            <input type="number" class="form-control" id="newUserReward" name="newUserReward" value="100">
+                          </div>
+                        </div>
+                        <div class="mb-3 ">  
+                          <div class="form-group">
+                            <label for="referrerReward">Referrer Reward (₹)</label>
+                            <input type="number" class="form-control" id="referrerReward" name="referrerReward" value="200">
+                          </div>
+                          </div>
+                          <div class="mb-3 ">       
+                            <input type="submit" class="form-control fs-6"  value="SAVE"   required>
+                        </div>     
+                        </form>                        
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>       
+             
+    </body>
+
+</html>

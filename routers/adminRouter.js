@@ -16,6 +16,7 @@ const orderController = require('../controllers/orderController');
 const couponController = require('../controllers/couponController');
 const offerController = require('../controllers/offerController');
 const salesController = require('../controllers/salesController');
+const referralController = require('../controllers/referralController');
 const { routes } = require('./userRouter');
 
 // middlewares 
@@ -115,6 +116,12 @@ adminRoute.get('/categoryOffer/add-offer/:id', isAuthenticated, offerController.
 adminRoute.post('/categoryOffer/add-offer', isAuthenticated, offerController.addNewCategoryOffer);
 adminRoute.get('/categoryOffer/edit-offer/:id', isAuthenticated, offerController.getEditCategoryOffer);
 adminRoute.post('/categoryOffer/edit-offer', isAuthenticated, offerController.updateCategoryOffer);
+
+// referral offer routes 
+
+adminRoute.get('/referralOffer', isAuthenticated, referralController.getReferralList);
+adminRoute.get('/referralOffer/update-rewards', isAuthenticated, referralController.getupdateReferralRewards);
+adminRoute.post('/referralOffer/update-rewards', isAuthenticated, referralController.updateReferralRewards);
 
 
 // sales routes 
