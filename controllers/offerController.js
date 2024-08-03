@@ -1,4 +1,6 @@
+const res = require('express/lib/response');
 const Product = require('../models/product');
+const Category = require('../models/category');
 
 
 const getProductOffer = async(req,res)=>{
@@ -89,6 +91,109 @@ const updateProductOffer = async (req, res) => {
       
     } catch (error) {}
   };
+  
+
+const getCategoryOffer = async (req, res) => {
+    
+        try {
+            let page = 1;
+            const limit = 5;
+            if (req.query.page) {
+                page = parseInt(req.query.page);
+            }
+            
+            const category = await Category.find();
+            const totalCount = category.reduce((acc, curr)=>{
+                acc+=curr.offer.length
+              },0)
+            
+    
+            const totalPages = Math.ceil(totalCount / limit);
+
+            const categoryOffer = await Category.find({
+                'offer.name': { $exists: true }
+              }).limit(limit).skip((page - 1) * limit);
+    
+            
+    
+            const categoryData = {
+                categoryOffer,
+                totalPages,
+                page: page,
+            };
+    
+            res.render('categoryOfferList', categoryData);
+        } catch (error) {
+            console.error('Error fetching category offers:', error);
+            res.status(500).render('error', { message: 'Internal server error' });
+        }
+};
+
+const getAddCategoryOffer = async(req,res)=>{
+    try {
+        const id = req.params.id;
+        const category = await Category.findById(id);
+        
+        res.render('addCategoryOffer',{category:category});
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const addNewCategoryOffer =async (req, res) => {
+    
+        try {
+           
+            const {name,description,startDate,endDate,percentage,categoryId} = req.body;
+            console.log("Received request body:", req.body);
+            const category = await Category.findById({_id:categoryId});
+            category.offer = {
+                name:name,
+                description:description,
+                discount_percentage:percentage,
+                start_date:startDate,
+                end_date:endDate
+            }
+    
+            await category.save();
+            res.redirect('/admin/categories')
+    
+    
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+const getEditCategoryOffer = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const category = await Category.findById(id);        
+        res.render('editCategoryOffer',{category: category});
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+
+const updateCategoryOffer = async(req,res) =>{
+    try {
+        const {name,description,startDate,endDate,percentage,categoryId} = req.body;
+        const category = await Product.findById({_id:categoryId});
+          category.offer = {
+              name:name,
+              description:description,
+              discount_percentage:percentage,
+              start_date:startDate,
+              end_date:endDate
+          }
+          await category.save();
+          res.redirect('/admin/categories')
+        
+      } catch (error) {
+        console.log(error)
+      }
+};
+
 
 module.exports = {
     getProductOffer,
@@ -96,4 +201,9 @@ module.exports = {
     addNewproductOffer,
     getEditProductOffer,
     updateProductOffer,
+    getCategoryOffer,
+    getAddCategoryOffer,
+    addNewCategoryOffer,
+    getEditCategoryOffer,
+    updateCategoryOffer
 }

@@ -37,7 +37,7 @@
                                             <td class="py-5 ">
                                                 <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss') %>
                                             </td>
-                                            <td class="py-5 ">₹<%= order.total %>
+                                            <td class="py-5 ">₹<%= order.total.toFixed(2) %>
                                             </td>
                                             <td class="py-5 ">
                                                 <%= order.status %>

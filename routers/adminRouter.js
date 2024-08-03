@@ -101,13 +101,21 @@ adminRoute.get('/coupons/edit-coupon/:id', isAuthenticated, couponController.loa
 adminRoute.put('/coupons/edit-coupon/:id',  isAuthenticated,couponController.updateCoupon);
 adminRoute.get('/coupons/delete-coupon',  isAuthenticated, couponController.deleteCoupon);
 
-//offer routes
+//product offer routes
 
 adminRoute.get('/productOffer', isAuthenticated, offerController.getProductOffer);
 adminRoute.get('/productOffer/add-offer/:id', isAuthenticated, offerController.getAddProductOffer);
 adminRoute.post('/productOffer/add-offer', isAuthenticated, offerController.addNewproductOffer);
 adminRoute.get('/productOffer/edit-offer/:id', isAuthenticated, offerController.getEditProductOffer);
 adminRoute.post('/productOffer/edit-offer', isAuthenticated, offerController.updateProductOffer);
+
+// category offer routes 
+adminRoute.get('/categoryOffer', isAuthenticated, offerController.getCategoryOffer);
+adminRoute.get('/categoryOffer/add-offer/:id', isAuthenticated, offerController.getAddCategoryOffer);
+adminRoute.post('/categoryOffer/add-offer', isAuthenticated, offerController.addNewCategoryOffer);
+adminRoute.get('/categoryOffer/edit-offer/:id', isAuthenticated, offerController.getEditCategoryOffer);
+adminRoute.post('/categoryOffer/edit-offer', isAuthenticated, offerController.updateCategoryOffer);
+
 
 // sales routes 
 adminRoute.get('/sales',isAuthenticated, salesController.getSalesPage)

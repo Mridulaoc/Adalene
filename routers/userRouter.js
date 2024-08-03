@@ -124,6 +124,7 @@ userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
 userRoute.get('/my-wallet', isAuthenticated, walletController.loadMyWallet);
 userRoute.get('/my-wallet/balance', isAuthenticated, walletController.getWalletBalance);
 userRoute.get('/my-wallet/transactions', isAuthenticated, walletController.getWalletTransactions);
+// userRoute.post('/process-wallet-payment', isAuthenticated, walletController.processWalletPayment)
 userRoute.get('/wishlist',isAuthenticated,userController.getWishlist);
 userRoute.post('/wishlist/add', isAuthenticated, userController.addToWishlist);
 userRoute.post('/wishlist/remove', isAuthenticated, userController.removeFromWishlist);

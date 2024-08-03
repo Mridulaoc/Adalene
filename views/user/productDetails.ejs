@@ -33,11 +33,11 @@
                                     <%= products.prod_name %> (<%= products.prod_rating %> <i
                                                 class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)
                                 </h3>
-                                <% if(products.offer && new Date() <=products.offer.end_date){ %>
+                                <% if(appliedOffer){ %>
                                     <p class="text-decoration-line-through">Original Price: ₹<%= products.prod_mrp %>
                                     </p>
-                                    <p class="text-danger">Offer Price: ₹<%= discountedPrice %> (<%=
-                                                products.offer.discount_percentage %>% off)</p>
+                                    <p class="text-danger">Offer Price: ₹<%= discountedPrice.toFixed(2) %> (<%=
+                                                appliedOffer.discount_percentage %>% off)</p>
 
                                     <%} else {%>
                                         <p>Price: ₹<%= products.prod_mrp %>
@@ -204,6 +204,7 @@
                                 });
                             }
                         }
+
 
                         // add to wishlist 
                         const wishlistIcon = document.getElementById('addToWishlistBtn');
