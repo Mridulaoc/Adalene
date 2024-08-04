@@ -485,9 +485,7 @@ const loadProductDetails = async (req, res) => {
         products.prod_mrp * (products.offer.discount_percentage / 100);
       discountedPrice = products.prod_mrp - productDiscount;
       appliedOffer = products.offer;
-      console.log(discountedPrice);
-      console.log(products.prod_category.offer);
-
+    }
       if (
         products.prod_category.offer &&
         now >= new Date(products.prod_category.offer.start_date) &&
@@ -504,7 +502,7 @@ const loadProductDetails = async (req, res) => {
           appliedOffer = products.prod_category.offer;
         }
       }
-    }
+    
     const relatedProducts = await Products.find({
       prod_status: "ACTIVE",
       prod_category: products.prod_category._id,
@@ -1335,16 +1333,58 @@ const processPayment = async (req, res) => {
   console.log(paymentMethod, selectedAddressId, couponCode);
 
   try {
-    const user = await User.findById(req.user.id).populate(
-      "cart.products.product"
-    );
+    const user = await User.findById(req.user.id).populate({
+      path: "cart.products.product",
+      populate: {
+        path: "prod_category",
+        model: "Category",
+      },
+    });
+
     let wallet = await Wallet.findOne({ user: req.user.id });
     const selectedAddress = user.addresses.id(selectedAddressId);
 
     let subTotal = 0;
+    let totalDiscountPercentage = 0;
+    const now = new Date();
+
     user.cart.products.forEach((item) => {
-      subTotal += item.price * item.quantity;
+      let productPrice = item.product.prod_mrp;
+      let discountPercentage = 0;
+
+      // Check product offer
+      if (
+        item.product.offer &&
+        now >= new Date(item.product.offer.start_date) &&
+        now <= new Date(item.product.offer.end_date)
+      ) {
+        discountPercentage = Math.max(
+          discountPercentage,
+          item.product.offer.discount_percentage
+        );
+      }
+
+      if (
+        item.product.prod_category &&
+        item.product.prod_category.offer &&
+        now >= new Date(item.product.prod_category.offer.start_date) &&
+        now <= new Date(item.product.prod_category.offer.end_date)
+      ) {
+        discountPercentage = Math.max(
+          discountPercentage,
+          item.product.prod_category.offer.discount_percentage
+        );
+      }
+      if (discountPercentage > 0) {
+        productPrice *= 1 - discountPercentage / 100;
+      }
+      subTotal += productPrice * item.quantity;
+      totalDiscountPercentage += discountPercentage * item.quantity;
     });
+
+    const averageDiscountPercentage =
+      totalDiscountPercentage /
+      user.cart.products.reduce((sum, item) => sum + item.quantity, 0);
 
     let discount = 0;
     if (req.session.appliedCoupon) {
@@ -1399,6 +1439,7 @@ const processPayment = async (req, res) => {
       total: finalValue,
       coupon: couponCode,
       walletAmountUsed: walletAmountToUse,
+      averageDiscountPercentage: averageDiscountPercentage.toFixed(2),
     });
 
     console.log(newOrder);
@@ -1441,15 +1482,56 @@ async function convert(price) {
 const createPaypalOrder = async (req, res) => {
   try {
     const { selectedAddress, useWalletAmount, couponCode } = req.body;
-    const user = await User.findById(req.user.id).populate(
-      "cart.products.product"
-    );
+    const user = await User.findById(req.user.id).populate({
+      path: "cart.products.product",
+      populate: {
+        path: "prod_category",
+        model: "Category",
+      },
+    });
     let wallet = await Wallet.findOne({ user: req.user.id });
 
     let subTotal = 0;
+    let totalDiscountPercentage = 0;
+    const now = new Date();
+
     user.cart.products.forEach((item) => {
-      subTotal += item.price * item.quantity;
+      let productPrice = item.product.prod_mrp;
+      let discountPercentage = 0;
+
+      // Check product offer
+      if (
+        item.product.offer &&
+        now >= new Date(item.product.offer.start_date) &&
+        now <= new Date(item.product.offer.end_date)
+      ) {
+        discountPercentage = Math.max(
+          discountPercentage,
+          item.product.offer.discount_percentage
+        );
+      }
+      if (
+        item.product.prod_category &&
+        item.product.prod_category.offer &&
+        now >= new Date(item.product.prod_category.offer.start_date) &&
+        now <= new Date(item.product.prod_category.offer.end_date)
+      ) {
+        discountPercentage = Math.max(
+          discountPercentage,
+          item.product.prod_category.offer.discount_percentage
+        );
+      }
+      if (discountPercentage > 0) {
+        productPrice *= 1 - discountPercentage / 100;
+      }
+      subTotal += productPrice * item.quantity;
+      totalDiscountPercentage += discountPercentage * item.quantity;
     });
+
+    // Calculate average discount percentage
+    const averageDiscountPercentage =
+      totalDiscountPercentage /
+      user.cart.products.reduce((sum, item) => sum + item.quantity, 0);
 
     let discount = 0;
     if (req.session.appliedCoupon) {
@@ -1516,6 +1598,7 @@ const createPaypalOrder = async (req, res) => {
       orderId: generateOrderId(),
       walletAmountUsed: walletAmountToUse,
       coupon: couponCode,
+      averageDiscountPercentage: averageDiscountPercentage.toFixed(2),
     });
 
     if (walletAmountToUse > 0) {
@@ -1580,10 +1663,52 @@ const paypalSuccess = async (req, res) => {
       res.redirect(`/order-confirmation/${existingOrder._id}`);
     } else {
       const userEmail = order.result.payer.email_address;
-      const user = await User.findOne({ email: userEmail }).populate(
-        "cart.products.product"
-      );
-      console.log(user);
+      const user = await User.findOne({ email: userEmail }).populate({
+        path: "cart.products.product",
+        populate: {
+          path: "prod_category",
+          model: "Category",
+        },
+      });
+
+      let totalDiscountPercentage = 0;
+      const now = new Date();
+
+      user.cart.products.forEach((item) => {
+        let discountPercentage = 0;
+
+        // Check product offer
+        if (
+          item.product.offer &&
+          now >= new Date(item.product.offer.start_date) &&
+          now <= new Date(item.product.offer.end_date)
+        ) {
+          discountPercentage = Math.max(
+            discountPercentage,
+            item.product.offer.discount_percentage
+          );
+        }
+
+        // Check category offer
+        if (
+          item.product.prod_category &&
+          item.product.prod_category.offer &&
+          now >= new Date(item.product.prod_category.offer.start_date) &&
+          now <= new Date(item.product.prod_category.offer.end_date)
+        ) {
+          discountPercentage = Math.max(
+            discountPercentage,
+            item.product.prod_category.offer.discount_percentage
+          );
+        }
+
+        totalDiscountPercentage += discountPercentage * item.quantity;
+      });
+
+      const averageDiscountPercentage =
+        totalDiscountPercentage /
+        user.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+      
       const newOrder = new Order({
         orderId: generateOrderId(),
         user: user._id,
@@ -1598,6 +1723,7 @@ const paypalSuccess = async (req, res) => {
         paypalOrderId: orderID,
         status:
           order.result.status === "COMPLETED" ? "COMPLETED" : "Payment Pending",
+          averageDiscountPercentage: averageDiscountPercentage.toFixed(2),
       });
 
       if (order.result.status === "COMPLETED") {

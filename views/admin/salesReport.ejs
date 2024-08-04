@@ -8,20 +8,38 @@
 
             <div class="container-fluid">
                 <div class="container">
-                    <div class="my-5">
-                        <select id="dateRangeDropdown">
-                            <option value="1day">Last 1 Day</option>
-                            <option value="1week">Last 1 Week</option>
-                            <option value="1month">Last 1 Month</option>
-                            <option value="1year">Last 1 Year</option>
-                        </select>
-                        <button id="fetchSalesDataBtn" onclick="fetchSalesData(value)">Fetch Sales Data</button>
-                        <button id="exportCsvBtn">Export as CSV</button>
+
+                    <div class="my-5  border mx-auto px-5 py-5" style="width: 70%;">
+                        <h3 class="text-center my-5">Filter Sales Report</h3>
+                        <div class="d-flex justify-content-between my-5 flex-wrap ">
+                            <div class="d-flex flex-column">
+                                <label for="dateRangeDropdown">Period :</label>
+                                <select id="dateRangeDropdown" class=" form-control px-5" name="dateRangeDropdown">
+                                    <option value="">Select</option>
+                                    <option value="custom">Custom</option>
+                                    <option value="1day">Last 1 Day</option>
+                                    <option value="1week">Last 1 Week</option>
+                                    <option value="1month">Last 1 Month</option>
+                                    <option value="1year">Last 1 Year</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="startDate">Start Date:</label>
+                                <input type="date" class="form-control px-5" id="startDate" name="startDate">
+                            </div>
+                            <div>
+                                <label for="endDate">End Date:</label>
+                                <input type="date" class="form-control px-5" id="endDate" name="endDate">
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button id="generateReportBtn" onclick="generateReport()"
+                                class="px-3 py-2 bg-transparent rounded">Generate Report</button>
+                        </div>
+                        <div class="d-flex gap-3 justify-content-center my-3" id="downloadBtnContainer"> </div>
                     </div>
-                    <div id="statistics my-5">
-                        <p id="overallSales">Overall Sales:</p>
-                        <p id="overallOrderAmount">Overall Order Amount:</p>
-                        <p id="overallDiscount">Overall Discount: </p>
+                    <div id="statistics" class="my-5 d-flex">
+
                     </div>
                     <table class="table">
                         <thead>
@@ -44,7 +62,140 @@
             <%- include ("../layout/footerAdmin.ejs") %>
                 <script>
 
-                   
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const dateRangeDropdown = document.getElementById('dateRangeDropdown');
+                        const startDateInput = document.getElementById('startDate');
+                        const endDateInput = document.getElementById('endDate');
+                        const generateReportBtn = document.getElementById('generateReportBtn');
+                        const downloadPdfBtn = document.getElementById('downloadPDFBtn');
+                        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+
+                        // Initialize date inputs as disabled
+                        startDateInput.disabled = true;
+                        endDateInput.disabled = true;
+
+                        dateRangeDropdown.addEventListener('change', function () {
+
+                            if (this.value === 'custom') {
+                                startDateInput.disabled = false;
+                                endDateInput.disabled = false;
+                            } else {
+                                startDateInput.disabled = true;
+                                endDateInput.disabled = true;
+                                startDateInput.value = '';
+                                endDateInput.value = '';
+                            }
+                        });
+
+                        generateReportBtn.addEventListener('click', generateReport);
+                        downloadPdfBtn.addEventListener('click', downloadPdf);
+                        downloadExcelBtn.addEventListener('click', downloadExcel);
+                    });
+                    function getDateRange() {
+                        const dateRangeDropdown = document.getElementById('dateRangeDropdown');
+                        const startDateInput = document.getElementById('startDate');
+                        const endDateInput = document.getElementById('endDate');
+
+                        let startDate, endDate;
+                        const today = new Date();
+
+                        if (dateRangeDropdown.value === 'custom') {
+                            startDate = startDateInput.value;
+                            endDate = endDateInput.value;
+                        } else {
+                            endDate = today.toISOString().split('T')[0];
+                            startDate = new Date(today);
+
+                            switch (dateRangeDropdown.value) {
+                                case '1day':
+                                    startDate.setDate(today.getDate() - 1);
+                                    break;
+                                case '1week':
+                                    startDate.setDate(today.getDate() - 7);
+                                    break;
+                                case '1month':
+                                    startDate.setMonth(today.getMonth() - 1);
+                                    break;
+                                case '1year':
+                                    startDate.setFullYear(today.getFullYear() - 1);
+                                    break;
+                            }
+                            startDate = startDate.toISOString().split('T')[0];
+                        }
+
+                        return { startDate, endDate };
+                    }
+
+
+                    async function generateReport() {
+                        const { startDate, endDate } = getDateRange();
+                        
+                        try {
+                            const response = await fetch(`/admin/salesReport?startDate=${startDate}&endDate=${endDate}`);
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            const data = await response.json();
+                            const { salesReport, overallSales, totalOrders, overallDiscount } = data;
+
+                            // Update summary
+                            document.getElementById('statistics').innerHTML = `
+                            <div class="col-4 border px-5 py-5 my-5 text-center">
+                            <h4>Overall Sales Count</h4>
+                            <h4>${totalOrders}</h4>
+                            </div>
+                            <div class="col-4 border px-5 py-5 my-5 text-center">
+                            <h4>Overall Order Amount</h4>
+                            <h4>₹${overallSales}</h4>
+                            </div>
+                            <div class="col-4 border px-5 py-5 my-5 text-center">
+                            <h4>Overall Discount</h4>
+                            <h4>${overallDiscount}%</h4>
+                            </div>         
+                            `
+
+                            // Update table
+                            const tableBody = document.getElementById('salesDataTableBody');
+                            tableBody.innerHTML = '';
+                            salesReport.forEach(order => {
+                                const row = `
+        <tr>
+          <td>${new Date(order.date).toLocaleDateString()}</td>
+          <td>${order.orderId}</td>
+          <td>${order.products}</td>
+          <td>${order.quantity}</td>
+          <td>${order.coupon}</td>
+          <td>${order.discount}%</td>
+          <td>₹${order.total.toFixed(2)}</td>
+        </tr>
+      `;
+                                tableBody.innerHTML += row;
+                            });
+
+                            document.getElementById("downloadBtnContainer").innerHTML = `
+                          <div class="d-flex gap-3 justify-content-center my-3" id="downloadBtnContainer">
+                            <button id="downloadPDFBtn" onclick="downloadPdf()"
+                                class="px-3 py-2 bg-transparent rounded"  >Download PDF</button>
+                            <button id="downloadExcelBtn" onclick="downloadExcel()"
+                                class="px-3 py-2 bg-transparent rounded" >Download Excel</button>
+                        </div>
+                          `
+
+                        } catch (error) {
+                            console.error('Error fetching sales data:', error);
+
+                        }
+                    }
+
+                    function downloadPdf() {
+                        const { startDate, endDate } = getDateRange();
+                        window.location.href = `/admin/download-sales-report-pdf?startDate=${startDate}&endDate=${endDate}`;
+                    }
+
+                    function downloadExcel() {
+                        const { startDate, endDate } = getDateRange();
+                        window.location.href = `/admin/download-sales-report-excel?startDate=${startDate}&endDate=${endDate}`;
+                    }
 
 
                 </script>

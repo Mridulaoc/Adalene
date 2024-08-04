@@ -125,8 +125,10 @@ adminRoute.post('/referralOffer/update-rewards', isAuthenticated, referralContro
 
 
 // sales routes 
-adminRoute.get('/sales',isAuthenticated, salesController.getSalesPage)
-adminRoute.get('/salesReport', isAuthenticated, salesController.getSalesReport)
+adminRoute.get('/sales',isAuthenticated, salesController.getSalesReportPage);
+adminRoute.get('/salesReport', isAuthenticated, salesController.getSalesReport);
+adminRoute.get('/download-sales-report-pdf',isAuthenticated, salesController.downloadPDFReport);
+adminRoute.get('/download-sales-report-excel',isAuthenticated, salesController.downloadExcelReport);
 
 
 
