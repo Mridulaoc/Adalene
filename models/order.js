@@ -37,7 +37,7 @@ const orderSchema = mongoose.Schema({
             },
             originalPrice:{
                 type: Number,
-                required: true,
+                
             },
             offerApplied:{
                 type:Boolean,
@@ -95,6 +95,10 @@ const orderSchema = mongoose.Schema({
     },
     coupon:{
         type: String,
+    },
+    averageDiscountPercentage:{
+        type: Number,
+        default: 0
     }
 })
 

@@ -1,125 +1,85 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const dateRangeDropdown = document.getElementById("dateRangeDropdown");
-  const fetchSalesDataBtn = document.getElementById("fetchSalesDataBtn");
-  const exportCsvBtn = document.getElementById("exportCsvBtn");
-  const salesDataTableBody = document.getElementById("salesDataTableBody");
-  const overallSalesElem = document.getElementById("overallSales");
-  const overallOrderAmountElem = document.getElementById("overallOrderAmount");
-  const overallDiscountElem = document.getElementById("overallDiscount");
+document.addEventListener('DOMContentLoaded', function() {
+  const dateRangeDropdown = document.getElementById('dateRangeDropdown');
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
+  const fetchSalesDataBtn = document.getElementById('fetchSalesDataBtn');
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
 
-  const dateRanges = {
-    "1day": {
-      startDate: new Date(new Date().setDate(new Date().getDate() - 1)),
-      endDate: new Date(),
-    },
-    "1week": {
-      startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-      endDate: new Date(),
-    },
-    "1month": {
-      startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-      endDate: new Date(),
-    },
-    "1year": {
-      startDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-      endDate: new Date(),
-    },
-  };
+  dateRangeDropdown.addEventListener('change', function() {
+      const today = new Date();
+      let startDate = new Date();
 
-  async function fetchSalesData(dateRange) {
-    try {
-      const response = await fetch(
-        `admin/salesReport?startDate=${dateRange.startDate.toISOString()}&endDate=${dateRange.endDate.toISOString()}`
-      );
-      console.log("Fetching from URL:", response);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      switch(this.value) {
+          case '1day':
+              startDate.setDate(today.getDate() - 1);
+              break;
+          case '1week':
+              startDate.setDate(today.getDate() - 7);
+              break;
+          case '1month':
+              startDate.setMonth(today.getMonth() - 1);
+              break;
+          case '1year':
+              startDate.setFullYear(today.getFullYear() - 1);
+              break;
       }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching sales data:", error);
-      alert(
-        "There was an error fetching the sales data. Please try again later."
-      );
-      throw error;
-    }
-  }
 
-  function populateSalesTable(data) {
-    salesDataTableBody.innerHTML = "";
-
-    data.salesData.forEach((row) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-<td>${new Date(row.date).toLocaleDateString()}</td>
-<td>${row.orderId}</td>
-<td>${row.product}</td>
-<td>${row.quantity}</td>
-<td>${row.coupon}</td>
-<td>$${row.discount.toFixed(2)}</td>
-<td>$${row.total.toFixed(2)}</td>
-`;
-      salesDataTableBody.appendChild(tr);
-    });
-
-    // Update overall statistics
-    overallSalesElem.textContent = `Overall Sales: $${data.overallSales.toFixed(
-      2
-    )}`;
-    overallOrderAmountElem.textContent = `Overall Order Amount: ${data.overallOrderAmount}`;
-    overallDiscountElem.textContent = `Overall Discount: $${data.overallDiscount.toFixed(
-      2
-    )}`;
-  }
-
-  function exportToCSV(data) {
-    const headers = [
-      "Date",
-      "Order ID",
-      "Product",
-      "Quantity",
-      "Coupon",
-      "Discount",
-      "Total",
-    ];
-    const csvRows = [headers.join(",")];
-
-    data.salesData.forEach((row) => {
-      const values = [
-        new Date(row.date).toLocaleDateString(),
-        row.orderId,
-        row.product,
-        row.quantity,
-        row.coupon,
-        row.discount.toFixed(2),
-        row.total.toFixed(2),
-      ];
-      csvRows.push(values.join(","));
-    });
-
-    const csvString = csvRows.join("\n");
-    const blob = new Blob([csvString], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute("download", "sales_report.csv");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-  fetchSalesDataBtn.addEventListener("click", async () => {
-    const selectedRange = dateRangeDropdown.value;
-    const dateRange = dateRanges[selectedRange];
-    const data = await fetchSalesData(dateRange);
-    populateSalesTable(data);
+      startDateInput.value = startDate.toISOString().split('T')[0];
+      endDateInput.value = today.toISOString().split('T')[0];
   });
 
-  exportCsvBtn.addEventListener("click", async () => {
-    const selectedRange = dateRangeDropdown.value;
-    const dateRange = dateRanges[selectedRange];
-    const data = await fetchSalesData(dateRange);
-    exportToCSV(data);
-  });
+  fetchSalesDataBtn.addEventListener('click', fetchSalesData);
+  exportCsvBtn.addEventListener('click', exportCsv);
 });
+
+async function fetchSalesData() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  if (!startDate || !endDate) {
+      alert('Please select both start and end dates');
+      return;
+  }
+
+  try {
+      const response = await axios.get(`/salesReport?startDate=${startDate}&endDate=${endDate}`);
+      const { salesReport, overallSales, overallOrderAmount, overallDiscount } = response.data;
+
+      // Update summary
+      document.getElementById('overallSales').textContent = `Overall Sales: $${overallSales.toFixed(2)}`;
+      document.getElementById('overallOrderAmount').textContent = `Overall Order Amount: ${overallOrderAmount}`;
+      document.getElementById('overallDiscount').textContent = `Overall Discount: $${overallDiscount.toFixed(2)}`;
+
+      // Update table
+      const tableBody = document.getElementById('salesDataTableBody');
+      tableBody.innerHTML = '';
+      salesReport.forEach(order => {
+          const row = `
+              <tr>
+                  <td>${new Date(order.date).toLocaleDateString()}</td>
+                  <td>${order.orderId}</td>
+                  <td>${order.products}</td>
+                  <td>${order.quantity}</td>
+                  <td>${order.coupon}</td>
+                  <td>$${order.discount.toFixed(2)}</td>
+                  <td>$${order.total.toFixed(2)}</td>
+              </tr>
+          `;
+          tableBody.innerHTML += row;
+      });
+
+      // Show the table, statistics, and export button
+      document.getElementById('statistics').style.display = 'block';
+      document.getElementById('salesTable').style.display = 'table';
+      document.getElementById('exportCsvBtn').style.display = 'inline-block';
+  } catch (error) {
+      console.error('Error fetching sales data:', error);
+      alert('An error occurred while fetching sales data');
+  }
+}
+
+function exportCsv() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  window.location.href = `/export-sales-report?startDate=${startDate}&endDate=${endDate}`;
+}

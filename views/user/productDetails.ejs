@@ -11,9 +11,12 @@
                     </p>
                     <div class="container my-5">
                         <div class="row align-items-start">
-                            <div class="col-6">
-                                <i class="fa-regular fa-heart" style="color: #bc4c2a;" id="addToWishlistBtn"
-                                    data-product-id="<%= products._id %>"></i>
+                            <div class="col-6 d-flex flex-column align-items-center" style="position: relative;">
+                                <div style="position: absolute; right: 15%;" class="">
+                                    <i class="fa-regular fa-heart fs-3" style="color: #bc4c2a; cursor: pointer;"
+                                        id="addToWishlistBtn" data-product-id="<%= products._id %>"
+                                        data-is-in-wishlist="<%= isInWishlist ? 'true' : 'false' %>"></i>
+                                </div>
                                 <div class="image-container" onmousemove="zoomIn(event)" onmouseleave="zoomOut()">
                                     <img src="\uploads\<%= products.prod_images[0] %>" alt="" id="mainImage">
                                     <img src="\uploads\<%= products.prod_images[0] %>" alt="" class='zoomed-image'>
@@ -30,11 +33,11 @@
                                     <%= products.prod_name %> (<%= products.prod_rating %> <i
                                                 class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)
                                 </h3>
-                                <% if(products.offer && new Date() <=products.offer.end_date){ %>
+                                <% if(appliedOffer){ %>
                                     <p class="text-decoration-line-through">Original Price: ₹<%= products.prod_mrp %>
                                     </p>
-                                    <p class="text-danger">Offer Price: ₹<%= discountedPrice %> (<%=
-                                                products.offer.discount_percentage %>% off)</p>
+                                    <p class="text-danger">Offer Price: ₹<%= discountedPrice.toFixed(2) %> (<%=
+                                                appliedOffer.discount_percentage %>% off)</p>
 
                                     <%} else {%>
                                         <p>Price: ₹<%= products.prod_mrp %>
@@ -143,7 +146,7 @@
                             let quantity = parseInt(quantityInput.value);
                             console.log(quantity)
                             let quantityAvailablity = document.getElementById('quantity-availablity');
-                            if (quantity+1 > maxValue) {
+                            if (quantity + 1 > maxValue) {
                                 quantityAvailablity.innerText = `Only ${maxValue} stocks left `
                             } else if (quantity >= maxQuantityPerUser) {
                                 quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
@@ -174,7 +177,7 @@
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ productId, quantity,maxValue })
+                                body: JSON.stringify({ productId, quantity, maxValue })
                             });
 
                             if (response.status === 401) {
@@ -202,42 +205,55 @@
                             }
                         }
 
-                            // add to wishlist 
 
-                            document.getElementById('addToWishlistBtn').addEventListener('click', function () {
-                                const productId = this.dataset.productId;
+                        // add to wishlist 
+                        const wishlistIcon = document.getElementById('addToWishlistBtn');
+                        let isInWishlist = wishlistIcon.dataset.isInWishlist === 'true';
 
-                                fetch('/wishlist/add', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ productId: productId })
+                        function updateWishlistIcon() {
+                            wishlistIcon.classList.toggle('fa-regular', !isInWishlist);
+                            wishlistIcon.classList.toggle('fa-solid', isInWishlist);
+                        }
+
+                        updateWishlistIcon();
+
+                        wishlistIcon.addEventListener('click', function () {
+                            const productId = this.dataset.productId;
+                            const endpoint = isInWishlist ? '/wishlist/remove' : '/wishlist/add';
+
+                            fetch(endpoint, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ productId: productId })
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
                                 })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.error) {
-                                            console.error(data.error);
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: 'Failed to add product to wishlist.',
-                                                icon: 'error',
-                                                confirmButtonText: 'OK'
-                                            });
-
-                                        } else {
-                                            Swal.fire({
-                                                title: 'Success!',
-                                                text: 'Product added to wishlist successfully!',
-                                                icon: 'success',
-                                                confirmButtonText: 'OK'
-                                            });
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error adding product to wishlist:', error);
+                                .then(data => {
+                                    isInWishlist = !isInWishlist;
+                                    updateWishlistIcon();
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: isInWishlist ? 'Product added to wishlist successfully!' : 'Product removed from wishlist successfully!',
+                                        icon: 'success',
+                                        confirmButtonText: 'OK'
                                     });
-                            });
+                                })
+                                .catch(error => {
+                                    console.error('Error updating wishlist:', error);
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: isInWishlist ? 'Failed to remove product from wishlist.' : 'Failed to add product to wishlist.',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                        });
 
 
 

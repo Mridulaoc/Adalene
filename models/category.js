@@ -28,6 +28,13 @@ const categorySchema = mongoose.Schema({
         default: 'ACTIVE'
     },
     offer: {
+        name:{
+            type:'string',            
+        },
+        description:{
+            type:'string',
+            
+        },
         discount_percentage: {
             type: Number,
             min: 0,

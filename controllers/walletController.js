@@ -57,6 +57,11 @@ const loadMyWallet = async (req,res)=>{
     }
 }
 
+
+const processWalletPayment = async (req, res) => {
+
+}
+
 module.exports = {
   getWalletBalance,
   getWalletTransactions,

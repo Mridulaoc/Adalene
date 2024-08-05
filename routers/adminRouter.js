@@ -16,6 +16,7 @@ const orderController = require('../controllers/orderController');
 const couponController = require('../controllers/couponController');
 const offerController = require('../controllers/offerController');
 const salesController = require('../controllers/salesController');
+const referralController = require('../controllers/referralController');
 const { routes } = require('./userRouter');
 
 // middlewares 
@@ -101,7 +102,7 @@ adminRoute.get('/coupons/edit-coupon/:id', isAuthenticated, couponController.loa
 adminRoute.put('/coupons/edit-coupon/:id',  isAuthenticated,couponController.updateCoupon);
 adminRoute.get('/coupons/delete-coupon',  isAuthenticated, couponController.deleteCoupon);
 
-//offer routes
+//product offer routes
 
 adminRoute.get('/productOffer', isAuthenticated, offerController.getProductOffer);
 adminRoute.get('/productOffer/add-offer/:id', isAuthenticated, offerController.getAddProductOffer);
@@ -109,9 +110,25 @@ adminRoute.post('/productOffer/add-offer', isAuthenticated, offerController.addN
 adminRoute.get('/productOffer/edit-offer/:id', isAuthenticated, offerController.getEditProductOffer);
 adminRoute.post('/productOffer/edit-offer', isAuthenticated, offerController.updateProductOffer);
 
+// category offer routes 
+adminRoute.get('/categoryOffer', isAuthenticated, offerController.getCategoryOffer);
+adminRoute.get('/categoryOffer/add-offer/:id', isAuthenticated, offerController.getAddCategoryOffer);
+adminRoute.post('/categoryOffer/add-offer', isAuthenticated, offerController.addNewCategoryOffer);
+adminRoute.get('/categoryOffer/edit-offer/:id', isAuthenticated, offerController.getEditCategoryOffer);
+adminRoute.post('/categoryOffer/edit-offer/:id', isAuthenticated, offerController.updateCategoryOffer);
+
+// referral offer routes 
+
+adminRoute.get('/referralOffer', isAuthenticated, referralController.getReferralList);
+adminRoute.get('/referralOffer/update-rewards', isAuthenticated, referralController.getupdateReferralRewards);
+adminRoute.post('/referralOffer/update-rewards', isAuthenticated, referralController.updateReferralRewards);
+
+
 // sales routes 
-adminRoute.get('/sales',isAuthenticated, salesController.getSalesPage)
-adminRoute.get('/salesReport', isAuthenticated, salesController.getSalesReport)
+adminRoute.get('/sales',isAuthenticated, salesController.getSalesReportPage);
+adminRoute.get('/salesReport', isAuthenticated, salesController.getSalesReport);
+adminRoute.get('/download-sales-report-pdf',isAuthenticated, salesController.downloadPDFReport);
+adminRoute.get('/download-sales-report-excel',isAuthenticated, salesController.downloadExcelReport);
 
 
 

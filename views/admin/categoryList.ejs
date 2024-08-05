@@ -1,51 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-   <%- include ("../layout/navBarAdmin.ejs") %>
-    <h2 class="text-center my-5">Category List</h2> 
-    
-    <div class="container-fluid">
-        <div class="container">
-            <div class="d-flex justify-content-end mb-5" >
-                <a href="/admin/categories/add-category" class="px-3 mx-5 text-decoration-none fs-6   border rounded-2 p-2" style="background-color: #BC4C2A; color: white;" >ADD NEW CATEGORY</a>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <h2 class="text-center my-5">Category List</h2>
+
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="d-flex justify-content-end mb-5">
+                        <a href="/admin/categories/add-category"
+                            class="px-3 mx-5 text-decoration-none fs-6   border rounded-2 p-2"
+                            style="background-color: #BC4C2A; color: white;">ADD NEW CATEGORY</a>
+                    </div>
+                    <div class="d-flex justify-content-between mb-5">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Created Date</th>
+                                <th scope="col">Status</th>
+                                <th scope="col" colspan="3" class="text-center">Actions</th>
+                            </tr>
+                            <%if(categories.length> 0){
+                                for(let i=0; i<categories.length; i++){ %>
+
+                                    <tr>
+                                        <td scope="row" class="text-capitalize">
+                                            <%= categories[i].cat_name %>
+                                        </td>
+                                        <td>
+                                            <%= categories[i].cat_desc %>
+                                        </td>
+                                        <td>
+                                            <%= moment(categories[i].created_on).format('MMMM Do YYYY, h:mm:ss') %>
+                                        </td>
+                                        <td>
+                                            <%= categories[i].cat_status %>
+                                        </td>
+                                        <td><a href="categories/edit-category/?id=<%= categories[i]._id %>"
+                                                class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 "
+                                                style="color: #BC4C2A;">EDIT</a></td>
+                                        <td><a href="categories/delete-category/?id=<%= categories[i]._id %>"
+                                                class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 "
+                                                style="color: #BC4C2A;">UNLIST</a>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if(categories[i].has_offer) { %>
+                                                <a href="/admin/categoryOffer/edit-offer/<%= categories[i]._id %>"
+                                                    class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 "
+                                                    style="color: #BC4C2A;">EDIT OFFER</a>
+                                                <%} else { %>
+                                                    <a href="/admin/categoryOffer/add-offer/<%= categories[i]._id %>"
+                                                        class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 "
+                                                        style="color: #BC4C2A;">ADD OFFER</a>
+                                                    <% } %>
+                                        </td>
+                                    </tr>
+
+                                    <%}%>
+                                        <%}else{%>
+
+                                            <td>Data not found</td>
+
+                                            <%}%>
+
+                        </table>
+
+
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-between mb-5">
-                <table class="table table-bordered" >
-                    <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Created Date</th>
-                        <th scope="col">Status</th> 
-                        <th scope="col" colspan="2" class="text-center">Actions</th>        
-                    </tr>
-                    <%if(categories.length > 0){
-                        for(let i=0; i<categories.length; i++){ 
-                            
-                        %>
-                    
-                        <tr>
-                            <td scope="row" class="text-capitalize"><%= categories[i].cat_name %></td>
-                            <td><%= categories[i].cat_desc %></td>
-                            <td><%=  moment(categories[i].created_on).format('MMMM Do YYYY, h:mm:ss')  %></td>
-                            <td><%= categories[i].cat_status %></td>
-                            <td><a href="categories/edit-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 " style="color: #BC4C2A;">EDIT</a></td>
-                            <td><a href="categories/delete-category/?id=<%= categories[i]._id %>" class="px-3 text-decoration-none fs-5 fw-bold border rounded-2 " style="color: #BC4C2A;">UNLIST</a></td>
-                        </tr>
-                        
-                        <%}%>
-                        <%}else{%>
-            
-                            <td>Data not found</td>
-                    
-                        <%}%>
-                
-                </table>
-                
-                
-            </div>
-        </div>
-    </div>
-    <%- include ("../layout/footerAdmin.ejs") %>
-</body>
+            <%- include ("../layout/footerAdmin.ejs") %>
+    </body>
+
 </html>

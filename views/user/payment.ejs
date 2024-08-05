@@ -79,7 +79,7 @@
                                     <td class="fs-5 py-3 sub_total">₹<%= totalValue %>
                                     </td>
                                 </tr>
-                                <tr id="couponDiscountRow" >
+                                <tr id="couponDiscountRow">
                                     <td class="fs-5 py-3">Coupon Discount:</td>
                                     <td class="fs-5 py-3 coupon-discount">₹0</td>
                                 </tr>
@@ -170,6 +170,10 @@
                             const couponBtn = document.getElementById('couponBtn');
                             const couponMessage = document.getElementById('couponMessage');
                             const appliedCouponCodeInput = document.getElementById('appliedCouponCode');
+                            const codRadio = document.getElementById('cod');
+                            const paypalRadio = document.getElementById('paypal');
+                            const totalElement = document.querySelector('.total');
+                            const codMessageDiv = document.createElement('div');
 
                             let appliedCoupon = null;
 
@@ -241,53 +245,54 @@
                                     });
                             }
 
-                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
-                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
-                                document.querySelector('.total').textContent = `₹${grandTotal}`;
 
-                                const couponDiscountRow = document.getElementById('couponDiscountRow');
-                                const couponDiscountElement = document.querySelector('.coupon-discount')
-                                if (couponDiscount > 0) {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
-                                } else {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = '₹0';
-                                }
-
-                            }
-
-
-                            fetch('/my-wallet/balance')
-                                .then(response => response.json())
-                                .then(data => {
-                                    walletBalanceSpan.textContent = data.balance.toFixed(2);
-                                    useWalletAmountInput.max = data.balance;
-                                });
-
+                            codMessageDiv.id = 'codMessage';
+                            codRadio.parentNode.appendChild(codMessageDiv);
 
                             let paypalButtonsRendered = false;
 
-                            function updateButtonVisibility() {
-                                const isPayPalSelected = document.getElementById('paypal').checked;
-                                paypalButtonContainer.style.display = isPayPalSelected ? 'block' : 'none';
-                                placeOrderBtn.style.display = isPayPalSelected ? 'none' : 'block';
+                            function updateCODAvailability() {
+                                const totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
 
-                                if (isPayPalSelected && !paypalButtonsRendered) {
+                                if (totalValue > 1000) {
+                                    codRadio.disabled = true;
+                                    codMessageDiv.textContent = 'Cash on Delivery is not available for orders above ₹1000.';
+                                    codMessageDiv.style.color = 'red';
+                                    if (codRadio.checked) {
+                                        paypalRadio.checked = true;
 
-                                    renderPayPalButtons();
+                                    } else {
+                                        codRadio.disabled = false;
+                                        codMessageDiv.textContent = '';
+                                    }
+
+                                    updateButtonVisibility();
                                 }
                             }
 
-                            paymentMethods.forEach(method => {
-                                method.addEventListener('change', updateButtonVisibility);
-                            });
 
 
-                            updateButtonVisibility();
+                            function updateButtonVisibility() {
+                                const isPayPalSelected = paypalRadio.checked;
+                                const isWalletPayment = placeOrderBtn.dataset.paymentMethod === 'wallet';
+                                if (isWalletPayment) {
+                                    paypalButtonContainer.style.display = 'none';
+                                    placeOrderBtn.style.display = 'block';
+                                } else {
+                                    paypalButtonContainer.style.display = isPayPalSelected ? 'block' : 'none';
+                                    placeOrderBtn.style.display = isPayPalSelected ? 'none' : 'block';
+
+                                    if (isPayPalSelected && !paypalButtonsRendered) {
+                                        renderPayPalButtons();
+                                    }
+                                }
+
+                            }
 
                             function renderPayPalButtons() {
                                 console.log('Rendering PayPal buttons');
+                                paypalButtonContainer.innerHTML = '';
                                 paypal.Buttons({
                                     createOrder: function (data, actions) {
                                         console.log('CreateOrder function called');
@@ -345,6 +350,143 @@
                                 });
                             }
 
+
+                            codRadio.addEventListener('change', function () {
+                                placeOrderBtn.dataset.paymentMethod = '';
+                                updateButtonVisibility();
+                            });
+
+                            paypalRadio.addEventListener('change', function () {
+                                placeOrderBtn.dataset.paymentMethod = '';
+                                updateButtonVisibility();
+                            });
+
+                            updateCODAvailability()
+
+                            placeOrderBtn.addEventListener('click', function (event) {
+                                const totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
+
+                                if (codRadio.checked && totalValue > 1000) {
+                                    event.preventDefault();
+                                    alert('Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.');
+                                    paypalRadio.checked = true;
+                                    updateButtonVisibility();
+                                }
+                            });
+
+                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
+                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
+                                document.querySelector('.total').textContent = `₹${grandTotal}`;
+
+                                const couponDiscountRow = document.getElementById('couponDiscountRow');
+                                const couponDiscountElement = document.querySelector('.coupon-discount')
+                                if (couponDiscount > 0) {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
+                                } else {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = '₹0';
+                                }
+                                updateCODAvailability();
+                            }
+
+
+                            fetch('/my-wallet/balance')
+                                .then(response => response.json())
+                                .then(data => {
+                                    const walletBalance = data.balance.toFixed(2);
+                                    walletBalanceSpan.textContent = walletBalance;
+                                    useWalletAmountInput.max = walletBalance;
+                                    checkWalletSufficiency(walletBalance);
+                                    updateButtonVisibility();
+                                });
+
+                            function checkWalletSufficiency(walletBalance) {
+                                totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
+                                if (walletBalance >= totalValue) {
+                                    useWalletAmountInput.value = totalValue;
+                                    useWalletAmountInput.disabled = true;
+                                    codRadio.disabled = true;
+                                    paypalRadio.disabled = true;
+                                    placeOrderBtn.textContent = 'Pay with Wallet';
+                                    placeOrderBtn.dataset.paymentMethod = 'wallet';
+
+                                    paypalButtonContainer.style.display = 'none';
+                                    placeOrderBtn.style.display = 'block';
+                                    document.querySelector('.form-group').style.display = 'none';
+                                } else {
+                                    useWalletAmountInput.value = walletBalance;
+                                    placeOrderBtn.dataset.paymentMethod = '';
+
+                                    document.querySelector('.form-group').style.display = 'block';
+                                    updateButtonVisibility();
+                                }
+                            }
+
+                            placeOrderBtn.addEventListener('click', function (event) {
+                                event.preventDefault();
+                                const totalText = totalElement.textContent;
+                                const totalValue = parseFloat(totalText.replace('₹', '').trim());
+
+                                if (placeOrderBtn.dataset.paymentMethod === 'wallet') {
+                                    // Send a request to process wallet payment
+                                    fetch('/payment', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            paymentMethod: 'wallet',
+                                            amount: totalValue,
+                                            selectedAddress: paymentForm.dataset.selectedAddress,
+                                            couponCode: appliedCouponCodeInput.value
+                                        }),
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                window.location.href = '/order-confirmation/' + data.orderId;;
+                                            } else {
+                                                alert('Payment failed: ' + data.message);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('An error occurred while processing your payment.');
+                                        });
+                                } else if (codRadio.checked && totalValue > 1000) {
+                                    alert('Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.');
+                                    paypalRadio.checked = true;
+                                    updateButtonVisibility();
+                                } else {
+                                    fetch('/payment', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            paymentMethod: codRadio.checked ? 'cod' : 'other',
+                                            selectedAddress: paymentForm.dataset.selectedAddress,
+                                            useWalletAmount: useWalletAmountInput.value,
+                                            couponCode: appliedCouponCodeInput.value
+                                        }),
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                window.location.href = '/order-confirmation/' + data.orderId;
+                                            } else {
+                                                alert('Order placement failed: ' + data.message);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            alert('An error occurred while placing your order.');
+                                        });
+                                }
+                            });
 
                         })
                     </script>

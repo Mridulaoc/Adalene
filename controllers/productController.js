@@ -31,15 +31,16 @@ const loadProductList = async (req, res) => {
         .sort({ created_on: -1 })
         .lean()
         .exec();
-
+      const currentDate = new Date();
       const count = await Product.find({
         prod_name: { $regex: ".*" + search + ".*", $options: "i" },
       }).countDocuments();
-      console.log(count)
-
+      
       const productsWithOfferStatus = productsData.map(product => ({
         ...product,
-        has_offer: !!product.offer && new Date(product.offer.end_date) > new Date()
+        has_offer: product.offer &&
+        product.offer.end_date && 
+         new Date(product.offer.end_date) > currentDate
       }));
 
       res.render("productList", {
