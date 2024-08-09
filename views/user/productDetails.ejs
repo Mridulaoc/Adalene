@@ -21,10 +21,11 @@
                                     <img src="\uploads\<%= products.prod_images[0] %>" alt="" id="mainImage">
                                     <img src="\uploads\<%= products.prod_images[0] %>" alt="" class='zoomed-image'>
                                 </div>
-                                <div id="currentImages" class="my-5">
-                                    <% products.prod_images.forEach(image=> { %>
-                                        <img src="\uploads\<%= image %>" alt="" style="width: 150px; height: 150px;"
-                                            onclick="changeImage('<%= image %>')">
+                                <div id="thumbnailContainer" class="d-flex justify-content-center flex-wrap mt-3">
+                                    <% products.prod_images.forEach((image, index)=> { %>
+                                        <img src="\uploads\<%= image %>" alt="" class="thumbnail-image m-2"
+                                            style="width: 80px; height: 80px; cursor: pointer;"
+                                            onclick="changeImage('<%= image %>', this)">
                                         <% }) %>
                                 </div>
                             </div>
@@ -135,6 +136,30 @@
                             const zoomedImage = document.querySelector('.zoomed-image');
                             zoomedImage.style.display = 'none';
                         }
+
+
+                        function changeImage(imageSrc, clickedThumbnail) {
+                            const mainImage = document.getElementById('mainImage');
+                            const zoomedImage = document.querySelector('.zoomed-image');
+
+                            mainImage.src = `\\uploads\\${imageSrc}`;
+                            zoomedImage.src = `\\uploads\\${imageSrc}`;
+
+                            // Remove 'active' class from all thumbnails
+                            const thumbnails = document.querySelectorAll('.thumbnail-image');
+                            thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
+
+                            // Add 'active' class to clicked thumbnail
+                            clickedThumbnail.classList.add('active-thumbnail');
+                        }
+
+                        // Call this function when the page loads to set the first image as active
+                        window.onload = function () {
+                            const firstThumbnail = document.querySelector('.thumbnail-image');
+                            if (firstThumbnail) {
+                                firstThumbnail.classList.add('active-thumbnail');
+                            }
+                        };
 
                         // functiions for increment decrement 
 

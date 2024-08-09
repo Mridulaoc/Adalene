@@ -4,7 +4,7 @@
 <body>
   <%- include ("../layout/navBarnew.ejs") %>
 
- <div class="container-fluid py-5" style="height: 100vh;">
+ <div class="container-fluid py-5 px-0" style="height: 100vh;">
     <div class="container mb-5">
         <h2>Your Cart</h2>
         <div class="d-flex flex-column align-items-center mb-5">
@@ -82,10 +82,8 @@
 
                     <%} else {%>
                         <h3>Your cart is empty</h3>
-                        <%}%>
-
-
-    
+                        <%}%>    
+ </div>
  </div>
  <%- include ("../layout/footerUser.ejs") %>
 <script>

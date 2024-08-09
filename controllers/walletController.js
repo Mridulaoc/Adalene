@@ -4,7 +4,7 @@ const User = require("../models/user");
 const getWalletBalance = async (req, res) => {
   try {
     let wallet = await Wallet.findOne({ user: req.user.id });
-    console.log(wallet)
+    
     if (!wallet) {
       wallet = new Wallet({ user: req.user.id });
       await wallet.save();
@@ -34,11 +34,16 @@ const addToWallet = async (userId, amount, description) => {
       wallet = new Wallet({ user: userId });
     }
 
-    
-    wallet.balance += amount;
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount)) {
+      throw new Error('Invalid amount: must be a valid number');
+    }
+
+    wallet.balance = Number(wallet.balance) + numericAmount;
+   
     wallet.transactions.push({
       type: "CREDIT",
-      amount,
+      amount:numericAmount,
       description,
     });
     await wallet.save();

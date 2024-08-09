@@ -100,10 +100,12 @@ userRoute.get('/payment', isAuthenticated, userController.displayPayment);
 userRoute.post('/apply-coupon', isAuthenticated, couponController.applyCoupon);
 userRoute.post('/remove-coupon', isAuthenticated, couponController.removeCoupon);
 userRoute.post('/paypal-success', isAuthenticated, userController.paypalSuccess);
-userRoute.post('/paypal-cancel', isAuthenticated, userController.paypalCancel);
+// userRoute.post('/paypal-cancel', isAuthenticated, userController.paypalCancel);
 userRoute.post('/payment', isAuthenticated, userController.processPayment);
 userRoute.post('/create-paypal-order',isAuthenticated, userController.createPaypalOrder);
+userRoute.get('/create-paypal-order/:orderId',isAuthenticated, userController.createPaypalOrderForRetry);
 userRoute.get('/order-confirmation/:orderId', isAuthenticated, userController.displayOrderConfirmation);
+userRoute.get('/retry-payment/:orderId',isAuthenticated,userController.createPaypalOrderForRetry);
 userRoute.get('/profile', isAuthenticated, userController.displayProfile);
 userRoute.get('/profile/edit/:id', isAuthenticated, userController.displayEditProfile);
 userRoute.put('/profile/edit/:id',isAuthenticated, userController.updateProfile);
@@ -120,7 +122,8 @@ userRoute.post('/cancel-order', isAuthenticated, userController.cancelOrder);
 userRoute.get('/order-details/:orderId', isAuthenticated, userController.displayOrderDetails)
 userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrderItem);
 userRoute.post('/return-order-item', isAuthenticated, userController.returnOrderItem);
-userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
+// userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
+userRoute.post('/return-order-request',isAuthenticated, userController.returnOrderRequest)
 userRoute.get('/my-wallet', isAuthenticated, walletController.loadMyWallet);
 userRoute.get('/my-wallet/balance', isAuthenticated, walletController.getWalletBalance);
 userRoute.get('/my-wallet/transactions', isAuthenticated, walletController.getWalletTransactions);

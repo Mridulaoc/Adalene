@@ -1,7 +1,9 @@
 const Order = require('../models/order')
 const User = require('../models/user');
 const Product = require('../models/product');
+const Wallet = require('../models/wallet');
 const moment = require('moment');
+const { addToWallet } = require("./walletController");
 
 const displayOrders = async(req,res)=>{
     try {
@@ -59,12 +61,54 @@ const updateStatus = async (req, res) => {
             if(!order){
                 res.status(404).send('Order not found');
             }
+            if (status === "Return Request Accepted") {
+                for (let product of order.products) {
+                    product.productStatus = "Returned";
+              
+                    const productInStock = await Product.findById(product.product);
+                    if (productInStock) {
+                      productInStock.quantity += product.quantity;
+                      await productInStock.save();
+                    }
+                  }
+                  let refundAmount;
+                  if (order.subtotal < 1000) {
+                    refundAmount = order.total - 100;
+                  } else {
+                    refundAmount = order.total; // If subtotal >= 1000, refund the full amount
+                  }
+                  await addToWallet(
+                    order.user,
+                    refundAmount,
+                    `Refund for returned order ${order._id}`
+                  );
+                  if (order.walletAmountUsed > 0) {
+                    // Refund the wallet amount
+                    const wallet = await Wallet.findOne({ user: order.user });
+                    wallet.balance += Number(order.walletAmountUsed);
+                    wallet.transactions.push({
+                      type: "CREDIT",
+                      amount: Number(order.walletAmountUsed),
+                      description: "Order cancellation refund (from wallet balance)",
+                    });
+                    await wallet.save();
+                  }
+              
+                  order.status = "Returned";
+                  order.total = 0;
+              
+                  await order.save();
+              
+                  res.redirect('/admin/orders')
+            }else{
             order.status = status;
             order.products.forEach(product => {
                 product.productStatus = status;
             })
             await order.save();
             res.redirect('/admin/orders')
+            } 
+           
 
         } catch (error) {
             console.log(error)

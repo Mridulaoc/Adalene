@@ -45,6 +45,9 @@ const orderSchema = mongoose.Schema({
             productStatus: {
                 type: String,
                 default: 'Pending'
+            },
+            returnReason:{
+                type: String,
             }
 
         }
@@ -99,6 +102,14 @@ const orderSchema = mongoose.Schema({
     averageDiscountPercentage:{
         type: Number,
         default: 0
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Failed', 'Completed'],
+        default: 'Pending'
+    },
+    returnReason:{
+        type: String,
     }
 })
 

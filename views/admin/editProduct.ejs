@@ -20,7 +20,7 @@
                         <label for="category" class="form-label">Category</label>
                         <select class="form-select" id="category" name="categoryId" required>
                             <% categories.forEach((category) => { %>
-                                <option value="<%= category._id %>" <%= category._id.equals(products.prod_category) ? 'selected' : '' %>><%= category.cat_name %></option>
+                                <option value="<%= category._id %>" <%= category._id.equals(products.prod_category._id) ? 'selected' : '' %>><%= category.cat_name %></option>
                             <% }) %>               
                         </select>
                     </div>
@@ -29,7 +29,7 @@
                         <label for="size" class="form-label">Size</label>
                         <select class="form-select" id="size" name="sizeId">                                 
                             <% sizes.forEach((size) => { %>
-                                <option value="<%= size._id %>"<%= size._id.equals(products.prod_size) ? 'selected' : '' %>><%= size.size %></option>
+                                <option value="<%= size._id %>"<%= size._id.equals(products.prod_size._id) ? 'selected' : '' %>><%= size.size %></option>
                             <% }) %> 
                         </select>                
                     </div>
@@ -38,14 +38,14 @@
                         <label for="colour" class="form-label">Colour</label>
                         <select class="form-select" id="colour" name="colorId">
                             <% colors.forEach((color) => { %>
-                                <option value="<%= color._id %>"<%= color._id.equals(products.prod_color) ? 'selected' : '' %>><%= color.color_name %></option>
+                                <option value="<%= color._id %>"<%= color._id.equals(products.prod_color._id) ? 'selected' : '' %>><%= color.color_name %></option>
                             <% }) %> 
                       </select>
                     </div>                    
                 </div>
                 <div class="mb-3 d-flex flex-column" style="width: 25%">
                     <label for="price" class="form-label">MRP</label>
-                    <input type="number" class="form-control" id="price" name="mPrice" required
+                    <input type="number" class="form-control" id="price" name="mPrice" value="<%= products.prod_mrp %>" required
                       onchange="validatePrice()" />
                     <span id="error" style="color: red"></span>
                   </div>

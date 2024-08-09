@@ -1,60 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-<%- include ("../layout/navBarSignIn.ejs") %>
-    <div class="container-fluid" style="height: 100vh;">
-        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my5 rounded col-md-4 col-xs-12 form "  >
-    
-    <form action="/signin" method="post"  autocomplete="off" style="width: 90%;" >
-        <h4 class="mb-3 text-center"> Sign In</h4> 
-        <p class="fs-6 text-center">Don't have an account yet? <span > <a href="/signup" class="text-decoration-none" style="color: #BC4C2A; font-weight: bold;">Sign Up Now</a></span></p>
-        <% if(locals.message){%>
-            <div class="alert alert-danger"><%= message %></div>         
-            
-        <%}%>
 
-        <% if(locals.success){%>
-          <div class="alert alert-success"><%= success %></div> 
-        <%}%>
-        <% if(locals.logout){%>
-          <div class="alert alert-success"><%= logout %></div> 
-        <%}%>
-        
-          <div class="mb-3 ">           
-            <label for="email" class="form-label"> Email address</label>
-            <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required>
-            <span id="emailError" style="color: red;"></span>
-          </div>
-          <div class="mb-3 ">           
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()"  required>
-            <span id="passwordError" style="color: red;"></span>
-            
-          </div>    
-          <div class="mb-3 " style="border-color: #BC4C2A;">       
-            <input type="submit" class="form-control  fs-6"  value="SIGN IN" style="color: #BC4C2A;"  required>
-          </div>    
-        </form>      
-          <div class="mb-3 text-center" >       
+  <body>
+    <%- include ("../layout/navBarSignIn.ejs") %>
+      <div class="container-fluid" style="height: 100vh;">
+        <div
+          class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my5 rounded col-md-4 col-xs-12 form ">
+
+          <form action="/signin" method="post" autocomplete="off" style="width: 90%;">
+            <h4 class="mb-3 text-center"> Sign In</h4>
+            <p class="fs-6 text-center">Don't have an account yet? <span> <a href="/signup" class="text-decoration-none"
+                  style="color: #BC4C2A; font-weight: bold;">Sign Up Now</a></span></p>
+            <% if(locals.message){%>
+              <div class="alert alert-danger">
+                <%= message %>
+              </div>
+
+              <%}%>
+
+                <% if(locals.success){%>
+                  <div class="alert alert-success">
+                    <%= success %>
+                  </div>
+                  <%}%>
+                    <% if(locals.logout){%>
+                      <div class="alert alert-success">
+                        <%= logout %>
+                      </div>
+                      <%}%>
+
+                        <div class="mb-3 ">
+                          <label for="email" class="form-label"> Email address</label>
+                          <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"
+                            required>
+                          <span id="emailError" style="color: red;"></span>
+                        </div>
+                        <div class="mb-3 ">
+                          <label for="password" class="form-label">Password</label>
+                          <input type="password" class="form-control" id="password" name="password"
+                            onchange="validatePassword()" required>
+                          <span id="passwordError" style="color: red;"></span>
+
+                        </div>
+                        <div class="mb-3 " style="border-color: #BC4C2A;">
+                          <input type="submit" class="form-control  fs-6" value="SIGN IN" style="color: #BC4C2A;"
+                            required>
+                        </div>
+          </form>
+          <div class="mb-3 text-center">
             OR USING
           </div>
-        
-          <div class="mb-3" style=" width: 90%;" >            
-            <button class="form-control text-center  fs-6" ><a href="/google" class="text-decoration-none " style="color: #BC4C2A;">Google</a></button>           
+
+          <div class="mb-3" style=" width: 90%;">
+            <button class="form-control text-center  fs-6"><a href="/google" class="text-decoration-none "
+                style="color: #BC4C2A;">Google</a></button>
           </div>
-          <p><a href="/forgot-password" class="fs-6 text-decoration-none" style="color: #BC4C2A;" >Forgot Password?</a></p>
+          <p><a href="/forgot-password" class="fs-6 text-decoration-none" style="color: #BC4C2A;">Forgot Password?</a>
+          </p>
         </div>
-    </div>    
-    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-      <script>
+      </div>
+      <% if (typeof errorMessage !=='undefined' && errorMessage) { %>
+        <script>
           Swal.fire({
-              icon: 'error',
-              title: 'Login Error',
-              text: '<%= errorMessage %>'
+            icon: 'error',
+            title: 'Login Error',
+            text: '<%= errorMessage %>'
           });
-      </script>
-  <% } %>
-  <%- include ("../layout/footerUser.ejs") %>
-</body>
+        </script>
+        <% } %>
+          <%- include ("../layout/footerUser.ejs") %>
+  </body>
+
 </html>

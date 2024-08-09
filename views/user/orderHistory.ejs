@@ -9,53 +9,65 @@
                     <h4>Account</h4>
                     <div class="d-flex gap-5 ">
                         <%- include ("../layout/profileSidebar.ejs") %>
-                        <div class="col-8 border shadow rounded px-5">
-                            <h4 class="text-center" style="padding: 1.5rem 10rem;">Order History</h4>
-                            <%if (orders.length> 0 ) {%>
-                                <table class="table  ">
-                                    <tr class="fs-6">
-                                        <th scope="col" class="text-center">Order ID</th>
-                                        <th scope="col" class="text-center">Date</th>
-                                        <th scope="col" class="text-center">Total</th>
-                                        <th scope="col" class="text-center">Status</th>
-                                        <th scope="col" class="text-center">Actions</th>
-                                    </tr>
-
-                                    <% orders.forEach(order=>{%>
-                                        <tr class="">
-                                            <td class="py-5 "><a href="/order-details/<%= order._id %>"
-                                                    class="text-decoration-none text-black fw-bold">
-                                                    <%= order.orderId %>
-                                                </a></td>
-                                            <td class="py-5 ">
-                                                <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss') %>
-                                            </td>
-                                            <td class="py-5 ">₹<%= order.total.toFixed(2) %>
-                                            </td>
-                                            <td class="py-5 ">
-                                                <%= order.status %>
-                                            </td>
-                                            <td class="py-5">
-                                                <% if(order.status==='Pending' ){%>
-                                                    <button
-                                                        class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
-                                                        style="color: #BC4C2A;"
-                                                        onclick="cancelOrder('<%= order._id %>')">CANCEL ORDER</button>
-                                                    <% } else if(order.status==='Delivered' ) {%>
-                                                        <button
-                                                            class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
-                                                            style="color: #BC4C2A;"
-                                                            onclick="returnOrder('<%= order._id %>')">RETURN
-                                                            ORDER</button>
-                                                        <%}%>
-                                            </td>
+                            <div class="col-8 border shadow rounded px-5">
+                                <h4 class="text-center" style="padding: 1.5rem 10rem;">Order History</h4>
+                                <%if (orders.length> 0 ) {%>
+                                    <table class="table  ">
+                                        <tr class="fs-6">
+                                            <th scope="col" class="text-center">Order ID</th>
+                                            <th scope="col" class="text-center">Date</th>
+                                            <th scope="col" class="text-center">Total</th>
+                                            <th scope="col" class="text-center">Status</th>
+                                            <th scope="col" class="text-center">Payment Status</th>
+                                            <th scope="col" colspan="2" class="text-center">Actions</th>
                                         </tr>
-                                        <% }) %>
-                                </table>
-                                <%} else {%>
-                                    <h3>No orders found</h3>
-                                    <% } %>
-                        </div>
+
+                                        <% orders.forEach(order=>{%>
+                                            <tr class="">
+                                                <td class="py-5 "><a href="/order-details/<%= order._id %>"
+                                                        class="text-decoration-none text-black fw-bold">
+                                                        <%= order.orderId %>
+                                                    </a></td>
+                                                <td class="py-5 ">
+                                                    <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss') %>
+                                                </td>
+                                                <td class="py-5 ">₹<%= order.total.toFixed(2) %>
+                                                </td>
+                                                <td class="py-5 ">
+                                                    <%= order.status %>
+                                                </td>
+                                                <td class="py-5">
+                                                    <%= order.paymentStatus %>
+                                                </td>
+                                                <td class="py-5">
+                                                    <% if (order.status==='Pending' ) { %>
+                                                        <button
+                                                            class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                            style="color: #BC4C2A;"
+                                                            onclick="cancelOrder('<%= order._id %>')">CANCEL
+                                                            ORDER</button>
+                                                        <% } else if (order.status==='Delivered' ) { %>
+                                                            <button
+                                                                class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                                style="color: #BC4C2A;"
+                                                                onclick="returnOrder('<%= order._id %>')">RETURN
+                                                                ORDER</button>
+                                                            <% } %>
+                                                                <% if (order.paymentStatus==='Failed' ) { %>
+                                                                    <button
+                                                                        class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                                        style="color: #BC4C2A;"
+                                                                        onclick="retryPayment('<%= order._id %>')">RETRY
+                                                                        PAYMENT</button>
+                                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </table>
+                                    <%} else {%>
+                                        <h3>No orders found</h3>
+                                        <% } %>
+                            </div>
                     </div>
 
                 </div>
@@ -63,6 +75,47 @@
             <%- include ("../layout/footerUser.ejs") %>
 
                 <script>
+                    async function returnOrder(orderId) {
+                        const { value: reason } = await Swal.fire({
+                            title: 'Enter the reason for return',
+                            input: 'text',
+                            inputPlaceholder: 'Enter reason',
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit',
+                            cancelButtonText: 'Cancel',
+                        });
+
+                        if (reason) {
+                            // Call the backend API to process the return request
+                            await handleReturnRequest(orderId, reason);
+                        }
+                    }
+
+                    async function handleReturnRequest(orderId, reason) {
+                        try {
+                            const response = await fetch('/return-order-request', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ orderId, reason }),
+                            });
+
+                            const data = await response.json();
+
+                            if (data.success) {                               
+                                location.reload();
+                            } else {
+                                Swal.fire('Error', data.message || 'Failed to submit return request.', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Error processing return request:', error);
+                            Swal.fire('Error', 'An error occurred while processing the return request.', 'error');
+                        }
+                    }
+
+                  
+
                     async function cancelOrder(orderId) {
                         const result = await Swal.fire({
                             title: 'Are you sure?',
@@ -102,42 +155,159 @@
                         }
                     }
 
-                    async function returnOrder(orderId) {
+                    // async function returnOrder(orderId) {
+                    //     const result = await Swal.fire({
+                    //         title: 'Are you sure?',
+                    //         text: 'Do you really want to return the full order?',
+                    //         icon: 'warning',
+                    //         showCancelButton: true,
+                    //         confirmButtonText: 'Yes, return it!',
+                    //         cancelButtonText: 'No, keep it'
+                    //     });
+
+                    //     if (result.isConfirmed) {
+                    //         try {
+                    //             const response = await fetch('/return-order', {
+                    //                 method: 'POST',
+                    //                 headers: {
+                    //                     'Content-Type': 'application/json'
+                    //                 },
+                    //                 body: JSON.stringify({ orderId })
+                    //             });
+
+                    //             const data = await response.json();
+
+                    //             if (data.success) {
+                    //                 Swal.fire('Returned!', 'The full order has been returned.', 'success')
+                    //                     .then(() => {
+                    //                         location.reload();
+                    //                     });
+                    //             } else {
+                    //                 Swal.fire('Failed!', data.message || 'Failed to return the full order.', 'error');
+                    //             }
+                    //         } catch (error) {
+                    //             console.log(error);
+                    //             Swal.fire('Error!', 'An error occurred while returning the full order.', 'error');
+                    //         }
+                    //     }
+                    // }
+                    async function retryPayment(orderId) {
                         const result = await Swal.fire({
-                            title: 'Are you sure?',
-                            text: 'Do you really want to return the full order?',
-                            icon: 'warning',
+                            title: 'Retry Payment',
+                            text: 'Do you want to retry the payment for this order?',
+                            icon: 'question',
                             showCancelButton: true,
-                            confirmButtonText: 'Yes, return it!',
-                            cancelButtonText: 'No, keep it'
+                            confirmButtonText: 'Yes, retry payment',
+                            cancelButtonText: 'No, cancel'
                         });
 
                         if (result.isConfirmed) {
                             try {
-                                const response = await fetch('/return-order', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ orderId })
-                                });
+                                const response = await fetch(`/create-paypal-order/${orderId}`);
+                                console.log(response)
+                                if (response.ok) {
 
-                                const data = await response.json();
 
-                                if (data.success) {
-                                    Swal.fire('Returned!', 'The full order has been returned.', 'success')
-                                        .then(() => {
-                                            location.reload();
+                                    const data = await response.json();
+                                    console.log(data)
+
+                                    if (data.id) {
+                                        const paypalButtonContainer = document.createElement('div');
+                                        paypalButtonContainer.id = 'paypal-button-container';
+                                        await new Promise(resolve => setTimeout(resolve, 500));
+                                        // Render PayPal buttons
+                                        paypal.Buttons({
+                                            createOrder: function () {
+                                                return data.id;
+                                            },
+                                            onApprove: function (data, actions) {
+                                                return actions.order.capture().then(function (details) {
+                                                    return fetch('/paypal-success', {
+                                                        method: 'post',
+                                                        headers: {
+                                                            'content-type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({
+                                                            orderID: data.orderID,
+                                                            payerID: data.payerID,
+                                                            paymentID: details.id
+                                                        })
+                                                    });
+                                                }).then(function (response) {
+                                                    if (response.ok) {
+                                                        window.location.href = '/order-confirmation/' + data.orderID;
+                                                    } else {
+                                                        window.location.href = '/order-history';
+                                                    }
+                                                })
+                                            },
+                                            onError: function (err) {
+                                                console.error('PayPal button error:', err);
+                                                Swal.fire('Error', 'An error occurred with the PayPal payment. Please try again.', 'error');
+                                            }
+                                        }).render(paypalButtonContainer);
+
+                                        // Show PayPal button in a modal
+                                        Swal.fire({
+                                            title: 'Complete Payment',
+                                            html: paypalButtonContainer,
+                                            showConfirmButton: false,
+                                            showCloseButton: true,
+                                            onOpen: () => {
+                                                setTimeout(() => {
+                                                    paypal.Buttons({
+                                                        createOrder: function () {
+                                                            return data.id;
+                                                        },
+                                                        onApprove: function (data, actions) {
+                                                            return actions.order.capture().then(function (details) {
+                                                                return fetch('/paypal-success', {
+                                                                    method: 'post',
+                                                                    headers: {
+                                                                        'content-type': 'application/json'
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        orderID: data.orderID,
+                                                                        payerID: data.payerID,
+                                                                        paymentID: details.id
+                                                                    })
+                                                                });
+                                                            }).then(function (response) {
+
+                                                                if (response.ok) {
+                                                                    window.location.href = '/order-confirmation/' + data.orderID;
+                                                                } else {
+                                                                    window.location.href = '/order-history';
+                                                                }
+                                                            })
+
+                                                        },
+                                                        onError: function (err) {
+                                                            console.error('PayPal button error:', err);
+                                                            Swal.fire('Error', 'An error occurred with the PayPal payment. Please try again.', 'error');
+                                                        }
+                                                    }).render('#paypal-button-container');
+                                                }, 500);
+                                            }
+
                                         });
+                                    } else {
+                                        Swal.fire('Error', 'Failed to create PayPal order', 'error');
+                                    }
                                 } else {
-                                    Swal.fire('Failed!', data.message || 'Failed to return the full order.', 'error');
+                                    const errorMessage = await response.text();
+                                    console.error('PayPal button error:', errorMessage);
+                                    Swal.fire('Error', 'An error occurred with the PayPal payment. Please try again.', 'error');
                                 }
                             } catch (error) {
-                                console.log(error);
-                                Swal.fire('Error!', 'An error occurred while returning the full order.', 'error');
+                                console.error('Retry Payment Error:', error);
+                                Swal.fire('Error', 'An error occurred while retrying payment', 'error');
                             }
                         }
                     }
+
+
+
                 </script>
     </body>
 

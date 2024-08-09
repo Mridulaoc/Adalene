@@ -114,7 +114,7 @@
                             <div id="couponMessage" class="mt-2"></div>
                         </div>
                         <form action="/payment" method="post" class=" mx-3 " id="paymentForm"
-                            data-selected-address="<%= selectedAddress %>">
+                            data-selected-address="<%= JSON.stringify(selectedAddress) %>">
                             <input type="hidden" id="appliedCouponCode" name="couponCode" value="">
                             <h5>Wallet Balance: ₹<span id="walletBalance"></span></h5>
                             <label for="useWalletAmount">Use from wallet:</label>
@@ -295,14 +295,15 @@
                                 paypalButtonContainer.innerHTML = '';
                                 paypal.Buttons({
                                     createOrder: function (data, actions) {
-                                        console.log('CreateOrder function called');
+                                        const selectedAddressString = paymentForm.dataset.selectedAddress;
+                                        const selectedAddress = JSON.parse(selectedAddressString || '{}');
                                         return fetch('/create-paypal-order', {
                                             method: 'POST',
                                             headers: {
                                                 'Content-Type': 'application/json',
                                             },
                                             body: JSON.stringify({
-                                                selectedAddress: paymentForm.dataset.selectedAddress,
+                                                selectedAddress: selectedAddress,
                                                 useWalletAmount: useWalletAmountInput.value,
                                                 couponCode: appliedCouponCodeInput.value
                                             }),
@@ -323,8 +324,7 @@
                                     },
                                     onApprove: function (data, actions) {
                                         return actions.order.capture().then(function (details) {
-                                            console.log('Capture result', details, JSON.stringify(details, null, 2));
-                                            // Call your server to save the transaction
+                                           
                                             return fetch('/paypal-success', {
                                                 method: 'post',
                                                 headers: {
@@ -336,18 +336,29 @@
                                                     paymentID: details.id
                                                 })
                                             });
-                                        }).then(function () {
-                                            window.location.href = '/order-confirmation/' + data.orderID;
+                                        }).then(function (res) {
+                                            if (res.ok) {
+                                                window.location.href = '/order-confirmation/' + data.orderID;
+                                            } else {
+                                                window.location.href = '/order-history';
+                                            }
+
                                         });
+                                    },
+                                    onCancel: function (data) {
+                                        console.log('Payment cancelled', data);
+                                        window.location.href = '/order-history';
                                     },
                                     onError: function (err) {
                                         console.error('PayPal button error:', err);
+                                        window.location.href = '/order-history';
                                     }
                                 }).render('#paypal-button-container').then(function () {
                                     paypalButtonsRendered = true;
                                 }).catch(function (error) {
                                     console.error('PayPal button render error:', error);
                                 });
+
                             }
 
 

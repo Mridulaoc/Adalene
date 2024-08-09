@@ -23,8 +23,12 @@
                             <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                             <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                             <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                            <option value="PaymentFailed" <%= order.status === 'PaymentFailed' ? 'selected' : '' %>>PaymentFailed</option>
-                        </select>
+                            <option value="PaymentFailed" <%= order.status === 'Payment Failed' ? 'selected' : '' %>>PaymentFailed</option>
+                            <option value="Return Requested" <%= order.status === 'Return Requested' ? 'selected' : '' %>>Return Requested</option>
+                            <option value="Return Request Accepted" <%= order.status === 'Return Request Accepted' ? 'selected' : '' %>>Return Request Accepted</option>
+                            <option value="Return Request Rejected" <%= order.status === 'Return Request Rejected' ? 'selected' : '' %>>Return Request Rejected</option>
+                            <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                        </select>                        
                         <input type="submit" class="form-control fs-6"  value="SAVE"   required>
                     </form> 
                 </div>
