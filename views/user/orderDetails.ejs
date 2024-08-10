@@ -32,6 +32,8 @@
                             </p>
                             <p>Coupon Discount: <%= order.discount %>
                             </p>
+                            <button id="download-invoice">Download Invoice</button>
+
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Products</h4>
                             <table class="table">
                                 <tr>
@@ -65,7 +67,7 @@
                                                     class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
                                                     style="color: #BC4C2A;"
                                                     onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
-                                                <%} else if (order.status ==='Delivered' ){ %>
+                                                <%} else if (order.status==='Delivered' ){ %>
                                                     <button
                                                         class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
                                                         style="color: #BC4C2A;"
@@ -80,7 +82,12 @@
                 </div>
             </div>
             <%- include ("../layout/footerUser.ejs") %>
+
                 <script>
+
+                    document.getElementById('download-invoice').addEventListener('click', () => {
+                        window.location.href = `/download-invoice/<%= order._id %>`;
+                    });
                     async function cancelOrderItem(orderId, productId) {
                         const result = await Swal.fire({
                             title: 'Are you sure?',
@@ -160,6 +167,8 @@
                             Swal.fire('Error', 'An error occurred while processing the return request.', 'error');
                         }
                     }
+
+
 
                 </script>
     </body>

@@ -124,6 +124,7 @@ userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrder
 userRoute.post('/return-order-item', isAuthenticated, userController.returnOrderItem);
 // userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
 userRoute.post('/return-order-request',isAuthenticated, userController.returnOrderRequest)
+userRoute.get('/download-invoice/:orderId',isAuthenticated,userController.downloadInvoice)
 userRoute.get('/my-wallet', isAuthenticated, walletController.loadMyWallet);
 userRoute.get('/my-wallet/balance', isAuthenticated, walletController.getWalletBalance);
 userRoute.get('/my-wallet/transactions', isAuthenticated, walletController.getWalletTransactions);

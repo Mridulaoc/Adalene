@@ -15,6 +15,7 @@ const { addToWallet } = require("./walletController");
 const generateOrderId = require("../utils/orderIdGenerator");
 const getSortOption = require("../utils/sortOptions");
 const referralCodeGenerator = require("../utils/referralCodeGenerator");
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib')
 
 require("dotenv/config");
 var moment = require("moment");
@@ -1056,6 +1057,52 @@ const returnOrderItem = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
+
+
+const downloadInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+
+    // Fetch the order details from MongoDB
+    const order = await Order.findById(orderId).populate("products.product").populate('user');
+  
+    // Create the PDF invoice
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  
+    // Add the invoice content to the PDF
+    page.setFont(font);
+    page.setFontSize(16);
+    page.drawText('Invoice', { x: 50, y: 750, color: rgb(0, 0, 0) });
+  
+    page.setFontSize(12);
+    page.drawText(`Order ID: ${order.orderID}`, { x: 50, y: 700 });
+    page.drawText(`User: ${order.user.user_name}`, { x: 50, y: 680 });
+    page.drawText(`Date: ${order.orderDate.toLocaleDateString()}`, { x: 50, y: 660 });
+  
+    page.drawText('Items:', { x: 50, y: 640 });
+    order.products.forEach((item, index) => {
+      page.drawText(`- ${item.product.prod_name} (Rs.${item.price})`, { x: 70, y: 620 - index * 20 });
+    });
+  
+    page.drawText(`Total: Rs.${order.total}`, { x: 50, y: 580 });
+  
+    // Save the PDF to a buffer
+    const pdfBytes = await pdfDoc.save();
+  
+    // Set the response headers for file download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="invoice_${order._id}.pdf"`);
+    res.setHeader('Content-Length', pdfBytes.length);
+    res.end(pdfBytes);
+  } catch (error) {
+    console.error('Error generating invoice:', error);
+    res.status(500).send('Error generating invoice');
+  }
+ 
+}
+
 
 // const returnOrder = async (req, res) => {
 //   const { orderId } = req.body;
@@ -2115,5 +2162,6 @@ module.exports = {
   removeFromWishlist,
   getReferrals,
   createPaypalOrderForRetry,
-  returnOrderRequest
+  returnOrderRequest,
+  downloadInvoice
 };

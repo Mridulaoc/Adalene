@@ -50,10 +50,10 @@ const productSchema = mongoose.Schema({
         type: 'date',
         default: new Date,
     },
-    is_bestseller:{
-        type:'boolean',
-        default: false,
-    },
+    // is_bestseller:{
+    //     type:'boolean',
+    //     default: false,
+    // },
     is_deleted:{
         type:'boolean',
         default: false,
