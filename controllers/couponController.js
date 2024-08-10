@@ -38,19 +38,31 @@ const loadAddCoupon = async (req, res) => {
   }
 };
 
+
+
 const addNewCoupon = async (req, res) => {
   try {
     const { coupon, description, expiryDate, value, minPurchase } = req.body;
-    const newCoupon = new Coupon({
-      Name: coupon,
-      Description: description,
-      expiryDate,
-      Value: value,
-      MinPurchase: minPurchase,
+    const isExisting = await Coupon.findOne({
+      Name:new RegExp(`^${coupon}$`, "i")
     });
 
+    if(isExisting){
+      res.render('addCoupon',{error:"Coupon name should be unique"})
+    }else{
+      const newCoupon = new Coupon({
+        Name: coupon,
+        Description: description,
+        expiryDate,
+        Value: value,
+        MinPurchase: minPurchase,
+    }) 
+    
     await newCoupon.save();
     res.redirect("/admin/coupons");
+    };
+
+   
   } catch (error) {
     console.log(error);
   }

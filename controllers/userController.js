@@ -11,6 +11,7 @@ const { session } = require("passport");
 const mongoose = require("mongoose");
 const Order = require("../models/order");
 const Wishlist = require("../models/wishlist");
+const Coupon = require("../models/coupon");
 const { addToWallet } = require("./walletController");
 const generateOrderId = require("../utils/orderIdGenerator");
 const getSortOption = require("../utils/sortOptions");
@@ -1532,6 +1533,8 @@ const displayPayment = async (req, res) => {
       },
     });
 
+    const coupon = await Coupon.find({});
+
     let totalValue = 0;
     user.cart.products.forEach((item) => {
       totalValue += item.price * item.quantity;
@@ -1548,6 +1551,7 @@ const displayPayment = async (req, res) => {
       selectedAddress,
       cart: user.cart,
       totalValue: totalValue,
+      coupons: coupon
     });
   } catch (error) {
     console.error(error);
