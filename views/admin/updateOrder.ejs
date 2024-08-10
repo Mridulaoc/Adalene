@@ -70,7 +70,10 @@
             </div>
             <div>                
                 <p class="fw-bold">Subtotal</p>
-                <p >₹<%= totalValue %></p>
+                <p >₹<%= (totalValue / 1.05).toFixed(2) %></p>
+                <p class="fw-bold">Tax:</p>
+                <p >₹<%= (totalValue - (totalValue / 1.05)).toFixed(2) %>
+                </p>
                 <p class="fw-bold">Shipping Cost</p>
                 <p>₹<%= shippingCost %></p>
                 <p class="fw-bold">Grand Total:</p>

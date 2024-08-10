@@ -1648,7 +1648,7 @@ const processPayment = async (req, res) => {
         description: "Purchase payment",
       });
       await wallet.save();
-      finalValue -= walletAmountToUse;
+      // finalValue -= walletAmountToUse;
     }
 
     const newOrder = new Order({
@@ -1668,6 +1668,7 @@ const processPayment = async (req, res) => {
       coupon: couponCode,
       walletAmountUsed: walletAmountToUse,
       averageDiscountPercentage: averageDiscountPercentage.toFixed(2),
+      paymentStatus: "Completed",
     });
 
     console.log(newOrder);

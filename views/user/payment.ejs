@@ -75,9 +75,13 @@
                         <div class="d-flex flex-column align-items-end container mb-4 ">
                             <table class="table  ">
                                 <tr>
-                                    <td class="fs-5 py-3 ">Sub Total:</td>
-                                    <td class="fs-5 py-3 sub_total">₹<%= totalValue %>
+                                    <td class="fs-5 py-3 ">Sub Total(Before Tax):</td>
+                                    <td class="fs-5 py-3 sub_total">₹<%= (totalValue / 1.05).toFixed(2) %>
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td class="fs-5 py-3 ">Tax:</td>
+                                    <td class="fs-5 py-3 tax">₹<%= (totalValue - (totalValue / 1.05)).toFixed(2) %>
                                 </tr>
                                 <tr id="couponDiscountRow">
                                     <td class="fs-5 py-3">Coupon Discount:</td>
@@ -193,7 +197,7 @@
                                         headers: {
                                             'Content-Type': 'application/json',
                                         },
-                                        body: JSON.stringify({ couponCode }),
+                                        body: JSON.stringify({ couponCode, }),
                                     })
                                         .then(response => response.json())
                                         .then(data => {
@@ -205,6 +209,9 @@
                                                 couponBtn.textContent = 'Remove';
                                                 couponBtn.classList.replace('btn-outline-secondary', 'btn-outline-danger');
                                                 couponCodeInput.disabled = true;
+                                                if(data.updateCOD){
+                                                    updateCODAvailability();
+                                                }
                                             } else {
                                                 couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
                                             }
@@ -218,11 +225,13 @@
 
 
                             function removeCoupon() {
+                                const couponCode = couponCodeInput.value.trim();
                                 fetch('/remove-coupon', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
                                     },
+                                    body: JSON.stringify({ couponCode, }),
                                 })
                                     .then(response => response.json())
                                     .then(data => {
@@ -235,6 +244,9 @@
                                             couponBtn.classList.replace('btn-outline-danger', 'btn-outline-secondary');
                                             couponCodeInput.disabled = false;
                                             couponCodeInput.value = '';
+                                            if(data.updateCOD){
+                                                updateCODAvailability();
+                                            }
                                         } else {
                                             couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
                                         }
@@ -262,6 +274,7 @@
                                     if (codRadio.checked) {
                                         paypalRadio.checked = true;
 
+                                    }
                                     } else {
                                         codRadio.disabled = false;
                                         codMessageDiv.textContent = '';
@@ -269,7 +282,7 @@
 
                                     updateButtonVisibility();
                                 }
-                            }
+                            
 
 
 
@@ -289,6 +302,26 @@
                                 }
 
                             }
+
+                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
+                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
+                                document.querySelector('.total').textContent = `₹${grandTotal}`;
+
+                                const couponDiscountRow = document.getElementById('couponDiscountRow');
+                                const couponDiscountElement = document.querySelector('.coupon-discount')
+                                if (couponDiscount > 0) {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = `₹${couponDiscount}`;                                                                  
+                                   
+                                } else {
+                                    couponDiscountRow.style.display = 'table-row';
+                                    couponDiscountElement.textContent = '₹0';                                  
+                                }
+
+                                updateCODAvailability();
+                               
+                            }                                
+
 
                             function renderPayPalButtons() {
                                 console.log('Rendering PayPal buttons');
@@ -386,22 +419,7 @@
                                 }
                             });
 
-                            function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
-                                document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
-                                document.querySelector('.total').textContent = `₹${grandTotal}`;
-
-                                const couponDiscountRow = document.getElementById('couponDiscountRow');
-                                const couponDiscountElement = document.querySelector('.coupon-discount')
-                                if (couponDiscount > 0) {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = `₹${couponDiscount}`;
-                                } else {
-                                    couponDiscountRow.style.display = 'table-row';
-                                    couponDiscountElement.textContent = '₹0';
-                                }
-                                updateCODAvailability();
-                            }
-
+                            
 
                             fetch('/my-wallet/balance')
                                 .then(response => response.json())

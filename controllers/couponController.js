@@ -142,6 +142,7 @@ const applyCoupon = async (req, res) => {
     });
 
     
+    
 
     if (totalValue < coupon.MinPurchase) {
       return res.json({
@@ -155,8 +156,9 @@ const applyCoupon = async (req, res) => {
       discount = totalValue;
     }
 
-    const newTotal = totalValue - discount;
-    let finalValue = totalValue > 1000 ? newTotal : newTotal + 100;
+    // const newTotal = totalValue - discount;
+    let finalValue = totalValue > 1000 ? totalValue-discount : totalValue + 100 -discount;
+    let newTotal = (totalValue/1.05)
 
     // Store the applied coupon in the session
     req.session.appliedCoupon = {
@@ -175,7 +177,8 @@ const applyCoupon = async (req, res) => {
         coupon: {
           Name: coupon.Name,
           discount: discount
-      }
+      },
+      updateCOD:true
     });
 
   } catch (error) {
@@ -186,16 +189,21 @@ const applyCoupon = async (req, res) => {
 
 const removeCoupon = async(req,res)=>{
   try {
+    const { couponCode } = req.body;
     const userId = req.user.id;
     const user = await User.findById(userId).populate("cart.products.product");
+    const coupon = await Coupon.findOne({ Name: couponCode });
 
     let totalValue = 0;
     user.cart.products.forEach((item) => {
         totalValue += item.price * item.quantity;
     });
 
+    
     const shippingCost = totalValue > 1000 ? 0 : 100;
     const grandTotal = totalValue + shippingCost;
+
+    let newTotal = (totalValue/1.05).toFixed(2);
 
    // Remove the applied coupon from the session
    if (req.session.appliedCoupon) {
@@ -211,8 +219,9 @@ const removeCoupon = async(req,res)=>{
     res.json({
         success: true,
         message: 'Coupon removed successfully!',
-        newSubTotal: totalValue.toFixed(2),
-        grandTotal: grandTotal.toFixed(2)
+        newSubTotal: newTotal,
+        grandTotal: grandTotal,
+        updateCOD:true,
     });
 
 } catch (error) {
