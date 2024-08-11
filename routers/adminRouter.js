@@ -58,6 +58,7 @@ adminRoute.set("views", './views/admin');
 adminRoute.get('/', isNotAuthenticated, adminController.loadSigIn);
 adminRoute.post('/', adminController.verifySignIn);
 adminRoute.get('/dashboard',isAuthenticated,adminController.loadDashboard);
+adminRoute.get('/update-dashboard',isAuthenticated,adminController.updateDashboardData);
 adminRoute.get('/signout',  adminController.adminSignOut);
 
 

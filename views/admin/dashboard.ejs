@@ -5,54 +5,145 @@
    <%- include ("../layout/navBarAdmin.ejs") %>
     <div class="container-fluid" >
        <h1 class="text-center">Dashboard</h1>
-
        <div class="container d-flex flex-column">
          <div class="d-flex justify-content-between my-5">
             <div class="border shadow" style="padding: 1rem 4rem;">
-               
-                  <h3>Total Sales</h3>
-                  <p class="fs-5 mb-2">₹40,29,000</p>
-                  <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
-               </div>
-               <div class="border shadow" style="padding: 1rem 4rem;">
+               <h3>Total Sales</h3>
+               <p class="fs-5 mb-2" id="totalSales">₹<%= dashboardData.totalSales.toLocaleString() %></p>
+               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+            </div>
+            <div class="border shadow" style="padding: 1rem 4rem;">
                <h3>Orders</h3>
-               <p class="fs-5 mb-2">450</p>
+               <p class="fs-5 mb-2" id="totalOrders"><%= dashboardData.totalOrders %></p>
                <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
             </div>
             <div class="border shadow" style="padding: 1rem 4rem;">
                <h3>Profit</h3>
-               <p class="fs-5 mb-2">10,350</p>
-               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+               
             </div>                    
          </div>
+         <div class="my-3">
+            <label for="periodSelect">Select Period:</label>
+            <select id="periodSelect" class="form-select" style="width: 200px;">
+               <option value="7">Last 7 days</option>
+               <option value="30">Last 30 days</option>
+               <option value="90">Last 3 months</option>
+               <option value="365">Last year</option>
+            </select>
+         </div>
          <canvas id="myChart" width="400" height="100" class="my-5"></canvas>
+         
+         <div class="row mt-5">
+           <div class="col-md-6">
+             <h3>Top 10 Best-Selling Products</h3>
+             <table class="table table-striped">
+               <thead>
+                 <tr>
+                   <th>Rank</th>
+                   <th>Product Name</th>
+                   <th>Units Sold</th>
+                 </tr>
+               </thead>
+               <tbody id="bestProductsTable">
+                 <% dashboardData.bestProducts.forEach((product, index) => { %>
+                   <tr>
+                     <td><%= index + 1 %></td>
+                     <td><%= product.name %></td>
+                     <td><%= product.sold %></td>
+                   </tr>
+                 <% }) %>
+               </tbody>
+             </table>
+           </div>
+           <div class="col-md-6">
+             <h3>Top 10 Best-Selling Categories</h3>
+             <table class="table table-striped">
+               <thead>
+                 <tr>
+                   <th>Rank</th>
+                   <th>Category Name</th>
+                   <th>Units Sold</th>
+                 </tr>
+               </thead>
+               <tbody id="bestCategoriesTable">
+                 <% dashboardData.bestCategories.forEach((category, index) => { %>
+                   <tr>
+                     <td><%= index + 1 %></td>
+                     <td><%= category.name %></td>
+                     <td><%= category.sold %></td>
+                   </tr>
+                 <% }) %>
+               </tbody>
+             </table>
+           </div>
+         </div>
        </div>
     </div>
     <%- include ("../layout/footerAdmin.ejs") %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       const ctx = document.getElementById('myChart');
-    
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-          datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1,
-            backgroundColor:'#BC4C2A',
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
+      let myChart;
+
+      function updateDashboard(period) {
+        fetch(`/admin/update-dashboard?period=${period}`)
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('totalSales').textContent = `₹${data.totalSales.toLocaleString()}`;
+            document.getElementById('totalOrders').textContent = data.totalOrders;
+            // document.getElementById('totalProfit').textContent = `₹${data.totalProfit}`;
+
+            const bestProductsTable = document.getElementById('bestProductsTable');
+            bestProductsTable.innerHTML = data.bestProducts.map((product, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${product.name}</td>
+                <td>${product.sold}</td>
+              </tr>
+            `).join('');
+
+            const bestCategoriesTable = document.getElementById('bestCategoriesTable');
+            bestCategoriesTable.innerHTML = data.bestCategories.map((category, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${category.name}</td>
+                <td>${category.sold}</td>
+              </tr>
+            `).join('');
+
+            if (myChart) {
+              myChart.destroy();
             }
-          }
-        }
+
+            myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: data.chartLabels,
+                datasets: [{
+                  label: 'Sales',
+                  data: data.chartData,
+                  borderWidth: 1,
+                  backgroundColor: '#BC4C2A',
+                }]
+              },
+              options: {
+                scales: {
+                  y: {
+                    beginAtZero: true
+                  }
+                }
+              }
+            });
+          });
+      }
+
+      // Initial chart load
+      updateDashboard(7);
+
+      // Event listener for period selection
+      document.getElementById('periodSelect').addEventListener('change', function() {
+        updateDashboard(this.value);
       });
     </script>
-
     </body>
     </html>
-    
