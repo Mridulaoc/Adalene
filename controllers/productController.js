@@ -3,6 +3,7 @@ const Product = require("../models/product");
 const Category = require("../models/category");
 const Color = require("../models/color");
 const Size = require("../models/size");
+const Offer = require("../models/offer");
 const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
@@ -31,23 +32,19 @@ const loadProductList = async (req, res) => {
         .sort({ created_on: -1 })
         .lean()
         .exec();
-      const currentDate = new Date();
+    
       const count = await Product.find({
         prod_name: { $regex: ".*" + search + ".*", $options: "i" },
       }).countDocuments();
       
-      const productsWithOfferStatus = productsData.map(product => ({
-        ...product,
-        has_offer: product.offer &&
-        product.offer.end_date && 
-         new Date(product.offer.end_date) > currentDate
-      }));
-
+     
+      const offers = await Offer.find();
       res.render("productList", {
-        products: productsWithOfferStatus,
+        products: productsData,
         search,
         totalPages: Math.ceil(count / limit),
         currentPage: page,
+        offers: offers
       });
     }
   } catch (error) {
@@ -255,6 +252,33 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const updateProductOffer = async(req, res) => {
+ 
+    const { productId, offerId } = req.body;
+    try {
+      const products = await Product.findById(productId);
+      if (!products) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+
+      if (offerId) {
+          const offer = await Offer.findById(offerId);
+          if (!offer) {
+              return res.status(404).json({ success: false, message: 'Offer not found' });
+          }
+          products.offer = offerId;
+      } else {
+          products.offer = null; // No offer selected
+      }
+
+      await products.save();
+      res.json({ success: true, message: 'Offer updated successfully' });
+  } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to update offer' });
+  }
+  
+}
+
 module.exports = {
   loadProductList,
   loadAddProduct,
@@ -263,4 +287,5 @@ module.exports = {
   addNewProduct,
   deleteProduct,
   deleteProductImage,
+  updateProductOffer
 };

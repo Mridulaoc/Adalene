@@ -7,57 +7,56 @@
             <div class="container-fluid">
                 <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"
                     style="height: 90vh;">
-                    <h2 class="mb-5 text-center fs-5"> EDIT PRODUCT OFFER</h2>
+                    <h2 class="mb-5 text-center fs-5"> ADD OFFER</h2>
 
 
-                    <form action="/admin/productOffer/edit-offer" method="post" autocomplete="off"
+                    <form action="/admin/offers/add-offer" method="post" autocomplete="off"
                         style="width: 90%;">
                         <% if (locals.error) { %>
                             <div class="alert alert-danger">
                                 <%= error %>
                             </div>
-                            <%}%>
-                            <input type="hidden" name="productId" value="<%= product._id %>">
+                            <%}%>                         
 
 
                                 <div class="mb-3 ">
                                     <label for="name" class="form-label">Name</label>
                                     <input type="text" class="form-control" id="name" placeholder="Enter offer name"
-                                        name="name" required onchange="validateOfferName()" value="<%= product.offer.name %>">
+                                        name="name" required onchange="validateOfferName()">
                                     <span id="nameError" style="color: red;"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Description</label>
                                     <textarea class="form-control" id="description" rows="3" name="description" required
                                         minlength="10" maxlength="200" onchange="validateOfferDesc()"
-                                        placeholder="Offer Description"><%= product.offer.description %></textarea>
+                                        placeholder="Offer Description"></textarea>
                                     <span id="descError" style="color: red;"></span>
                                 </div>
                                 <div class="mb-3 d-flex justify-content-between">
                                     <div>
                                         <label for="startDate" class="form-label">Start Date</label>
                                         <input type="date" class="form-control" id="startDate" name="startDate"
-                                            required value="<%= product.offer.start_date ? product.offer.start_date.toISOString().substring(0, 10) : '' %>">
+                                            required>
                                     </div>
                                     <div>
                                         <label for="endDate" class="form-label">End Date</label>
-                                        <input type="date" class="form-control" id="endDate" name="endDate" required value="<%= product.offer.start_date ? product.offer.start_date.toISOString().substring(0, 10) : '' %>">
+                                        <input type="date" class="form-control" id="endDate" name="endDate" required>
                                     </div>
 
                                 </div>
                                 <div class="mb-3">
                                     <label for="percentage" class="form-label">Percentage</label>
-                                    <input type="number" class="form-control" id="percentage" name="percentage" required onchange="validatePercentage()" value="<%= product.offer.discount_percentage %>">
+                                    <input type="number" class="form-control" id="percentage" name="percentage" required onchange="validatePercentage()">
                                     <span id="valueError" style="color: red;"></span>
                                 </div>
                                 <div class="mb-3 ">
-                                    <input type="submit" class="form-control  fs-6" value="SAVE" required>
+                                    <input type="submit" class="form-control  fs-6" value="ADD NEW OFFER" required>
                                 </div>
                     </form>
                     <div class="mb-3 border text-center py-1 rounded" style="width: 90%;">
-                        <a href="/admin/offers/productOffer" class="fs-6 text-decoration-none text-black"> CANCEL</a>
+                        <a href="/admin/offers" class="fs-6 text-decoration-none text-black"> CANCEL</a>
                     </div>
-
+ 
                 </div>
             </div>
             <%- include ("../layout/footerAdmin.ejs") %>

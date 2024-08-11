@@ -64,21 +64,9 @@ const productSchema = mongoose.Schema({
         default: 'ACTIVE'
     },
     offer: {
-        name:{
-            type:'string',
-            
-        },
-        description:{
-            type:'string',
-            
-        },
-        discount_percentage: {
-            type: Number,
-            min: 0,
-            max: 100
-        },
-        start_date: Date,
-        end_date: Date,
+        type:mongoose.Schema.Types.ObjectId,
+        ref : 'Offer',
+        default: null
         
     }
 })

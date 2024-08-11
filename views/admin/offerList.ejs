@@ -4,11 +4,15 @@
 
     <body>
         <%- include ("../layout/navBarAdmin.ejs") %>
-            <h2 class="text-center my-5">Product Offer List</h2>
+            <h2 class="text-center my-5">Offer List</h2>
 
             <div class="container-fluid">
                 <div class="container">
-                    
+                    <div class="d-flex justify-content-end mb-5">
+                        <a href="/admin/offers/add-offer"
+                            class="px-3 mx-5 text-decoration-none fs-6   border rounded-2 p-2"
+                            style="background-color: #BC4C2A; color: white;">ADD NEW OFFER</a>
+                    </div>
                     <div class="d-flex flex-column align-items-center mb-5">
                         <table class="table table-bordered">
                             <tr>
@@ -19,27 +23,27 @@
                                 <th scope="col">Percentage</th>
                                 <th scope="col" class="text-center"></th>
                             </tr>
-                            <%if(productOffer.length> 0){
-                                for(let i=0; i<productOffer.length; i++){ %>
+                            <%if (offers.length> 0){
+                                for(let i=0; i<offers.length; i++){ %>
 
                                     <tr>
                                         <td>
                                             <%= i+1 %>
                                         </td>
                                         <td scope="row" class="text-capitalize">
-                                            <%= productOffer[i].offer.name %>
+                                            <%= offers[i].name %>
                                         </td>
                                         <td>
-                                            <%= productOffer[i].offer.start_date.toLocaleDateString() %>
+                                            <%= offers[i].start_date.toLocaleDateString() %>
                                         </td>
                                         <td>
-                                            <%= productOffer[i].offer.end_date.toLocaleDateString() %>
+                                            <%= offers[i].end_date.toLocaleDateString() %>
                                         </td>
                                         <td>
-                                            <%= productOffer[i].offer.discount_percentage %>
+                                            <%= offers[i].discount_percentage %>
                                         </td>
                                         
-                                        <td><a href="productOffer/edit-offer/<%= productOffer[i]._id %>"
+                                        <td><a href="/admin/offers/edit-offer/?id=<%= offers[i]._id %>"
                                                 class="px-3 text-decoration-none fs-5  border rounded-2 "
                                                 style="color: #BC4C2A;">EDIT</a></td>
                                         
@@ -57,19 +61,19 @@
                         <br>
                         <div class="d-flex gap-3">
                             <% if (page> 1) { %>
-                                <a href="/admin/productOffer/?page=<%= page - 1 %>"
+                                <a href="/admin/offer/?page=<%= page - 1 %>"
                                     class="text-decoration-none fw-bold fs-5 button rounded">Prev</a>
                                 <% } %>
                                     <div class="d-flex gap-3">
                                         <% for (i=1; i <=totalPage; i++ ){ %>
-                                            <a href="/admin/productOffer/?page=<%= i %>"
+                                            <a href="/admin/offer/?page=<%= i %>"
                                                 class="text-decoration-none fw-bold fs-5 button rounded">
                                                 <%= i %>
                                             </a>
                                             <%}%>
                                     </div>
                                     <% if (page < totalPage) { %>
-                                        <a href="/admin/productOffer/?page=<%= Number(page) + 1 %>"
+                                        <a href="/admin/offer/?page=<%= Number(page) + 1 %>"
                                             class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
                                         <% } %>
                         </div>

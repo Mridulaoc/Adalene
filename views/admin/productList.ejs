@@ -29,6 +29,7 @@
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Rating</th>
                                     <th scope="col">Images</th>
+                                    <th scope="col">Current Offer</th>
                                     <th scope="col" colspan="2" class="text-center">Actions</th>
                                 </tr>
 
@@ -53,6 +54,19 @@
                                             </td>
                                             <td><img src="\uploads\<%= products[i].prod_images[0] %>" width="50px"
                                                     height="50px"></td>
+                                            <td>
+                                                <select class="form-select"
+                                                    onchange="updateOffer('<%= products[i]._id %>', this.value)">
+                                                    <option value="">No Offer</option>
+                                                    <% offers.forEach((offer)=> { %>
+                                                        <option value="<%= offer._id %>" <%=products[i].offer && products[i].offer._id &&
+                                                            products[i].offer._id.equals(offer._id) ? 'selected' : '' %>
+                                                            >
+                                                            <%= offer.name %> (<%= offer.discount_percentage %>%)
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </td>
                                             <td class="text-center"><a
                                                     href="/admin/products/edit-product/<%= products[i]._id %>"
                                                     class="px-3 text-decoration-none fs-5  border rounded-2 "
@@ -62,17 +76,7 @@
                                                     style="color: #BC4C2A;"
                                                     onclick="confirmDelete('<%= products[i]._id %>')">
                                                     <%= products[i].is_deleted ? 'LIST' : 'UNLIST' %>
-                                                </button></td>
-
-                                            <td class="text-center">
-                                                <% if(products[i].has_offer) { %>
-                                                <a href="/admin/productOffer/edit-offer/<%= products[i]._id %>"class="px-3 text-decoration-none fs-5  border rounded-2 "
-                                                    style="color: #BC4C2A;">EDIT OFFER</a>
-                                                <%} else { %>
-                                                <a href="/admin/productOffer/add-offer/<%= products[i]._id %>"class="px-3 text-decoration-none fs-5  border rounded-2 "
-                                                    style="color: #BC4C2A;">ADD OFFER</a>
-                                                <% } %>
-                                                </td>
+                                                </button></td>                                        
 
                                         </tr>
                                         <%}%>
@@ -140,6 +144,27 @@
                                     });
                                 }
                             });
+                        }
+                        function updateOffer(productId, offerId) {
+                            fetch(`/admin/products/update-offer`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    productId: productId,
+                                    offerId: offerId
+                                })
+                            }).then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire('Success', 'Offer updated successfully', 'success');
+                                    } else {
+                                        Swal.fire('Error', data.message, 'error');
+                                    }
+                                }).catch(error => {
+                                    Swal.fire('Error', 'An error occurred while updating the offer', 'error');
+                                });
                         }
                     </script>
             </body>

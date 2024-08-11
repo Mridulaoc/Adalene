@@ -1,19 +1,13 @@
 const categoryRoute = require("../routers/categoryRouter");
 const Category = require("../models/category");
+const Offer = require("../models/offer");
 var moment = require("moment");
 
 const loadCategoryList = async (req, res) => {
   try {
-    const categoryData = await Category.find({ cat_status: "ACTIVE" });
-
-    const categoryWithOfferStatus = categoryData.map(category => {
-        const categoryObject = category.toObject(); // Convert to a plain JavaScript object
-        categoryObject.has_offer = !!category.offer && new Date(category.offer.end_date) > new Date();
-        return categoryObject;
-      });
-    console.log(categoryWithOfferStatus)
-
-    res.render("categoryList", { categories:categoryWithOfferStatus, moment });
+    const categoryData = await Category.find({ cat_status: "ACTIVE" });   
+    const offers = await Offer.find()
+    res.render("categoryList", { categories:categoryData, moment,offers });
   } catch (err) {
     console.log(err);
   }
@@ -83,6 +77,33 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const updateCategoryOffer = async (req, res) => {
+  const { categoryId, offerId } = req.body;
+    console.log(categoryId,offerId);
+    try {
+      const categories = await Category.findById(categoryId);
+      if (!categories) {
+          return res.status(404).json({ success: false, message: 'Category not found' });
+      }
+
+      if (offerId) {
+          const offer = await Offer.findById(offerId);
+          if (!offer) {
+              return res.status(404).json({ success: false, message: 'Offer not found' });
+          }
+          categories.offer = offerId;
+      } else {
+          categories.offer = null; 
+      }
+
+      await categories.save();
+      res.json({ success: true, message: 'Offer updated successfully' });
+  } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to update offer' });
+  }
+}
+  
+
 module.exports = {
   loadCategoryList,
   loadAddCategory,
@@ -90,4 +111,5 @@ module.exports = {
   addNewCategory,
   deleteCategory,
   updateCategory,
+  updateCategoryOffer
 };
