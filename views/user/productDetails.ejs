@@ -80,7 +80,7 @@
                                             <span id="quantity-availablity" class="fs-5 my-3"></span>
 
                                             <div class="d-flex flex-column gap-3">
-                                                <button class="px-5 py-3 fs-5 text-white fw-bold"
+                                                <button class="px-5 py-3 fs-5 text-white fw-bold" id="addToCartBtn"
                                                     style="border: none;background-color: #BC4C2A;"
                                                     onclick="addToCart('<%= products._id %>')">ADD TO CART</button>
 
@@ -159,7 +159,22 @@
                             if (firstThumbnail) {
                                 firstThumbnail.classList.add('active-thumbnail');
                             }
+                            const stockQuantity = <%= products.prod_quantity %>;
+                            console.log(stockQuantity)
+                            const addToCartButton = document.getElementById('addToCartBtn');
+                            const quantityInput = document.getElementById('quantityInput');
+
+                            if (stockQuantity === 0) {
+                                addToCartButton.disabled = true;
+                                addToCartButton.innerText = 'OUT OF STOCK';
+                                addToCartButton.style.backgroundColor = '#d3d3d3'; // Change to grey or any other color to indicate disabled state
+                            } else {
+                                addToCartButton.disabled = false;
+                                addToCartButton.innerText = 'ADD TO CART';
+                                addToCartButton.style.backgroundColor = '#BC4C2A';
+                            }
                         };
+
 
                         // functiions for increment decrement 
 
@@ -191,12 +206,13 @@
                             }
                         }
 
+
                         // add to cart function 
                         async function addToCart(productId) {
                             const quantityInput = document.getElementById('quantityInput');
                             const quantity = quantityInput.value;
                             const maxValue = quantityInput.max;
-                            console.log(maxValue)
+
                             const response = await fetch('/add-to-cart', {
                                 method: 'POST',
                                 headers: {

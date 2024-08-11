@@ -270,7 +270,6 @@ const updateProductOffer = async(req, res) => {
       } else {
           products.offer = null; // No offer selected
       }
-
       await products.save();
       res.json({ success: true, message: 'Offer updated successfully' });
   } catch (error) {
