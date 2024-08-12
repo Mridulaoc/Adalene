@@ -8,14 +8,7 @@
                 <div class="container">
                     <h4>Account</h4>
                     <div class="d-flex gap-5 ">
-                        <div class="col-3 border px-5 py-5 rounded">
-                            <p><a href="/profile" class="text-decoration-none fs-4 " style="color: #888888;">Profile</a>
-                            </p>
-                            <p><a href="/addresses" class="text-decoration-none fs-4 "
-                                    style="color: #888888;">Addresses</a></p>
-                            <p><a href="/order-history" class="text-decoration-none fs-4 "
-                                    style="color: #888888;">Order</a></p>
-                        </div>
+                        <%- include ("../layout/profileSidebar.ejs") %>
                         <div class="col-8 border shadow rounded px-5 fs-6">
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Order Details</h4>
                             <p>Order Id : <%= order.orderId %>

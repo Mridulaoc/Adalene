@@ -785,10 +785,26 @@ const deleteAddress = async (req, res) => {
 
 const displayOrderHistory = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10; // Number of orders per page
+    const skip = (page - 1) * limit;
+
+    const totalOrders = await Order.countDocuments({ user: req.user.id });
+    const totalPages = Math.ceil(totalOrders / limit);
+
     const orders = await Order.find({ user: req.user.id })
       .populate("products.product")
-      .sort({ orderDate: -1 });
-    res.render("orderHistory", { orders, user: req.user, moment });
+      .sort({ orderDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.render("orderHistory", { 
+      orders, 
+      user: req.user, 
+      moment,
+      currentPage: page,
+      totalPages: totalPages
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal Server Error");

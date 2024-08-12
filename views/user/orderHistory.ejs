@@ -9,7 +9,7 @@
                     <h4>Account</h4>
                     <div class="d-flex gap-5 ">
                         <%- include ("../layout/profileSidebar.ejs") %>
-                            <div class="col-8 border shadow rounded px-5">
+                            <div class="col-8 border shadow rounded px-5 py-5 d-flex flex-column align-items-center ">
                                 <h4 class="text-center" style="padding: 1.5rem 10rem;">Order History</h4>
                                 <%if (orders.length> 0 ) {%>
                                     <table class="table  ">
@@ -19,27 +19,27 @@
                                             <th scope="col" class="text-center">Total</th>
                                             <th scope="col" class="text-center">Status</th>
                                             <th scope="col" class="text-center">Payment Status</th>
-                                            <th scope="col" colspan="2" class="text-center">Actions</th>
+                                            <th scope="col" colspan="3" class="text-center">Actions</th>
                                         </tr>
 
                                         <% orders.forEach(order=>{%>
                                             <tr class="">
-                                                <td class="py-5 "><a href="/order-details/<%= order._id %>"
+                                                <td class="py-2 "><a href="/order-details/<%= order._id %>"
                                                         class="text-decoration-none text-black fw-bold">
                                                         <%= order.orderId %>
                                                     </a></td>
-                                                <td class="py-5 ">
+                                                <td class="py-2 ">
                                                     <%= moment(order.orderDate).format('D/MM/YYYY, h:mm:ss') %>
                                                 </td>
-                                                <td class="py-5 ">₹<%= (order.total).toFixed(2) %>
+                                                <td class="py-2 ">₹<%= (order.total).toFixed(2) %>
                                                 </td>
-                                                <td class="py-5 ">
+                                                <td class="py-2 ">
                                                     <%= order.status %>
                                                 </td>
-                                                <td class="py-5">
+                                                <td class="py-2">
                                                     <%= order.paymentStatus %>
                                                 </td>
-                                                <td class="py-5">
+                                                <td class="py-2">
                                                     <% if (order.status==='Pending' ) { %>
                                                         <button
                                                             class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
@@ -67,9 +67,25 @@
                                     <%} else {%>
                                         <h3>No orders found</h3>
                                         <% } %>
-                            </div>
+                                        <div class="d-flex flex-column gap-3">
+                                            <div class="d-flex gap-3">
+                                              <% if (currentPage > 1) { %>
+                                              <a href="?page=<%= currentPage - 1 %>" class="text-decoration-none fw-bold fs-5 button rounded"> Prev</a>
+                                              <% } %>
+                                              <div class="d-flex gap-3 ">
+                                              <% for (let i = 1; i <= totalPages; i++ ){ %>
+                                              <a href="?page=<%= i %>" class="text-decoration-none fw-bold fs-5 button rounded" ><%= i %></a>                    
+                                              <%}%>
+                                              </div>
+                                              <% if (currentPage < totalPages) { %>
+                                              <a href="?page=<%= Number(currentPage) + 1 %>" class="text-decoration-none fw-bold fs-5 button rounded">Next</a>
+                                              <% } %>
+                                            </div>   
+                                        </div>
+                            </div>     
+                              
                     </div>
-
+                    
                 </div>
             </div>
             <%- include ("../layout/footerUser.ejs") %>
