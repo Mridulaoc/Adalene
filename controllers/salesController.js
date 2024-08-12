@@ -10,63 +10,74 @@ const getSalesReportPage = async (req, res) => {
   }
 };
 
-const getSalesReport = async (req, res) => {
-  try {
-    const { startDate, endDate } = req.query;
 
-    if (!startDate || !endDate) {
-      return res
-        .status(400)
-        .json({ error: "Start date and end date are required" });
+  const getSalesReport = async (req, res) => {
+    try {
+      const { startDate, endDate, page = 1, limit = 10 } = req.query;
+  
+      if (!startDate || !endDate) {
+        return res
+          .status(400)
+          .json({ error: "Start date and end date are required" });
+      }
+  
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Set to end of day
+  
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ error: "Invalid date format" });
+      }
+  
+      const orders = await Order.find({
+        orderDate: { $gte: start, $lte: end },
+        status: "Delivered",
+      })
+        .populate("products.product")
+        .sort({ orderDate: -1 })
+        .skip((page-1)*limit)
+        .limit(limit *1)
+  
+      const salesReport = orders.map((order) => ({
+        date: order.orderDate,
+        orderId: order.orderId,
+        products: order.products.map(
+          (p) => `${p.product.prod_name} (${p.quantity})`
+        ),
+        quantity: order.products.reduce((sum, p) => sum + p.quantity, 0),
+        coupon: order.coupon || "Not Applied",
+        discount: order.averageDiscountPercentage || 0,
+        total: order.total,
+      }));
+  
+      const overallSales = orders.reduce((sum, order) => sum + order.total, 0);
+      const totalOrders = await Order.find({
+        orderDate: { $gte: start, $lte: end },
+        status: "Delivered",
+      }).countDocuments();
+      const overallDiscount = (orders.reduce(
+        (sum, order) => sum + (order.averageDiscountPercentage || 0),
+        0
+      )/totalOrders).toFixed(2);
+  
+      res.json({
+        salesReport,
+        overallSales,
+        totalOrders,
+        overallDiscount,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalOrders / limit),
+        
+      });
+    } catch (error) {
+      console.error("Error in sales report:", error);
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching sales data" });
     }
+  };
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999); // Set to end of day
 
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return res.status(400).json({ error: "Invalid date format" });
-    }
-
-    const orders = await Order.find({
-      orderDate: { $gte: start, $lte: end },
-      status: "Delivered",
-    })
-      .populate("products.product")
-      .sort({ orderDate: -1 });
-
-    const salesReport = orders.map((order) => ({
-      date: order.orderDate,
-      orderId: order.orderId,
-      products: order.products.map(
-        (p) => `${p.product.prod_name} (${p.quantity})`
-      ),
-      quantity: order.products.reduce((sum, p) => sum + p.quantity, 0),
-      coupon: order.coupon || "Not Applied",
-      discount: order.averageDiscountPercentage || 0,
-      total: order.total,
-    }));
-
-    const overallSales = orders.reduce((sum, order) => sum + order.total, 0);
-    const totalOrders = orders.length;
-    const overallDiscount = orders.reduce(
-      (sum, order) => sum + (order.averageDiscountPercentage || 0),
-      0
-    );
-
-    res.json({
-      salesReport,
-      overallSales,
-      totalOrders,
-      overallDiscount,
-    });
-  } catch (error) {
-    console.error("Error in sales report:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching sales data" });
-  }
-};
 
 const downloadPDFReport = async (req, res) => {
   try {
@@ -208,11 +219,12 @@ async function fetchSalesData(startDate, endDate) {
   }));
 
   const overallSales = orders.reduce((sum, order) => sum + order.total, 0);
-  const totalOrders = orders.length;
+  const totalOrders = await Order.find({
+    orderDate: { $gte: start, $lte: end },
+    status: "Delivered",
+  }).countDocuments();
   const overallDiscount = orders.reduce(
-    (sum, order) => sum + (order.averageDiscountPercentage || 0),
-    0
-  );
+    (sum, order) => sum + (order.averageDiscountPercentage || 0),0)/totalOrders;
 
   return {
     salesReport,

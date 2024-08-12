@@ -17,7 +17,7 @@
                                     style="color: #888888;">Order</a></p>
                         </div>
                         <div class="col-8 border shadow rounded px-5 fs-6">
-                            <h4 class="text-center" style="padding: 1.5rem 10rem;">Order History</h4>
+                            <h4 class="text-center" style="padding: 1.5rem 10rem;">Order Details</h4>
                             <p>Order Id : <%= order.orderId %>
                             </p>
                             <p>Order Date : <%= moment(order.orderDate).format('MMMM Do YYYY, h:mm:ss') %>
@@ -32,7 +32,7 @@
                             </p>
                             <p>Coupon Discount: <%= order.discount %>
                             </p>
-                            <button id="download-invoice">Download Invoice</button>
+                            <button id="download-invoice" class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "style="color: #BC4C2A;">Download Invoice</button>
 
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Products</h4>
                             <table class="table">
@@ -46,11 +46,9 @@
                                 </tr>
                                 <% order.products.forEach(item=>{%>
                                     <tr>
+                                        <td class="d-flex flex-column py-5"><img src="/uploads/<%= item.product.prod_images[0]%>" height="50px" width="50px"><%= item.product.prod_name %></td>
                                         <td class="py-5">
-                                            <%= item.product.prod_name %>
-                                        </td>
-                                        <td class="py-5">
-                                            <%= item.price %>
+                                            <%= (item.price).toFixed(2) %>
                                         </td>
                                         <td class="py-5">
                                             <%= item.quantity %>

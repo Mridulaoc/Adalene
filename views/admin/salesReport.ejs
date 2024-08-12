@@ -57,6 +57,11 @@
                             <!-- Sales data will be populated here -->
                         </tbody>
                     </table>
+                    <div id="paginationControls" class="d-flex justify-content-center my-3 gap-1">
+                        <button id="prevPage" class="text-decoration-none fw-bold fs-5 button rounded bg-transparent">Previous</button>
+                        <!-- <span id="pageInfo" class="text-decoration-none fw-bold fs-5 "></span> -->
+                        <button id="nextPage" class="text-decoration-none fw-bold fs-5 button rounded bg-transparent">Next</button>
+                    </div>
                 </div>
             </div>
             <%- include ("../layout/footerAdmin.ejs") %>
@@ -86,8 +91,10 @@
                                 endDateInput.value = '';
                             }
                         });
-
-                        generateReportBtn.addEventListener('click', generateReport);
+                        document.getElementById('generateReportBtn').addEventListener('click', () => {
+                            currentPage = 1;
+                            generateReport();
+                        });                        
                         downloadPdfBtn.addEventListener('click', downloadPdf);
                         downloadExcelBtn.addEventListener('click', downloadExcel);
                     });
@@ -126,17 +133,20 @@
                         return { startDate, endDate };
                     }
 
-
+                    let currentPage = 1;
+                    let totalPages = 1;
                     async function generateReport() {
                         const { startDate, endDate } = getDateRange();
-                        
+
                         try {
-                            const response = await fetch(`/admin/salesReport?startDate=${startDate}&endDate=${endDate}`);
+                            const response = await fetch(`/admin/salesReport?startDate=${startDate}&endDate=${endDate}&page=${currentPage}`);
                             if (!response.ok) {
                                 throw new Error(`HTTP error! status: ${response.status}`);
                             }
                             const data = await response.json();
-                            const { salesReport, overallSales, totalOrders, overallDiscount } = data;
+                            const { salesReport, overallSales, totalOrders, overallDiscount, currentPage: page, totalPages: pages } = data;
+                            currentPage = page;
+                            totalPages = pages;
 
                             // Update summary
                             document.getElementById('statistics').innerHTML = `
@@ -159,16 +169,16 @@
                             tableBody.innerHTML = '';
                             salesReport.forEach(order => {
                                 const row = `
-        <tr>
-          <td>${new Date(order.date).toLocaleDateString()}</td>
-          <td>${order.orderId}</td>
-          <td>${order.products}</td>
-          <td>${order.quantity}</td>
-          <td>${order.coupon}</td>
-          <td>${order.discount}%</td>
-          <td>₹${order.total.toFixed(2)}</td>
-        </tr>
-      `;
+                             <tr>
+                                <td>${new Date(order.date).toLocaleDateString()}</td>
+                                <td>${order.orderId}</td>
+                                <td>${order.products}</td>
+                                <td>${order.quantity}</td>
+                                <td>${order.coupon}</td>
+                                <td>${order.discount}%</td>
+                                <td>₹${order.total.toFixed(2)}</td>
+                            </tr>
+                                 `;
                                 tableBody.innerHTML += row;
                             });
 
@@ -180,12 +190,27 @@
                                 class="px-3 py-2 bg-transparent rounded" >Download Excel</button>
                         </div>
                           `
-
+                            document.getElementById('pageInfo').textContent = `${currentPage}`;
+                            document.getElementById('prevPage').disabled = currentPage === 1;
+                            document.getElementById('nextPage').disabled = currentPage === totalPages;
                         } catch (error) {
                             console.error('Error fetching sales data:', error);
 
                         }
                     }
+
+                    document.getElementById('prevPage').addEventListener('click', () => {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            generateReport();
+                        }
+                    });
+                    document.getElementById('nextPage').addEventListener('click', () => {
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            generateReport();
+                        }
+                    });
 
                     function downloadPdf() {
                         const { startDate, endDate } = getDateRange();

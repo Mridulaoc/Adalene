@@ -426,12 +426,12 @@ const loadShopall = async (req, res) => {
     }
 
     const products = await Products.find(filter)
-    .populate({
-      path: 'prod_category',
-      populate: {
-        path: 'offer',
-      },
-    })
+      .populate({
+        path: "prod_category",
+        populate: {
+          path: "offer",
+        },
+      })
       .populate("prod_size")
       .populate("prod_color")
       .populate("offer")
@@ -451,23 +451,26 @@ const loadShopall = async (req, res) => {
         now >= product.offer.start_date &&
         now <= product.offer.end_date
       ) {
-        discountedPrice = product.prod_mrp * (1 - product.offer.discount_percentage / 100);
-      } 
+        discountedPrice =
+          product.prod_mrp * (1 - product.offer.discount_percentage / 100);
+      }
       // Check for category offer if no product-specific offer applies
       else if (
         product.prod_category.offer &&
         now >= product.prod_category.offer.start_date &&
         now <= product.prod_category.offer.end_date
       ) {
-        discountedPrice = product.prod_mrp * (1 - product.prod_category.offer.discount_percentage / 100);
+        discountedPrice =
+          product.prod_mrp *
+          (1 - product.prod_category.offer.discount_percentage / 100);
       }
 
       return {
         ...product.toObject(),
-        discountedPrice: discountedPrice < product.prod_mrp ? discountedPrice : null,
+        discountedPrice:
+          discountedPrice < product.prod_mrp ? discountedPrice : null,
       };
     });
-
 
     const count = await Products.find(filter).countDocuments();
 
@@ -493,7 +496,6 @@ const loadShopall = async (req, res) => {
   }
 };
 
-
 const loadProductDetails = async (req, res) => {
   try {
     let id = req.params.id;
@@ -506,15 +508,15 @@ const loadProductDetails = async (req, res) => {
     }
 
     const products = await Products.findById({ _id: id })
-    .populate({
-      path: 'prod_category',
-      populate: {
-        path: 'offer',
-      },
-    })
-    .populate('offer') 
-    .populate('prod_size')
-    .populate('prod_color');
+      .populate({
+        path: "prod_category",
+        populate: {
+          path: "offer",
+        },
+      })
+      .populate("offer")
+      .populate("prod_size")
+      .populate("prod_color");
 
     if (!products) {
       return res.status(404).render("error", { message: "Product not found" });
@@ -523,15 +525,19 @@ const loadProductDetails = async (req, res) => {
     let discountedPrice = products.prod_mrp;
     let appliedOffer = null;
     const now = new Date();
-    console.log(products.offer)
+    console.log(products.offer);
 
     // Check for product-specific offer
-    if (products.offer && now >= new Date(products.offer.start_date) && now <= new Date(products.offer.end_date)) {
-      const productDiscount = products.prod_mrp * (products.offer.discount_percentage / 100);
+    if (
+      products.offer &&
+      now >= new Date(products.offer.start_date) &&
+      now <= new Date(products.offer.end_date)
+    ) {
+      const productDiscount =
+        products.prod_mrp * (products.offer.discount_percentage / 100);
       discountedPrice = products.prod_mrp - productDiscount;
       appliedOffer = products.offer;
-    } 
-
+    }
 
     // If no valid product-specific offer, check for category offer
     else if (
@@ -539,11 +545,13 @@ const loadProductDetails = async (req, res) => {
       now >= new Date(products.prod_category.offer.start_date) &&
       now <= new Date(products.prod_category.offer.end_date)
     ) {
-      const categoryDiscount = products.prod_mrp * (products.prod_category.offer.discount_percentage / 100);
+      const categoryDiscount =
+        products.prod_mrp *
+        (products.prod_category.offer.discount_percentage / 100);
       discountedPrice = products.prod_mrp - categoryDiscount;
       appliedOffer = products.prod_category.offer;
     }
-    
+
     // console.log(appliedOffer)
     const relatedProducts = await Products.find({
       prod_status: "ACTIVE",
@@ -566,7 +574,6 @@ const loadProductDetails = async (req, res) => {
     console.log(error);
   }
 };
-
 
 const displayProfile = async (req, res) => {
   try {
@@ -1068,52 +1075,68 @@ const downloadInvoice = async (req, res) => {
       .populate("products.product")
       .populate("user");
 
-    // Create the PDF invoice
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-    // Add the invoice content to the PDF
-    page.setFont(font);
-    page.setFontSize(16);
-    page.drawText("Invoice", { x: 50, y: 750, color: rgb(0, 0, 0) });
-
-    page.setFontSize(12);
-    page.drawText(`Order ID: ${order.orderID}`, { x: 50, y: 700 });
-    page.drawText(`User: ${order.user.user_name}`, { x: 50, y: 680 });
-    page.drawText(`Date: ${order.orderDate.toLocaleDateString()}`, {
-      x: 50,
-      y: 660,
-    });
-
-    page.drawText("Items:", { x: 50, y: 640 });
-    order.products.forEach((item, index) => {
-      page.drawText(`- ${item.product.prod_name} (Rs.${item.price})`, {
-        x: 70,
-        y: 620 - index * 20,
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([600, 800]); // Adjust page size as needed
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  
+      // Table settings
+      const startX = 50;
+      const startY = 750;
+      const rowHeight = 20;
+      const colWidths = [50, 200, 100, 100]; // Customize column widths
+  
+      // Add the invoice title
+      page.setFont(font);
+      page.setFontSize(16);
+      page.drawText("Invoice", { x: startX, y: startY, color: rgb(0, 0, 0) });
+  
+      // Add the order details
+      page.setFontSize(12);
+      page.drawText(`Order ID: ${order.orderId}`, { x: startX, y: startY - 40 });
+      page.drawText(`User: ${order.user.user_name}`, { x: startX, y: startY - 60 });
+      page.drawText(`Date: ${order.orderDate.toLocaleDateString()}`, {
+        x: startX,
+        y: startY - 80,
       });
-    });
-
-    page.drawText(`Total: Rs.${order.total}`, { x: 50, y: 580 });
-
-    // Save the PDF to a buffer
-    const pdfBytes = await pdfDoc.save();
-
-    // Set the response headers for file download
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="invoice_${order._id}.pdf"`
-    );
-    res.setHeader("Content-Length", pdfBytes.length);
-    res.end(pdfBytes);
-  } catch (error) {
-    console.error("Error generating invoice:", error);
-    res.status(500).send("Error generating invoice");
-  }
+  
+      // Draw table headers
+      const tableStartY = startY - 120;
+      const headers = ['S.No', 'Product', 'Price', 'Quantity'];
+  
+      headers.forEach((header, index) => {
+        page.drawText(header, { x: startX + colWidths.slice(0, index).reduce((a, b) => a + b, 0), y: tableStartY });
+      });
+  
+      // Draw the items in the table
+      order.products.forEach((item, index) => {
+        const currentY = tableStartY - (index + 1) * rowHeight;
+  
+        page.drawText(`${index + 1}`, { x: startX, y: currentY });
+        page.drawText(`${item.product.prod_name}`, { x: startX + colWidths[0], y: currentY });
+        page.drawText(`Rs.${item.price.toFixed(2)}`, { x: startX + colWidths[0] + colWidths[1], y: currentY });
+        page.drawText(`${item.quantity}`, { x: startX + colWidths[0] + colWidths[1] + colWidths[2], y: currentY });
+      });
+  
+      // Draw the total amount
+      const totalY = (tableStartY - (order.products.length + 1) * rowHeight )-25 ;
+      page.drawText(`Total: Rs.${order.total.toFixed(2)}`, { x: startX + 300, y: totalY });
+  
+      // Save the PDF to a buffer
+      const pdfBytes = await pdfDoc.save();
+  
+      // Set the response headers for file download
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="invoice_${order._id}.pdf"`
+      );
+      res.setHeader("Content-Length", pdfBytes.length);
+      res.end(pdfBytes);
+    } catch (error) {
+      console.error("Error generating invoice:", error);
+      res.status(500).send("Error generating invoice");
+    }
 };
-
-
 
 const addToWishlist = async (req, res) => {
   try {
@@ -1157,19 +1180,16 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
-
-
 const getWishlist = async (req, res) => {
   try {
     const userId = req.user.id;
-    const wishlist = await Wishlist.findOne({ user: userId })
-      .populate({
-        path: 'products',
-        populate: {
-          path: 'offer prod_category',
-          populate: { path: 'offer' }, // Populate category's offer
-        },
-      });
+    const wishlist = await Wishlist.findOne({ user: userId }).populate({
+      path: "products",
+      populate: {
+        path: "offer prod_category",
+        populate: { path: "offer" }, // Populate category's offer
+      },
+    });
 
     // Calculate discounted prices and check stock
     const productsWithDiscounts = wishlist.products.map((product) => {
@@ -1182,24 +1202,28 @@ const getWishlist = async (req, res) => {
         now >= product.offer.start_date &&
         now <= product.offer.end_date
       ) {
-        discountedPrice = product.prod_mrp * (1 - product.offer.discount_percentage / 100);
+        discountedPrice =
+          product.prod_mrp * (1 - product.offer.discount_percentage / 100);
       } else if (
         product.prod_category.offer &&
         now >= product.prod_category.offer.start_date &&
         now <= product.prod_category.offer.end_date
       ) {
         // Check for category offer if no product-specific offer applies
-        discountedPrice = product.prod_mrp * (1 - product.prod_category.offer.discount_percentage / 100);
+        discountedPrice =
+          product.prod_mrp *
+          (1 - product.prod_category.offer.discount_percentage / 100);
       }
 
       return {
         ...product.toObject(),
-        discountedPrice: discountedPrice < product.prod_mrp ? discountedPrice : null,
+        discountedPrice:
+          discountedPrice < product.prod_mrp ? discountedPrice : null,
         inStock: product.prod_quantity > 0,
       };
     });
 
-    res.render('wishlist', {
+    res.render("wishlist", {
       user: req.user,
       wishlist: {
         ...wishlist.toObject(),
@@ -1207,11 +1231,10 @@ const getWishlist = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error getting wishlist:', error);
-    res.status(500).json({ error: 'Failed to get wishlist' });
+    console.error("Error getting wishlist:", error);
+    res.status(500).json({ error: "Failed to get wishlist" });
   }
 };
-
 
 const getReferrals = async (req, res) => {
   try {
@@ -1240,15 +1263,15 @@ const addToCart = async (req, res) => {
     try {
       let user = await User.findOne({ _id: userId });
       const product = await Products.findById(productId)
-      .populate({
-        path: 'prod_category',
-        populate: {
-          path: 'offer',
-        },
-      })
-      .populate('offer') 
-      .populate('prod_size')
-      .populate('prod_color');
+        .populate({
+          path: "prod_category",
+          populate: {
+            path: "offer",
+          },
+        })
+        .populate("offer")
+        .populate("prod_size")
+        .populate("prod_color");
 
       if (!user || !product) {
         return res
@@ -1259,9 +1282,9 @@ const addToCart = async (req, res) => {
       let price = product.prod_mrp;
       let offerApplied = false;
       let discountPercentage = 0;
-  
+
       const now = new Date();
-  
+
       // Check for product-specific offer
       if (
         product.offer &&
@@ -1271,7 +1294,7 @@ const addToCart = async (req, res) => {
         discountPercentage = product.offer.discount_percentage;
         offerApplied = true;
       }
-  
+
       // Check for category offer only if no product-specific offer applies
       if (
         !offerApplied && // Only check category offer if no product offer applied
@@ -1283,12 +1306,11 @@ const addToCart = async (req, res) => {
         discountPercentage = product.prod_category.offer.discount_percentage;
         offerApplied = true;
       }
-  
+
       // Apply the discount
       if (offerApplied) {
         price = product.prod_mrp * (1 - discountPercentage / 100);
       }
-  
 
       const productIndex = user.cart.products.findIndex(
         (p) => p.product.toString() === productId
@@ -1355,15 +1377,15 @@ const updateCart = async (req, res) => {
     const user = await User.findById({ _id: req.user.id });
 
     const product = await Products.findById(productId)
-    .populate({
-      path: 'prod_category',
-      populate: {
-        path: 'offer',
-      },
-    })
-    .populate('offer') 
-    .populate('prod_size')
-    .populate('prod_color');
+      .populate({
+        path: "prod_category",
+        populate: {
+          path: "offer",
+        },
+      })
+      .populate("offer")
+      .populate("prod_size")
+      .populate("prod_color");
 
     if (!user || !product) {
       return res
@@ -1372,38 +1394,38 @@ const updateCart = async (req, res) => {
     }
 
     let price = product.prod_mrp;
-      let offerApplied = false;
-      let discountPercentage = 0;
-  
-      const now = new Date();
-  
-      // Check for product-specific offer
-      if (
-        product.offer &&
-        now >= new Date(product.offer.start_date) &&
-        now <= new Date(product.offer.end_date)
-      ) {
-        discountPercentage = product.offer.discount_percentage;
-        offerApplied = true;
-      }
-  
-      // Check for category offer only if no product-specific offer applies
-      if (
-        !offerApplied && // Only check category offer if no product offer applied
-        product.prod_category &&
-        product.prod_category.offer &&
-        now >= new Date(product.prod_category.offer.start_date) &&
-        now <= new Date(product.prod_category.offer.end_date)
-      ) {
-        discountPercentage = product.prod_category.offer.discount_percentage;
-        offerApplied = true;
-      }
-  
-      // Apply the discount
-      if (offerApplied) {
-        price = product.prod_mrp * (1 - discountPercentage / 100);
-      }
-  
+    let offerApplied = false;
+    let discountPercentage = 0;
+
+    const now = new Date();
+
+    // Check for product-specific offer
+    if (
+      product.offer &&
+      now >= new Date(product.offer.start_date) &&
+      now <= new Date(product.offer.end_date)
+    ) {
+      discountPercentage = product.offer.discount_percentage;
+      offerApplied = true;
+    }
+
+    // Check for category offer only if no product-specific offer applies
+    if (
+      !offerApplied && // Only check category offer if no product offer applied
+      product.prod_category &&
+      product.prod_category.offer &&
+      now >= new Date(product.prod_category.offer.start_date) &&
+      now <= new Date(product.prod_category.offer.end_date)
+    ) {
+      discountPercentage = product.prod_category.offer.discount_percentage;
+      offerApplied = true;
+    }
+
+    // Apply the discount
+    if (offerApplied) {
+      price = product.prod_mrp * (1 - discountPercentage / 100);
+    }
+
     const productIndex = user.cart.products.findIndex(
       (item) => item.product._id.toString() === productId
     );
@@ -1521,22 +1543,35 @@ const processPayment = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate({
       path: "cart.products.product",
-      populate: {
-        path: "prod_category",
-        model: "Category",
-      },
+      populate: [
+        {
+          path: "prod_category",
+          model: "Category",
+          populate: {
+            path: "offer",
+            model: "Offer",
+          },
+        },
+        {
+          path: "offer",
+          model: "Offer",
+        },
+      ],
     });
 
     let wallet = await Wallet.findOne({ user: req.user.id });
     const selectedAddress = user.addresses.id(selectedAddressId);
 
     let subTotal = 0;
-    let totalDiscountPercentage = 0;
+    
     const now = new Date();
+    let totalDiscountAmount = 0;
+    let totalOriginalPrice = 0;
 
     user.cart.products.forEach((item) => {
       let productPrice = item.product.prod_mrp;
       let discountPercentage = 0;
+      console.log(item.product.offer)
 
       // Check product offer
       if (
@@ -1544,33 +1579,25 @@ const processPayment = async (req, res) => {
         now >= new Date(item.product.offer.start_date) &&
         now <= new Date(item.product.offer.end_date)
       ) {
-        discountPercentage = Math.max(
-          discountPercentage,
-          item.product.offer.discount_percentage
-        );
-      }
-
-      if (
+        discountPercentage = item.product.offer.discount_percentage;
+      } else if (
         item.product.prod_category &&
         item.product.prod_category.offer &&
         now >= new Date(item.product.prod_category.offer.start_date) &&
         now <= new Date(item.product.prod_category.offer.end_date)
       ) {
-        discountPercentage = Math.max(
-          discountPercentage,
-          item.product.prod_category.offer.discount_percentage
-        );
+        discountPercentage =
+          item.product.prod_category.offer.discount_percentage;
       }
-      if (discountPercentage > 0) {
-        productPrice *= 1 - discountPercentage / 100;
-      }
-      subTotal += productPrice * item.quantity;
-      totalDiscountPercentage += discountPercentage * item.quantity;
+      let discountedPrice = productPrice * (1 - discountPercentage / 100);
+      let discountAmount = (productPrice - discountedPrice) * item.quantity;
+
+      totalDiscountAmount += discountAmount;
+      totalOriginalPrice += productPrice * item.quantity;
+      subTotal += discountedPrice * item.quantity;
     });
 
-    const averageDiscountPercentage =
-      totalDiscountPercentage /
-      user.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+    const averageDiscountPercentage = (totalDiscountAmount / totalOriginalPrice) * 100;
 
     let discount = 0;
     if (req.session.appliedCoupon) {
@@ -1672,21 +1699,35 @@ const createPaypalOrder = async (req, res) => {
 
     const user = await User.findById(req.user.id).populate({
       path: "cart.products.product",
-      populate: {
-        path: "prod_category",
-        model: "Category",
-      },
+      populate: [
+        {
+          path: "prod_category",
+          model: "Category",
+          populate: {
+            path: "offer",
+            model: "Offer",
+          },
+        },
+        {
+          path: "offer",
+          model: "Offer",
+        },
+      ],
     });
 
     let wallet = await Wallet.findOne({ user: req.user.id });
+   
 
     let subTotal = 0;
-    let totalDiscountPercentage = 0;
+    
     const now = new Date();
+    let totalDiscountAmount = 0;
+    let totalOriginalPrice = 0;
 
     user.cart.products.forEach((item) => {
       let productPrice = item.product.prod_mrp;
       let discountPercentage = 0;
+      console.log(item.product.offer)
 
       // Check product offer
       if (
@@ -1694,35 +1735,27 @@ const createPaypalOrder = async (req, res) => {
         now >= new Date(item.product.offer.start_date) &&
         now <= new Date(item.product.offer.end_date)
       ) {
-        discountPercentage = Math.max(
-          discountPercentage,
-          item.product.offer.discount_percentage
-        );
-      }
-      if (
+        discountPercentage = item.product.offer.discount_percentage;
+      } else if (
         item.product.prod_category &&
         item.product.prod_category.offer &&
         now >= new Date(item.product.prod_category.offer.start_date) &&
         now <= new Date(item.product.prod_category.offer.end_date)
       ) {
-        discountPercentage = Math.max(
-          discountPercentage,
-          item.product.prod_category.offer.discount_percentage
-        );
+        discountPercentage =
+          item.product.prod_category.offer.discount_percentage;
       }
-      if (discountPercentage > 0) {
-        productPrice *= 1 - discountPercentage / 100;
-      }
-      subTotal += productPrice * item.quantity;
-      totalDiscountPercentage += discountPercentage * item.quantity;
+      let discountedPrice = productPrice * (1 - discountPercentage / 100);
+      let discountAmount = (productPrice - discountedPrice) * item.quantity;
+
+      totalDiscountAmount += discountAmount;
+      totalOriginalPrice += productPrice * item.quantity;
+      subTotal += discountedPrice * item.quantity;
     });
 
-    // Calculate average discount percentage
-    const averageDiscountPercentage =
-      totalDiscountPercentage /
-      user.cart.products.reduce((sum, item) => sum + item.quantity, 0);
-
+    const averageDiscountPercentage = (totalDiscountAmount / totalOriginalPrice) * 100;
     let discount = 0;
+    let coupon;
     if (req.session.appliedCoupon) {
       discount = req.session.appliedCoupon.discount;
       coupon = req.session.appliedCoupon.Name;

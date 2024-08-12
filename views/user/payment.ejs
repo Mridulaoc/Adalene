@@ -103,9 +103,9 @@
                                     <tr>
                                         <td class="fs-5 py-3">Total:</td>
                                         <% if (totalValue > 1000) { %>
-                                        <td class="fs-5 py-3 total">₹<%= totalValue + 0 %></td>
+                                        <td class="fs-5 py-3 total">₹<%= (totalValue + 0).toFixed(2) %></td>
                                         <% } else { %>
-                                        <td class="fs-5 py-3 total">₹<%= totalValue + 100 %></td>
+                                        <td class="fs-5 py-3 total">₹<%= (totalValue + 100).toFixed(2) %></td>
                                         <% } %>
                                     </tr>
                                 </table>
