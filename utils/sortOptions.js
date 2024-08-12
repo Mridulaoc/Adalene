@@ -1,4 +1,4 @@
-// utils.js
+
 function getSortOption(sortBy, order) {
     switch (sortBy) {
         case 'popularity':

@@ -4,27 +4,29 @@
 <body>
    <%- include ("../layout/navBarAdmin.ejs") %>
     <div class="container-fluid" >
-       <h1 class="text-center">Dashboard</h1>
+       <h1 class="text-center my-5">Dashboard</h1>
        <div class="container d-flex flex-column">
-         <div class="d-flex justify-content-between my-5">
-            <div class="border shadow" style="padding: 1rem 4rem;">
+         <div class="row my-5">
+            <div class="border shadow col-lg-3 mx-5 text-center py-5" style="padding: 1rem 4rem;">
                <h3>Total Sales</h3>
-               <p class="fs-5 mb-2" id="totalSales">₹<%= dashboardData.totalSales.toLocaleString() %></p>
-               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
-            </div>
-            <div class="border shadow" style="padding: 1rem 4rem;">
+               <p class="fs-5 mb-2" id="totalSales">₹<%= dashboardData.totalSales.toLocaleString() %></p>              
+            </div> 
+            <div class="border shadow col-lg-3  mx-5 text-center py-5" style="padding: 1rem 4rem;">
                <h3>Orders</h3>
                <p class="fs-5 mb-2" id="totalOrders"><%= dashboardData.totalOrders %></p>
-               <p style="font-size: 1rem; color: lightgray;">+20% month over month</p>
+              
             </div>
-            <div class="border shadow" style="padding: 1rem 4rem;">
-               <h3>Profit</h3>
+            <div class="border shadow col-lg-3  mx-5 text-center py-5" style="padding: 1rem 4rem;">
+               <h3>Users</h3>
+               <p class="fs-5 mb-2" id="userCount"><%= dashboardData.userCount %></p>
                
             </div>                    
          </div>
          <div class="my-3">
-            <label for="periodSelect">Select Period:</label>
+            <label for="periodSelect"></label>
             <select id="periodSelect" class="form-select" style="width: 200px;">
+              <option >Select Period:</option>
+              <option value="1">Today</option>
                <option value="7">Last 7 days</option>
                <option value="30">Last 30 days</option>
                <option value="90">Last 3 months</option>
@@ -91,6 +93,7 @@
           .then(data => {
             document.getElementById('totalSales').textContent = `₹${data.totalSales.toLocaleString()}`;
             document.getElementById('totalOrders').textContent = data.totalOrders;
+            document.getElementById('userCount').textContent = data.userCount;
             // document.getElementById('totalProfit').textContent = `₹${data.totalProfit}`;
 
             const bestProductsTable = document.getElementById('bestProductsTable');
