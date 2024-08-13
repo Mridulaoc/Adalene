@@ -7,7 +7,7 @@
     <div>
       <h4>Browse By</h4>
       <% categories.forEach(category =>{%>
-        <a class="nav-link mx-lg-2" href="/shopall?category=<%= category.cat_name %>"><%= category.cat_name %></a>
+        <a class=" nav-link mx-lg-2 <%= currentCategory === category.cat_name ? 'active' : '' %>" style="cursor: pointer;" onclick="updateProducts('<%= category.cat_name %>')"><%= category.cat_name %></a>
       
       <%})%>
     </div>

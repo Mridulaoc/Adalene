@@ -21,7 +21,9 @@ html{
 p{
  font-size: 1.2rem;
 }
-
+.activemode{
+    color:#BC4C2A;
+}
 .form{
     border-color: #BC4C2A;
 }

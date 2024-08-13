@@ -440,7 +440,7 @@ const loadShopall = async (req, res) => {
     if (req.query.page) {
       page = req.query.page;
     }
-    const limit = 5;
+    const limit = 6;
     const {
       sortBy = "popularity",
       order = "asc",
@@ -546,7 +546,6 @@ const loadShopall = async (req, res) => {
     console.log(error);
   }
 };
-
 const loadProductDetails = async (req, res) => {
   try {
     let id = req.params.id;
@@ -1284,7 +1283,12 @@ const getWishlist = async (req, res) => {
         populate: { path: "offer" }, // Populate category's offer
       },
     });
-
+    if (!wishlist) {
+      return res.render("wishlist", {
+        user: req.user,
+        wishlist: { products: [] },
+      });
+    }
     // Calculate discounted prices and check stock
     const productsWithDiscounts = wishlist.products.map((product) => {
       let discountedPrice = product.prod_mrp;

@@ -1,4 +1,6 @@
-function updateProducts() {
+
+
+function updateProducts(selectedCategory = "") {
   const sortByElement = document.getElementById("sortBy");
   const searchElement = document.getElementById("search");
   const showOutOfStockElement = document.getElementById("showOutOfStock");
@@ -38,6 +40,10 @@ function updateProducts() {
   urlParams.set("maxPrice", maxPrice);
   urlParams.set("color", selectedColor);
   urlParams.set("page", "1"); // Reset to first page when updating filters
+  if(selectedCategory){
+    urlParams.set("category", selectedCategory);
+  }
+
 
   // Construct the new URL
   const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
