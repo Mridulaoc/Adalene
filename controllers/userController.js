@@ -30,9 +30,54 @@ let client = new paypal.core.PayPalHttpClient(environment);
 const axios = require("axios");
 
 const successGoogleLogin = async (req, res) => {
-  if (req.isAuthenticated) {
-    const products = await Products.find({ is_bestseller: true });
-    res.render("home", { products, user: req.user });
+  try {
+    if (req.isAuthenticated) {
+      const popularProducts = await Products.find({
+        prod_status: "ACTIVE",
+        is_deleted: false,
+      })
+        .sort({ prod_rating: -1 })
+        .limit(4)
+        .populate("offer")
+        .populate({
+          path: "prod_category",
+          populate: { path: "offer" },
+        });
+
+      // Calculate discounted prices
+      const productsWithDiscounts = popularProducts.map((product) => {
+        let discountedPrice = product.prod_price;
+        let appliedDiscount = 0;
+
+        if (product.offer && product.offer.discount_percentage) {
+          appliedDiscount = product.offer.discount_percentage;
+        } else if (
+          product.prod_category &&
+          product.prod_category.offer &&
+          product.prod_category.offer.discount_percentage
+        ) {
+          appliedDiscount = product.prod_category.offer.discount_percentage;
+        }
+
+        if (appliedDiscount > 0) {
+          discountedPrice = product.prod_price * (1 - appliedDiscount / 100);
+        }
+
+        return {
+          ...product.toObject(),
+          discountedPrice: Math.round(discountedPrice * 100) / 100,
+          appliedDiscount,
+        };
+      });
+
+      res.render("home", {
+        products: productsWithDiscounts,
+        user: req.user,
+        cart: req.cart,
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -254,10 +299,12 @@ const verifySignIn = async (req, res) => {
     const { email, password } = req.body;
     const userData = await User.findOne({ user_email: email });
     if (userData) {
-      const passwordMatch = await bCrypt.compare(
-        password,
-        userData.user_password
-      );
+      if (!userData.isVerified) {
+        return res.render("signin", {
+          message: "Please verify your email before signing in",
+        });
+      }
+      tch = await bCrypt.compare(password, userData.user_password);
       if (passwordMatch) {
         req.session.userId = userData._id;
         res.redirect("/");
@@ -364,20 +411,24 @@ const updatePassword = async (req, res) => {
 
 const loadHome = async (req, res) => {
   try {
-    if (!req.session.userId) {
-      res.redirect("/");
-    } else {
-      if (req.isAuthenticated()) {
-        console.log(req.user);
-        const products = await Products.find({ is_bestseller: true });
-        res.render("home", { products, user: req.user, cart: req.cart });
-      }
-    }
+    console.log("home");
+    const popularProducts = await Products.find({
+      prod_status: "ACTIVE",
+      is_deleted: false,
+    })
+      .sort({ prod_rating: -1 })
+      .limit(4);
+
+    console.log(popularProducts);
+    res.render("home", {
+      products: popularProducts,
+      user: req.user,
+      cart: req.cart,
+    });
   } catch (error) {
     console.log(error);
   }
 };
-
 const loadShopall = async (req, res) => {
   try {
     let search = "";
@@ -558,13 +609,22 @@ const loadProductDetails = async (req, res) => {
       prod_category: products.prod_category._id,
       _id: { $ne: products._id },
     })
-      .populate("prod_category")
-      .limit(3);
+    .populate({
+      path: "prod_category",
+      populate: {
+        path: "offer",
+      },
+    })
+    .populate("offer")
+    .populate("prod_size")
+    .populate("prod_color")
+    .limit(4)
+
 
     res.render("productDetails", {
       products,
       relatedProducts,
-      discountedPrice,
+      discountedPrice: Math.round(discountedPrice),
       user: req.user,
       cart: req.cart,
       isInWishlist,
@@ -798,12 +858,12 @@ const displayOrderHistory = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    res.render("orderHistory", { 
-      orders, 
-      user: req.user, 
+    res.render("orderHistory", {
+      orders,
+      user: req.user,
       moment,
       currentPage: page,
-      totalPages: totalPages
+      totalPages: totalPages,
     });
   } catch (error) {
     console.log(error);
@@ -1091,67 +1151,85 @@ const downloadInvoice = async (req, res) => {
       .populate("products.product")
       .populate("user");
 
-      const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([600, 800]); // Adjust page size as needed
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  
-      // Table settings
-      const startX = 50;
-      const startY = 750;
-      const rowHeight = 20;
-      const colWidths = [50, 200, 100, 100]; // Customize column widths
-  
-      // Add the invoice title
-      page.setFont(font);
-      page.setFontSize(16);
-      page.drawText("Invoice", { x: startX, y: startY, color: rgb(0, 0, 0) });
-  
-      // Add the order details
-      page.setFontSize(12);
-      page.drawText(`Order ID: ${order.orderId}`, { x: startX, y: startY - 40 });
-      page.drawText(`User: ${order.user.user_name}`, { x: startX, y: startY - 60 });
-      page.drawText(`Date: ${order.orderDate.toLocaleDateString()}`, {
-        x: startX,
-        y: startY - 80,
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([600, 800]); // Adjust page size as needed
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    // Table settings
+    const startX = 50;
+    const startY = 750;
+    const rowHeight = 20;
+    const colWidths = [50, 200, 100, 100]; // Customize column widths
+
+    // Add the invoice title
+    page.setFont(font);
+    page.setFontSize(16);
+    page.drawText("Invoice", { x: startX, y: startY, color: rgb(0, 0, 0) });
+
+    // Add the order details
+    page.setFontSize(12);
+    page.drawText(`Order ID: ${order.orderId}`, { x: startX, y: startY - 40 });
+    page.drawText(`User: ${order.user.user_name}`, {
+      x: startX,
+      y: startY - 60,
+    });
+    page.drawText(`Date: ${order.orderDate.toLocaleDateString()}`, {
+      x: startX,
+      y: startY - 80,
+    });
+
+    // Draw table headers
+    const tableStartY = startY - 120;
+    const headers = ["S.No", "Product", "Price", "Quantity"];
+
+    headers.forEach((header, index) => {
+      page.drawText(header, {
+        x: startX + colWidths.slice(0, index).reduce((a, b) => a + b, 0),
+        y: tableStartY,
       });
-  
-      // Draw table headers
-      const tableStartY = startY - 120;
-      const headers = ['S.No', 'Product', 'Price', 'Quantity'];
-  
-      headers.forEach((header, index) => {
-        page.drawText(header, { x: startX + colWidths.slice(0, index).reduce((a, b) => a + b, 0), y: tableStartY });
+    });
+
+    // Draw the items in the table
+    order.products.forEach((item, index) => {
+      const currentY = tableStartY - (index + 1) * rowHeight;
+
+      page.drawText(`${index + 1}`, { x: startX, y: currentY });
+      page.drawText(`${item.product.prod_name}`, {
+        x: startX + colWidths[0],
+        y: currentY,
       });
-  
-      // Draw the items in the table
-      order.products.forEach((item, index) => {
-        const currentY = tableStartY - (index + 1) * rowHeight;
-  
-        page.drawText(`${index + 1}`, { x: startX, y: currentY });
-        page.drawText(`${item.product.prod_name}`, { x: startX + colWidths[0], y: currentY });
-        page.drawText(`Rs.${item.price.toFixed(2)}`, { x: startX + colWidths[0] + colWidths[1], y: currentY });
-        page.drawText(`${item.quantity}`, { x: startX + colWidths[0] + colWidths[1] + colWidths[2], y: currentY });
+      page.drawText(`Rs.${item.price.toFixed(2)}`, {
+        x: startX + colWidths[0] + colWidths[1],
+        y: currentY,
       });
-  
-      // Draw the total amount
-      const totalY = (tableStartY - (order.products.length + 1) * rowHeight )-25 ;
-      page.drawText(`Total: Rs.${order.total.toFixed(2)}`, { x: startX + 300, y: totalY });
-  
-      // Save the PDF to a buffer
-      const pdfBytes = await pdfDoc.save();
-  
-      // Set the response headers for file download
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="invoice_${order._id}.pdf"`
-      );
-      res.setHeader("Content-Length", pdfBytes.length);
-      res.end(pdfBytes);
-    } catch (error) {
-      console.error("Error generating invoice:", error);
-      res.status(500).send("Error generating invoice");
-    }
+      page.drawText(`${item.quantity}`, {
+        x: startX + colWidths[0] + colWidths[1] + colWidths[2],
+        y: currentY,
+      });
+    });
+
+    // Draw the total amount
+    const totalY = tableStartY - (order.products.length + 1) * rowHeight - 25;
+    page.drawText(`Total: Rs.${order.total.toFixed(2)}`, {
+      x: startX + 300,
+      y: totalY,
+    });
+
+    // Save the PDF to a buffer
+    const pdfBytes = await pdfDoc.save();
+
+    // Set the response headers for file download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="invoice_${order._id}.pdf"`
+    );
+    res.setHeader("Content-Length", pdfBytes.length);
+    res.end(pdfBytes);
+  } catch (error) {
+    console.error("Error generating invoice:", error);
+    res.status(500).send("Error generating invoice");
+  }
 };
 
 const addToWishlist = async (req, res) => {
@@ -1579,7 +1657,7 @@ const processPayment = async (req, res) => {
     const selectedAddress = user.addresses.id(selectedAddressId);
 
     let subTotal = 0;
-    
+
     const now = new Date();
     let totalDiscountAmount = 0;
     let totalOriginalPrice = 0;
@@ -1587,7 +1665,7 @@ const processPayment = async (req, res) => {
     user.cart.products.forEach((item) => {
       let productPrice = item.product.prod_mrp;
       let discountPercentage = 0;
-      console.log(item.product.offer)
+      console.log(item.product.offer);
 
       // Check product offer
       if (
@@ -1613,7 +1691,8 @@ const processPayment = async (req, res) => {
       subTotal += discountedPrice * item.quantity;
     });
 
-    const averageDiscountPercentage = (totalDiscountAmount / totalOriginalPrice) * 100;
+    const averageDiscountPercentage =
+      (totalDiscountAmount / totalOriginalPrice) * 100;
 
     let discount = 0;
     if (req.session.appliedCoupon) {
@@ -1732,10 +1811,9 @@ const createPaypalOrder = async (req, res) => {
     });
 
     let wallet = await Wallet.findOne({ user: req.user.id });
-   
 
     let subTotal = 0;
-    
+
     const now = new Date();
     let totalDiscountAmount = 0;
     let totalOriginalPrice = 0;
@@ -1743,7 +1821,7 @@ const createPaypalOrder = async (req, res) => {
     user.cart.products.forEach((item) => {
       let productPrice = item.product.prod_mrp;
       let discountPercentage = 0;
-      console.log(item.product.offer)
+      console.log(item.product.offer);
 
       // Check product offer
       if (
@@ -1769,7 +1847,8 @@ const createPaypalOrder = async (req, res) => {
       subTotal += discountedPrice * item.quantity;
     });
 
-    const averageDiscountPercentage = (totalDiscountAmount / totalOriginalPrice) * 100;
+    const averageDiscountPercentage =
+      (totalDiscountAmount / totalOriginalPrice) * 100;
     let discount = 0;
     let coupon;
     if (req.session.appliedCoupon) {

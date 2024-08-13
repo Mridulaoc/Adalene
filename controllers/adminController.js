@@ -56,10 +56,12 @@ const updateDashboardData = async(req,res) =>{
 async function getDashboardData(period) {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - period * 24 * 60 * 60 * 1000);
-
+   
     // Fetch orders within the selected period
     const orders = await Order.find({
-        orderDate: { $gte: startDate, $lte: endDate }
+        orderDate: { $gte: startDate, $lte: endDate },
+        status: "Delivered",
+
     }).populate('products.product');
 
     // Calculate total sales, orders, and profit

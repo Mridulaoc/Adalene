@@ -205,6 +205,31 @@ const updateProduct = async (req, res) => {
   }
 };
 
+// const deleteProductImage = async (req, res) => {
+//   const { index, image, productId } = req.body;
+//   console.log(index, image, productId);
+
+//   try {
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).send("Product not found");
+//     }
+
+//     const imagePath = path.join(__dirname, "../public/uploads", image);
+
+//     fs.unlink(imagePath, (err) => {
+//       if (err) {
+//         return res.status(500).send("Failed to delete image file");
+//       }
+//       product.prod_images.splice(index, 1);
+//       product.save();
+//     });
+//   } catch (error) {
+//     res.status(500).send("Server error");
+//   }
+// };
+
 const deleteProductImage = async (req, res) => {
   const { index, image, productId } = req.body;
   console.log(index, image, productId);
@@ -213,20 +238,29 @@ const deleteProductImage = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).send("Product not found");
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (index < 0 || index >= product.prod_images.length) {
+      return res.status(400).json({ message: "Invalid image index" });
     }
 
     const imagePath = path.join(__dirname, "../public/uploads", image);
 
-    fs.unlink(imagePath, (err) => {
-      if (err) {
-        return res.status(500).send("Failed to delete image file");
-      }
-      product.prod_images.splice(index, 1);
-      product.save();
-    });
+    try {
+      await fs.unlink(imagePath);
+    } catch (unlinkError) {
+      console.error("Failed to delete image file:", unlinkError);
+      // Continue with removing the image from the database even if file deletion fails
+    }
+
+    product.prod_images.splice(index, 1);
+    await product.save();
+
+    res.status(200).json({ message: "Image deleted successfully" });
   } catch (error) {
-    res.status(500).send("Server error");
+    console.error("Server error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

@@ -1,237 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-   <%- include ("../layout/navBarAdmin.ejs") %>
-    <div class="container-fluid">
-        <div class="container d-flex flex-column justify-content-center align-items-center mb-5"  >
-            <h2 class="mb-3 text-center"> Edit Product</h2>
-            <% if(typeof message !== "undefined"){%>
-                <div class="alert alert-danger" ><%= message %></div>       
-            <%}%>
-           
-            <form action="/admin/products/edit-product/<%= products._id %>?_method=PUT" method="post" enctype="multipart/form-data" autocomplete="off" class=" border px-3 py-3 rounded" style="width: 40%">
-                <div class="mb-3 ">           
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="<%= products.prod_name %>" required >
-                </div>
-                <div class="mb-3 d-md-flex justify-content-between">
-                    <div class="d-flex flex-column">
-                        <label for="category" class="form-label">Category</label>
-                        <select class="form-select" id="category" name="categoryId" required>
-                            <% categories.forEach((category) => { %>
-                                <option value="<%= category._id %>" <%= category._id.equals(products.prod_category._id) ? 'selected' : '' %>><%= category.cat_name %></option>
-                            <% }) %>               
-                        </select>
-                    </div>
-                    
-                    <div class="d-flex flex-column">
-                        <label for="size" class="form-label">Size</label>
-                        <select class="form-select" id="size" name="sizeId">                                 
-                            <% sizes.forEach((size) => { %>
-                                <option value="<%= size._id %>"<%= size._id.equals(products.prod_size._id) ? 'selected' : '' %>><%= size.size %></option>
-                            <% }) %> 
-                        </select>                
-                    </div>
-                    
-                    <div class="d-flex flex-column">
-                        <label for="colour" class="form-label">Colour</label>
-                        <select class="form-select" id="colour" name="colorId">
-                            <% colors.forEach((color) => { %>
-                                <option value="<%= color._id %>"<%= color._id.equals(products.prod_color._id) ? 'selected' : '' %>><%= color.color_name %></option>
-                            <% }) %> 
-                      </select>
-                    </div>                    
-                </div>
-                <div class="mb-3 d-flex flex-column" style="width: 25%">
-                    <label for="price" class="form-label">MRP</label>
-                    <input type="number" class="form-control" id="price" name="mPrice" value="<%= products.prod_mrp %>" required
-                      onchange="validatePrice()" />
-                    <span id="error" style="color: red"></span>
-                  </div>
-                <div class="mb-3 d-flex justify-content-between align-items-center" >
-                    <div class="mb-3 d-flex flex-column " style="width: 25%">           
-                        <label for="price" class="form-label">Price</label>
-                        <input type="number" class="form-control" id="price" name="price" value="<%= products.prod_price %>" required onchange="validatePrice()" >
-                        <span id="error" style="color: red"></span>
-                    </div>
-                    <div class="mb-3 flex-column " style="width: 25%">           
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="quantity" name="quantity" value="<%= products.prod_quantity %>" required onchange="validateQuantity()" >
-                        <span id="error" style="color: red"></span>
-                    </div>
-                    <div class="mb-3 flex-column ">           
-                        <label for="rating" class="form-label" style=" width:25%">Rating</label>
-                        <input type="number" class="form-control" step="0.1" id="rating" name="rating" value="<%= products.prod_rating %>" required onchange="validateRating()">
-                        <span id="error" style="color: red"></span>
-                    </div>
-                </div>
-                
-                  
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" rows="3" name="description" onchange="validateProductDesc()" ><%= products.prod_desc %></textarea>
-                    <span id="descError" style="color: red;"></span>
-                </div>
-                <div  class="mb-3">
-                    <label for="currentImages">Current Images:</label>
-                    <div id="currentImages" class="mb-5">
-                      <% products.prod_images.forEach((image,index) => { %>
-                        <div class="image-container" data-image="<%= image %>" style="display: inline-block;position: relative;" >
-                        <img src="\uploads\<%= image %>" alt="" style="width: 100px; height: 100px;" class="mb-3">
-                        <button class=" px-1 text-decoration-none fs-6  border rounded-2 bg-transparent delete-image-btn" data-index="<%= index %>" data-image="<%= image %>" style="position: absolute; top: 50%; left: 35%; color: #BC4C2A">Remove</button>
+
+    <body>
+        <%- include ("../layout/navBarAdmin.ejs") %>
+            <div class="container-fluid">
+                <div class="container d-flex flex-column justify-content-center align-items-center mb-5">
+                    <h2 class="mb-3 text-center"> Edit Product</h2>
+                    <% if(typeof message !=="undefined" ){%>
+                        <div class="alert alert-danger">
+                            <%= message %>
                         </div>
-                      <% }) %>
-                    </div>
+                        <%}%>
 
-                    <div class="input-group mb-3 d-flex flex-column">
-                        <label for="images" class="form-label">Images</label>
-                        <input type="file" class="form-control" id="images" name="images" style="width: 100%;" accept="image/*" multiple>
-                        <div id="imagePreview" class="d-flex justify-content-between"></div>                    
-                    </div>
-    
-                <input type="hidden" name="id" value="<%= products._id %>"> 
-                <div class="mb-3 ">                           
-                    <input type="submit" class="form-control fs-5"  value="SAVE"   required>
-                </div> 
-                <div class="mb-3 ">       
-                    <input type="submit" class="form-control  fs-5"  value="CANCEL" required>
-                </div> 
-            </form>            
-        </div>
-    </div>
-    <%- include ("../layout/footerAdmin.ejs") %>
-        
-    <script>
-       document.addEventListener("DOMContentLoaded", function() {
+                            <form action="/admin/products/edit-product/<%= products._id %>?_method=PUT" method="post"
+                                enctype="multipart/form-data" autocomplete="off" class=" border px-3 py-3 rounded"
+                                style="width: 40%">
+                                <div class="mb-3 ">
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                        value="<%= products.prod_name %>" required>
+                                </div>
+                                <div class="mb-3 d-md-flex justify-content-between">
+                                    <div class="d-flex flex-column">
+                                        <label for="category" class="form-label">Category</label>
+                                        <select class="form-select" id="category" name="categoryId" required>
+                                            <% categories.forEach((category)=> { %>
+                                                <option value="<%= category._id %>"
+                                                    <%=category._id.equals(products.prod_category._id) ? 'selected' : ''
+                                                    %>><%= category.cat_name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
 
-    const imageInput = document.getElementById('images');
-    const imagePreview = document.getElementById('imagePreview');
+                                    <div class="d-flex flex-column">
+                                        <label for="size" class="form-label">Size</label>
+                                        <select class="form-select" id="size" name="sizeId">
+                                            <% sizes.forEach((size)=> { %>
+                                                <option value="<%= size._id %>"
+                                                    <%=size._id.equals(products.prod_size._id) ? 'selected' : '' %>><%=
+                                                        size.size %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
 
-    imageInput.addEventListener('change', function() {
-        imagePreview.innerHTML = '';
+                                    <div class="d-flex flex-column">
+                                        <label for="colour" class="form-label">Colour</label>
+                                        <select class="form-select" id="colour" name="colorId">
+                                            <% colors.forEach((color)=> { %>
+                                                <option value="<%= color._id %>"
+                                                    <%=color._id.equals(products.prod_color._id) ? 'selected' : '' %>>
+                                                    <%= color.color_name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3 d-flex flex-column" style="width: 25%">
+                                    <label for="price" class="form-label">MRP</label>
+                                    <input type="number" class="form-control" id="price" name="mPrice"
+                                        value="<%= products.prod_mrp %>" required onchange="validatePrice()" />
+                                    <span id="error" style="color: red"></span>
+                                </div>
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <div class="mb-3 d-flex flex-column " style="width: 25%">
+                                        <label for="price" class="form-label">Price</label>
+                                        <input type="number" class="form-control" id="price" name="price"
+                                            value="<%= products.prod_price %>" required onchange="validatePrice()">
+                                        <span id="error" style="color: red"></span>
+                                    </div>
+                                    <div class="mb-3 flex-column " style="width: 25%">
+                                        <label for="quantity" class="form-label">Quantity</label>
+                                        <input type="number" class="form-control" id="quantity" name="quantity"
+                                            value="<%= products.prod_quantity %>" required
+                                            onchange="validateQuantity()">
+                                        <span id="error" style="color: red"></span>
+                                    </div>
+                                    <div class="mb-3 flex-column ">
+                                        <label for="rating" class="form-label" style=" width:25%">Rating</label>
+                                        <input type="number" class="form-control" step="0.1" id="rating" name="rating"
+                                            value="<%= products.prod_rating %>" required onchange="validateRating()">
+                                        <span id="error" style="color: red"></span>
+                                    </div>
+                                </div>
 
-        const files = Array.from(imageInput.files);
 
-        files.forEach(file => {
-            const reader = new FileReader();
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" name="description"
+                                        onchange="validateProductDesc()"><%= products.prod_desc %></textarea>
+                                    <span id="descError" style="color: red;"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="currentImages">Current Images:</label>
+                                    <div id="currentImages" class="mb-5">
+                                        <% products.prod_images.forEach((image,index)=> { %>
+                                            <div class="image-container" data-image="<%= image %>"
+                                                style="display: inline-block;position: relative;">
+                                                <img src="\uploads\<%= image %>" alt=""
+                                                    style="width: 100px; height: 100px;" class="mb-3">
+                                                <button
+                                                    class=" px-1 text-decoration-none fs-6  border rounded-2 bg-transparent delete-image-btn"
+                                                    data-index="<%= index %>" data-image="<%= image %>"
+                                                    style="position: absolute; top: 50%; left: 35%; color: #BC4C2A">Remove</button>
+                                            </div>
+                                            <% }) %>
+                                    </div>
 
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.style.width = '150px'; // Adjust image size as needed
-                img.style.height = '150px';
-                img.style.margin = '10px';
-                img.style.objectFit = 'cover'; // Ensure image covers the box
-                img.setAttribute('data-original-src', e.target.result); // Store original image data
-                img.setAttribute('data-cropped-src', ''); // Initialize cropped image data attribute
-                img.addEventListener('click', function() {
-                    // Initialize cropper on image click
-                    const cropper = new Cropper(img, {
-                        aspectRatio: 1, // Example 1:1 aspect ratio
-                        viewMode: 1, // Restrict the cropping area to the image bounds
-                        autoCropArea: 1, // Automatically resize the crop box to cover the entire image
-                        crop(event) {
-                            const canvas = cropper.getCroppedCanvas({
-                                width: 150, // Adjust dimensions as needed for upload
-                                height: 150
+                                    <div class="input-group mb-3 d-flex flex-column">
+                                        <label for="images" class="form-label">Images</label>
+                                        <input type="file" class="form-control" id="images" name="images"
+                                            style="width: 100%;" accept="image/*" multiple>
+                                        <div id="imagePreview" class="d-flex justify-content-between"></div>
+                                    </div>
+
+                                    <input type="hidden" name="id" value="<%= products._id %>">
+                                    <div class="mb-3 ">
+                                        <input type="submit" class="form-control fs-5" value="SAVE" required>
+                                    </div>
+                                    <div class="mb-3 ">
+                                        <input type="submit" class="form-control  fs-5" value="CANCEL" required>
+                                    </div>
+                            </form>
+                </div>
+            </div>
+            <%- include ("../layout/footerAdmin.ejs") %>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+
+                        const imageInput = document.getElementById('images');
+                        const imagePreview = document.getElementById('imagePreview');
+
+                        imageInput.addEventListener('change', function () {
+                            imagePreview.innerHTML = '';
+
+                            const files = Array.from(imageInput.files);
+
+                            files.forEach(file => {
+                                const reader = new FileReader();
+
+                                reader.onload = function (e) {
+                                    const img = document.createElement('img');
+                                    img.src = e.target.result;
+                                    img.style.width = '150px'; // Adjust image size as needed
+                                    img.style.height = '150px';
+                                    img.style.margin = '10px';
+                                    img.style.objectFit = 'cover'; // Ensure image covers the box
+                                    img.setAttribute('data-original-src', e.target.result); // Store original image data
+                                    img.setAttribute('data-cropped-src', ''); // Initialize cropped image data attribute
+                                    img.addEventListener('click', function () {
+                                        // Initialize cropper on image click
+                                        const cropper = new Cropper(img, {
+                                            aspectRatio: 1, // Example 1:1 aspect ratio
+                                            viewMode: 1, // Restrict the cropping area to the image bounds
+                                            autoCropArea: 1, // Automatically resize the crop box to cover the entire image
+                                            crop(event) {
+                                                const canvas = cropper.getCroppedCanvas({
+                                                    width: 150, // Adjust dimensions as needed for upload
+                                                    height: 150
+                                                });
+
+                                                img.setAttribute('data-cropped-src', canvas.toDataURL()); // Store cropped image data
+
+                                                // Display the cropped image preview
+                                                img.src = canvas.toDataURL();
+                                            }
+                                        });
+                                    });
+
+                                    imagePreview.appendChild(img);
+                                }
+
+                                reader.readAsDataURL(file);
                             });
+                        });
 
-                            img.setAttribute('data-cropped-src', canvas.toDataURL()); // Store cropped image data
 
-                            // Display the cropped image preview
-                            img.src = canvas.toDataURL();
-                        }
+                        const deleteButtons = document.querySelectorAll('.delete-image-btn');
+
+                        deleteButtons.forEach(button => {
+                            button.addEventListener('click', async (event) => {
+                                event.preventDefault();
+                                const imageIndex = button.getAttribute('data-index');
+                                const imageName = button.getAttribute('data-image');
+                                const imageContainer = button.closest('.image-container');
+                                const productId = '<%= products._id %>';
+
+                                const response = await fetch('/admin/delete-image', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ index: imageIndex, image: imageName, productId })
+                                });
+
+                                if (response.ok) {
+                                    imageContainer.style.transition = 'opacity 0.5s';
+                                    imageContainer.style.opacity = '0';
+                                    setTimeout(() => {
+                                        imageContainer.remove();
+                                    }, 500);
+
+                                } else {
+                                    alert('Failed to delete image');
+                                }
+                            });
+                        });
+
                     });
-                });
 
-                imagePreview.appendChild(img);
-            }
+                    // validation scripts
 
-            reader.readAsDataURL(file);
-        });
-    });
+                    function validateName() {
+                        const name = document.getElementById("name").value.trim();
+                        const nameError = document.getElementById("nameError");
 
+                        if (name.length < 5) {
+                            nameError.textContent = "Name must be atleat 5 characters long"
+                        }
 
-    const deleteButtons = document.querySelectorAll('.delete-image-btn');
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const imageIndex = button.getAttribute('data-index');
-                const imageName = button.getAttribute('data-image');
-                const imageContainer = button.closest('.image-container');
-                const productId = '<%= products._id %>';
-
-                const response = await fetch('/admin/delete-image', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ index: imageIndex, image: imageName,productId })
-                });
-
-                if (response.ok) {                   
-                    imageContainer.remove();                   
-                   
-                } else {
-                    alert('Failed to delete image');
-                }
-            });
-        });
-
-});
-
-         // validation scripts
-
-         function validateName() {
-          const name = document.getElementById("name").value.trim();
-          const nameError = document.getElementById("nameError");
-
-          if (name.length < 5) {
-            nameError.textContent = "Name must be atleat 5 characters long"
-          }
-
-        }
+                    }
 
 
-        function validatePrice() {
-          const priceInput = document.getElementById('price').value;
-          const errorSpan = document.getElementById('error');
-          // errorSpan.textContent = ''; // Clear previous error message
-          if (isNaN(priceInput) || priceInput <= 0) {
-            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
-          }
-        }
+                    function validatePrice() {
+                        const priceInput = document.getElementById('price').value;
+                        const errorSpan = document.getElementById('error');
+                        // errorSpan.textContent = ''; // Clear previous error message
+                        if (isNaN(priceInput) || priceInput <= 0) {
+                            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
+                        }
+                    }
 
-        function validateQuantity() {
-          const quantityInput = document.getElementById('quantity').value;
-          const errorSpan = document.getElementById('error');
-          // errorSpan.textContent = ''; // Clear previous error message
-          if (isNaN(quantityInput) || quantityInput <= 0) {
-            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
-          }
-        }
+                    function validateQuantity() {
+                        const quantityInput = document.getElementById('quantity').value;
+                        const errorSpan = document.getElementById('error');
+                        // errorSpan.textContent = ''; // Clear previous error message
+                        if (isNaN(quantityInput) || quantityInput <= 0) {
+                            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
+                        }
+                    }
 
-        function validateRating() {
-          const ratingInput = document.getElementById('rating').value;
-          const errorSpan = document.getElementById('error');
-          // errorSpan.textContent = ''; // Clear previous error message
-          if (isNaN(ratingInput) || ratingInput <= 0) {
-            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
-          }
-        }
+                    function validateRating() {
+                        const ratingInput = document.getElementById('rating').value;
+                        const errorSpan = document.getElementById('error');
+                        // errorSpan.textContent = ''; // Clear previous error message
+                        if (isNaN(ratingInput) || ratingInput <= 0) {
+                            errorSpan.textContent = 'Please enter a valid amount greater than 0.';
+                        }
+                    }
 
-        
-        function validateProductDesc(){
-            var productDescription = document.getElementById('description').value.trim();
-            const descError = document.getElementById("descError");
-        
-        
-        if (productDescription.length < 10 || productDescription.length > 200) {        
-            descError.textContent = "Product description must be between 10 and 200 characters";      
-        } 
-    };
-    </script>
-</body>
+
+                    function validateProductDesc() {
+                        var productDescription = document.getElementById('description').value.trim();
+                        const descError = document.getElementById("descError");
+
+
+                        if (productDescription.length < 10 || productDescription.length > 200) {
+                            descError.textContent = "Product description must be between 10 and 200 characters";
+                        }
+                    };
+                </script>
+    </body>
+
 </html>

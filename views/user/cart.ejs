@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
+<body class="d-flex flex-column min-vh-100">
   <%- include ("../layout/navBarnew.ejs") %>
 
- <div class="container-fluid py-5 px-0" style="height: 100vh;">
-    <div class="container mb-5">
+ <div class="container-fluid py-5 px-0" >
+    <div class="container mb-5 ">
         <h2>Your Cart</h2>
         <div class="d-flex flex-column align-items-center mb-5">
             <% if(cart.products.length >0){%>
@@ -30,7 +30,7 @@
                         </div>
                         </div>
                         </td>
-                        <td class="py-5 "><%= item.price.toFixed(2) %></td>
+                        <td class="py-5 "><%= Math.round(item.price) %></td>
                         
                         <td class="py-5">
                             <div class="d-flex align-items-center my-3">
@@ -41,7 +41,7 @@
                             <span id="quantity-availablity-<%=item.product._id %>" class="fs-5 my-3" style="max-width: 20%;"></span>                           
                         </td>
                        
-                        <td class="py-5"><%= (item.price * item.quantity).toFixed(2) %></td>
+                        <td class="py-5"><%= Math.round(item.price * item.quantity) %></td>
                         <td class="text-center py-5"><button class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent " style="color: #BC4C2A;" onclick="removeItem('<%= item.product._id %>')">REMOVE</button></td>                                           
                     </tr>
                     <%})%>                                        

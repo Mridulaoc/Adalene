@@ -9,14 +9,14 @@
           <h4>Account</h4>
           <div class="d-flex gap-5 ">
             <%- include ("../layout/profileSidebar.ejs") %>
-              <div class="col-7 border shadow rounded">
+              <div class="col-8 border shadow rounded">
                 <h4 style="padding: 1.5rem 10rem;">My Wishlist</h4>
                 <hr style="width: 80%;margin: auto;">
                 <div style="padding: 3rem 10rem;">
                   <% if (wishlist && wishlist.products.length> 0) { %>
                     <% wishlist.products.forEach(product=> { %>
                       <a href="/products/<%= product._id %>" class="text-decoration-none">
-                      <div class="col-md-4">
+                      <div class="col-md-6 text-center">
                         <div class="card mb-4 shadow-sm">
                           <img src="/uploads/<%= product.prod_images[0] %>" alt="<%= product.prod_name %>"
                             class="card-img-top" />
@@ -27,7 +27,7 @@
                             <% if (product.discountedPrice) { %>
                               <p class="card-text">
                                 <span class="text-decoration-line-through">₹<%= product.prod_mrp %></span>
-                                <span class="text-danger">₹<%= product.discountedPrice.toFixed(2) %></span>
+                                <span class="text-danger">₹<%= Math.round(product.discountedPrice) %></span>
                               </p>
                             <% } else { %>
                               <p class="card-text">Price: ₹<%= product.prod_mrp %></p>

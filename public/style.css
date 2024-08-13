@@ -15,6 +15,9 @@ html{
     font-size: 80%;
 
 }
+.flex-grow-1 {
+    flex-grow: 1;
+  }
 p{
  font-size: 1.2rem;
 }

@@ -41,13 +41,13 @@
                                     <tr>
                                         <td class="d-flex flex-column py-5"><img src="/uploads/<%= item.product.prod_images[0]%>" height="50px" width="50px"><%= item.product.prod_name %></td>
                                         <td class="py-5">
-                                            <%= (item.price).toFixed(2) %>
+                                            <%= Math.round(item.price) %>
                                         </td>
                                         <td class="py-5">
                                             <%= item.quantity %>
                                         </td>
                                         <td class="py-5">
-                                            <%= (item.price * item.quantity).toFixed(2) %>
+                                            <%= Math.round(item.price * item.quantity) %>
                                         </td>
                                         <td class="py-5">
                                             <%= item.productStatus %>

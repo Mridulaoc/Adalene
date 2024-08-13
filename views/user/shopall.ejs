@@ -33,7 +33,7 @@
                             <% if (products[i].discountedPrice) { %>
                               <p class="card-text fs-5">
                                 <span class="text-decoration-line-through">₹<%= products[i].prod_mrp %></span>
-                                <p class="text-danger">₹<%= products[i].discountedPrice.toFixed(2) %></p>
+                                <p class="text-danger">₹<%= Math.round(products[i].discountedPrice) %></p>
                               </p>
                             <% } else { %>
                               <p class="card-text fs-5">₹<%= products[i].prod_mrp %></p>
