@@ -1,6 +1,7 @@
 const Order = require("../models/order");
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const { CURSOR_FLAGS } = require("mongodb");
 
 const getSalesReportPage = async (req, res) => {
   try {
@@ -14,6 +15,8 @@ const getSalesReportPage = async (req, res) => {
   const getSalesReport = async (req, res) => {
     try {
       const { startDate, endDate, page = 1, limit = 10 } = req.query;
+      console.log(startDate)
+      console.log(endDate)
   
       if (!startDate || !endDate) {
         return res
@@ -24,6 +27,8 @@ const getSalesReportPage = async (req, res) => {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999); // Set to end of day
+      console.log(start)
+      console.log(end)
   
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
         return res.status(400).json({ error: "Invalid date format" });

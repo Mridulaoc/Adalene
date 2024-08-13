@@ -109,8 +109,8 @@ adminRoute.get('/offers/add-offer',isAuthenticated,offerController.getAddOfferPa
 adminRoute.post('/offers/add-offer',isAuthenticated,offerController.addNewOffer);
 adminRoute.get('/offers/edit-offer',isAuthenticated,offerController.getEditOfferPage);
 adminRoute.put('/offers/edit-offer/:id',isAuthenticated,offerController.updateOffer);
-adminRoute.post('/products/update-offer',isAuthenticated,productController.updateProductOffer);
-adminRoute.post('/categories/update-offer',isAuthenticated,categoryController.updateCategoryOffer)
+// adminRoute.post('/products/update-offer',isAuthenticated,productController.updateProductOffer);
+// adminRoute.post('/categories/update-offer',isAuthenticated,categoryController.updateCategoryOffer)
 
 
 //product offer routes

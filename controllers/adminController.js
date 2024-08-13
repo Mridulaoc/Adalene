@@ -56,6 +56,9 @@ const updateDashboardData = async(req,res) =>{
 async function getDashboardData(period) {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - period * 24 * 60 * 60 * 1000);
+    // const startDate = new Date(endDate.getDate() - period );
+    console.log(startDate)
+    console.log(endDate)
    
     // Fetch orders within the selected period
     const orders = await Order.find({

@@ -26,6 +26,9 @@ app.use('/',userRoute);
 const adminRoute = require('./routers/adminRouter');
 app.use('/admin',adminRoute);
 
+// const guestRoute = require('./routers/guestRouter');
+// app.use('/guest',guestRoute);
+
 // const categoryRoute = require('./routers/categoryRouter');
 // app.use('/admin', categoryRoute);
 
