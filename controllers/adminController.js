@@ -57,12 +57,13 @@ async function getDashboardData(period) {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - period * 24 * 60 * 60 * 1000);
     // const startDate = new Date(endDate.getDate() - period );
-    console.log(startDate)
-    console.log(endDate)
+    const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); 
    
     // Fetch orders within the selected period
     const orders = await Order.find({
-        orderDate: { $gte: startDate, $lte: endDate },
+        orderDate: { $gte: start, $lte: end },
         status: "Delivered",
 
     }).populate('products.product');
