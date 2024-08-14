@@ -115,7 +115,7 @@
                                             style="width: 100%;" accept="image/*" multiple>
                                         <div id="imagePreview" class="d-flex justify-content-between"></div>
                                     </div>
-
+                                    <input type="hidden" id="deletedImages" name="deletedImages" value="">
                                     <input type="hidden" name="id" value="<%= products._id %>">
                                     <div class="mb-3 ">
                                         <input type="submit" class="form-control fs-5" value="SAVE" required>
@@ -179,34 +179,57 @@
                         });
 
 
-                        const deleteButtons = document.querySelectorAll('.delete-image-btn');
+                        // const deleteButtons = document.querySelectorAll('.delete-image-btn');
 
+                        // deleteButtons.forEach(button => {
+                        //     button.addEventListener('click', async (event) => {
+                        //         event.preventDefault();
+                        //         const imageIndex = button.getAttribute('data-index');
+                        //         const imageName = button.getAttribute('data-image');
+                        //         const imageContainer = button.closest('.image-container');
+                        //         const productId = '<%= products._id %>';
+
+                        //         const response = await fetch('/admin/delete-image', {
+                        //             method: 'POST',
+                        //             headers: {
+                        //                 'Content-Type': 'application/json'
+                        //             },
+                        //             body: JSON.stringify({ index: imageIndex, image: imageName, productId })
+                        //         });
+
+                        //         if (response.ok) {
+                        //             imageContainer.style.transition = 'opacity 0.5s';
+                        //             imageContainer.style.opacity = '0';
+                        //             setTimeout(() => {
+                        //                 imageContainer.remove();
+                        //             }, 500);
+
+                        //         } else {
+                        //             alert('Failed to delete image');
+                        //         }
+                        //     });
+                        // });
+
+                        const deletedImages = [];
+
+                        const deleteButtons = document.querySelectorAll('.delete-image-btn');
                         deleteButtons.forEach(button => {
-                            button.addEventListener('click', async (event) => {
+                            button.addEventListener('click', (event) => {
                                 event.preventDefault();
                                 const imageIndex = button.getAttribute('data-index');
                                 const imageName = button.getAttribute('data-image');
                                 const imageContainer = button.closest('.image-container');
-                                const productId = '<%= products._id %>';
 
-                                const response = await fetch('/admin/delete-image', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ index: imageIndex, image: imageName, productId })
-                                });
+                                // Store the image name in the deletedImages array
+                                deletedImages.push(imageName);
+                                document.getElementById('deletedImages').value = deletedImages.join(',');
 
-                                if (response.ok) {
-                                    imageContainer.style.transition = 'opacity 0.5s';
-                                    imageContainer.style.opacity = '0';
-                                    setTimeout(() => {
-                                        imageContainer.remove();
-                                    }, 500);
-
-                                } else {
-                                    alert('Failed to delete image');
-                                }
+                                // Hide the image visually
+                                imageContainer.style.transition = 'opacity 0.5s';
+                                imageContainer.style.opacity = '0';
+                                setTimeout(() => {
+                                    imageContainer.style.display = 'none';
+                                }, 500);
                             });
                         });
 

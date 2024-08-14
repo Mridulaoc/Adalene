@@ -32,19 +32,18 @@ const loadProductList = async (req, res) => {
         .sort({ created_on: -1 })
         .lean()
         .exec();
-    
+
       const count = await Product.find({
         prod_name: { $regex: ".*" + search + ".*", $options: "i" },
       }).countDocuments();
-      
-     
+
       const offers = await Offer.find();
       res.render("productList", {
         products: productsData,
         search,
         totalPages: Math.ceil(count / limit),
         currentPage: page,
-        offers: offers
+        offers: offers,
       });
     }
   } catch (error) {
@@ -147,10 +146,43 @@ const updateProduct = async (req, res) => {
       sizeId,
       colorId,
       rating,
+      deletedImages,
     } = req.body;
+    console.log(deletedImages)
     const files = req.files;
     const productId = req.params.id;
 
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (deletedImages) {
+      const imagesToDelete = deletedImages.split(",");
+      console.log("Images to delete: " + imagesToDelete);
+    
+      for (const image of imagesToDelete) {
+        const imagePath = path.join(__dirname, "../public/uploads", image);
+        try {
+          await fs.promises.unlink(imagePath); // Delete from filesystem
+          console.log("Deleted from filesystem: " + image);
+        } catch (unlinkError) {
+          console.error("Failed to delete image file:", unlinkError);
+        }
+    
+        // Remove from the product's image array
+        product.prod_images = product.prod_images.filter(img => img !== image);
+        console.log("Updated product images array: ", product.prod_images);
+      }
+    
+      // Save the updated product document to the database
+      try {
+        await product.save();
+        console.log("Product updated successfully in the database.");
+      } catch (saveError) {
+        console.error("Failed to save updated product:", saveError);
+      }
+    }
     if (files && files.length > 0) {
       imagePaths = [];
       const uploadPromises = files.map(async (file) => {
@@ -163,16 +195,15 @@ const updateProduct = async (req, res) => {
 
         imagePaths.push(croppedImg);
       });
-      await Promise.all(uploadPromises);
+      await Promise.all(uploadPromises);     
 
-      const product = await Product.findById(productId);
-      const updatedImages = [...product.prod_images, ...imagePaths];
+        product.prod_images = [...product.prod_images, ...imagePaths];
 
       (product.prod_name = name), (product.prod_category = categoryId);
       product.prod_desc = description;
       product.prod_price = price;
       (product.prod_mrp = mPrice), (product.prod_color = colorId);
-      product.prod_images = updatedImages;
+      
       product.prod_size = sizeId;
       product.prod_quantity = quantity;
       product.prod_rating = rating;
@@ -192,8 +223,9 @@ const updateProduct = async (req, res) => {
             prod_size: req.body.sizeId,
             prod_rating: req.body.rating,
             prod_color: req.body.colorId,
-          },
+         
         }
+      }
       );
 
       console.log(productData);
@@ -286,31 +318,33 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const updateProductOffer = async(req, res) => {
- 
-    const { productId, offerId } = req.body;
-    try {
-      const products = await Product.findById(productId);
-      if (!products) {
-          return res.status(404).json({ success: false, message: 'Product not found' });
-      }
+const updateProductOffer = async (req, res) => {
+  const { productId, offerId } = req.body;
+  try {
+    const products = await Product.findById(productId);
+    if (!products) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
 
-      if (offerId) {
-          const offer = await Offer.findById(offerId);
-          if (!offer) {
-              return res.status(404).json({ success: false, message: 'Offer not found' });
-          }
-          products.offer = offerId;
-      } else {
-          products.offer = null; // No offer selected
+    if (offerId) {
+      const offer = await Offer.findById(offerId);
+      if (!offer) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Offer not found" });
       }
-      await products.save();
-      res.json({ success: true, message: 'Offer updated successfully' });
+      products.offer = offerId;
+    } else {
+      products.offer = null; // No offer selected
+    }
+    await products.save();
+    res.json({ success: true, message: "Offer updated successfully" });
   } catch (error) {
-      res.status(500).json({ success: false, message: 'Failed to update offer' });
+    res.status(500).json({ success: false, message: "Failed to update offer" });
   }
-  
-}
+};
 
 module.exports = {
   loadProductList,
@@ -320,5 +354,5 @@ module.exports = {
   addNewProduct,
   deleteProduct,
   deleteProductImage,
-  updateProductOffer
+  updateProductOffer,
 };
