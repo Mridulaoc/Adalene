@@ -1909,7 +1909,7 @@ const createPaypalOrder = async (req, res) => {
       subtotal: subTotal,
       discount: discount,
       shippingCost: shippingCost,
-      total: finalValue,
+      total: finalValue+walletAmountToUse,
       status: "Pending",
       paypalOrderId: order.result.id,
       paymentMethod: "PayPal",

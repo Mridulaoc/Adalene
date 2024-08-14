@@ -2,190 +2,266 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 
-<body>
-    <%- include ("../layout/navBarnew.ejs") %>
-    <div class="container-fluid">
-        <div class="container mt-5">
-            <h2 class="mb-3">Payment</h2>
-            <div class="row">                
-                <div class="col-12 col-lg-8">
-                    <div class="table-responsive">
-                        <% if(cart.products.length>0){%>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Product</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% cart.products.forEach(item => {%>
-                                <tr>
-                                    <td scope="row" class="text-capitalize">
-                                        <div class="d-flex gap-2 align-items-center">
-                                            <img src="\uploads\<%= item.product.prod_images[0] %>" alt="" height="100px" width="100px" class="img-fluid">
-                                            <div class="d-flex flex-column">
-                                                <p class="fs-5">
-                                                    <%= item.product.prod_name %>
+    <body>
+        <%- include ("../layout/navBarnew.ejs") %>
+            <div class="container-fluid">
+                <div class="container mt-5">
+                    <h2 class="mb-3">Payment</h2>
+                    <div class="row">
+                        <div class="col-12 col-lg-8">
+                            <div class="table-responsive">
+                                <% if(cart.products.length>0){%>
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Product</th>
+                                                <th scope="col">Quantity</th>
+                                                <th scope="col">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% cart.products.forEach(item=> {%>
+                                                <tr>
+                                                    <td scope="row" class="text-capitalize">
+                                                        <div class="d-flex gap-2 align-items-center">
+                                                            <img src="\uploads\<%= item.product.prod_images[0] %>"
+                                                                alt="" height="100px" width="100px" class="img-fluid">
+                                                            <div class="d-flex flex-column">
+                                                                <p class="fs-5">
+                                                                    <%= item.product.prod_name %>
+                                                                </p>
+                                                                <p class="fs-6">Color: <%=
+                                                                        item.product.prod_color.color_name %>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" id="quantityInput-<%= item.product._id %>"
+                                                            value="<%= item.quantity %>" min="1" max="2"
+                                                            class="py-1 border border-1 text-center"
+                                                            style="border-left: none; border-right: none;" readonly>
+                                                    </td>
+                                                    <td>
+                                                        <%= item.price * item.quantity %>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                        </tbody>
+                                    </table>
+                                    <% } else { %>
+                                        <h3>Your cart is empty</h3>
+                                        <% } %>
+                            </div>
+                            <div class="col-12 ">
+                                <% if (selectedAddress) { %>
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5>Selected Address</h5>
+                                            <% const selectedAddressObj=user.addresses.id(selectedAddress) %>
+                                                <p>
+                                                    <%= selectedAddressObj.houseNo %>
                                                 </p>
-                                                <p class="fs-6">Color: <%= item.product.prod_color.color_name %></p>
+                                                <p>
+                                                    <%= selectedAddressObj.street %>,
+                                                </p>
+                                                <p>
+                                                    <%= selectedAddressObj.city %>,
+                                                </p>
+                                                <p>
+                                                    <%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,
+                                                </p>
+                                                <p>
+                                                    <%= selectedAddressObj.country %>
+                                                </p>
+                                        </div>
+                                    </div>
+                                    <% } %>
+
+                                        <% if(coupons.length> 0) { %>
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h5 class="mb-3">Available Coupons</h5>
+                                                    <% coupons.forEach(coupon=> { %>
+                                                        <p class="fw-bold">
+                                                            <%= coupon.Name %> <span class="fw-light">(Min. purchase of
+                                                                    <%= coupon.MinPurchase %> rupees)
+                                                                </span>
+                                                        </p>
+                                                        <% }) %>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex flex-column align-items-end container mb-4">
+                                        <table class="table">
+                                            <tr>
+                                                <td class="fs-5 py-3">Sub Total (Before Tax):</td>
+                                                <td class="fs-5 py-3 sub_total">₹<%= (totalValue / 1.05).toFixed(2) %>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fs-5 py-3">Tax:</td>
+                                                <td class="fs-5 py-3 tax">₹<%= (totalValue - (totalValue /
+                                                        1.05)).toFixed(2) %>
+                                                </td>
+                                            </tr>
+                                            <tr id="couponDiscountRow">
+                                                <td class="fs-5 py-3">Coupon Discount:</td>
+                                                <td class="fs-5 py-3 coupon-discount">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fs-5 py-3">Shipping:</td>
+                                                <% if (totalValue> 1000) { %>
+                                                    <td class="fs-5 py-3">₹0</td>
+                                                    <% } else { %>
+                                                        <td class="fs-5 py-3">₹100</td>
+                                                        <% } %>
+                                            </tr>
+                                            <tr>
+                                                <td class="fs-5 py-3">Total:</td>
+                                                <% if (totalValue> 1000) { %>
+                                                    <td class="fs-5 py-3 total">₹<%= (totalValue + 0).toFixed(2) %>
+                                                    </td>
+                                                    <% } else { %>
+                                                        <td class="fs-5 py-3 total">₹<%= (totalValue + 100).toFixed(2)
+                                                                %>
+                                                        </td>
+                                                        <% } %>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h5><label for="couponCode" class="form-label">Coupon Code</label></h5>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="couponCode" name="couponCode"
+                                                placeholder="Enter coupon code">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="couponBtn">Apply</button>
+                                        </div>
+                                        <div id="couponMessage" class="mt-2"></div>
+                                    </div>
+                                    <form action="/payment" method="post" class="mx-3" id="paymentForm"
+                                        data-selected-address="<%= JSON.stringify(selectedAddress) %>">
+                                        <input type="hidden" id="appliedCouponCode" name="couponCode" value="">
+                                        <h5>Wallet Balance: ₹<span id="walletBalance"></span></h5>
+                                        <label for="useWalletAmount">Use from wallet:</label>
+                                        <input type="number" id="useWalletAmount" name="useWalletAmount" min="0"
+                                            step="0.01">
+                                        <div class="form-group">
+                                            <label>
+                                                <h5>Select Payment Method</h5>
+                                            </label><br>
+                                            <div class="form-check">
+                                                <input class="form-check-input payment-method" type="radio"
+                                                    name="paymentMethod" id="wallet" value="wallet">
+                                                <label class="form-check-label" for="wallet">
+                                                    <p style="font-size: 1rem;">Wallet</p>
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input payment-method" type="radio"
+                                                    name="paymentMethod" id="cod" value="cod" checked>
+                                                <label class="form-check-label" for="cod">
+                                                    <p style="font-size: 1rem;">Cash on Delivery</p>
+                                                </label>
+                                            </div>
+                                            <div class="form-check payment-method">
+                                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                                    id="paypal" value="paypal">
+                                                <label class="form-check-label" for="paypal">
+                                                    <p style="font-size: 1rem;">PayPal</p>
+                                                </label>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <input type="number" id="quantityInput-<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="2" class="py-1 border border-1 text-center" style="border-left: none; border-right: none;" readonly>
-                                    </td>
-                                    <td>
-                                        <%= item.price * item.quantity %>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                        <% } else { %>
-                        <h3>Your cart is empty</h3>
-                        <% } %>
-                    </div>
-                    <div class="col-12 ">
-                        <% if (selectedAddress) { %>
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5>Selected Address</h5>
-                                <% const selectedAddressObj = user.addresses.id(selectedAddress) %>
-                                <p><%= selectedAddressObj.houseNo %></p>
-                                <p><%= selectedAddressObj.street %>,</p>
-                                <p><%= selectedAddressObj.city %>,</p>
-                                <p><%= selectedAddressObj.state %> - <%= selectedAddressObj.zipCode %>,</p>
-                                <p><%= selectedAddressObj.country %></p>
-                            </div>
-                        </div>
-                        <% } %>
-    
-                        <% if(coupons.length > 0) { %>
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5 class="mb-3">Available Coupons</h5>
-                                <% coupons.forEach(coupon => { %>
-                                <p class="fw-bold"><%= coupon.Name %> <span class="fw-light">(Min. purchase of <%= coupon.MinPurchase %> rupees)</span></p>
-                                <% }) %>
-                            </div>
-                        </div>
-                        <% } %>
-                </div>
-                </div>
-                
-                <div class="col-12 col-lg-4">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <div class="d-flex flex-column align-items-end container mb-4">
-                                <table class="table">
-                                    <tr>
-                                        <td class="fs-5 py-3">Sub Total (Before Tax):</td>
-                                        <td class="fs-5 py-3 sub_total">₹<%= (totalValue / 1.05).toFixed(2) %></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fs-5 py-3">Tax:</td>
-                                        <td class="fs-5 py-3 tax">₹<%= (totalValue - (totalValue / 1.05)).toFixed(2) %></td>
-                                    </tr>
-                                    <tr id="couponDiscountRow">
-                                        <td class="fs-5 py-3">Coupon Discount:</td>
-                                        <td class="fs-5 py-3 coupon-discount">₹0</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fs-5 py-3">Shipping:</td>
-                                        <% if (totalValue > 1000) { %>
-                                        <td class="fs-5 py-3">₹0</td>
-                                        <% } else { %>
-                                        <td class="fs-5 py-3">₹100</td>
-                                        <% } %>
-                                    </tr>
-                                    <tr>
-                                        <td class="fs-5 py-3">Total:</td>
-                                        <% if (totalValue > 1000) { %>
-                                        <td class="fs-5 py-3 total">₹<%= (totalValue + 0).toFixed(2) %></td>
-                                        <% } else { %>
-                                        <td class="fs-5 py-3 total">₹<%= (totalValue + 100).toFixed(2) %></td>
-                                        <% } %>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="mb-3">
-                                <h5><label for="couponCode" class="form-label">Coupon Code</label></h5>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="couponCode" name="couponCode" placeholder="Enter coupon code">
-                                    <button class="btn btn-outline-secondary" type="button" id="couponBtn">Apply</button>
+                                        <button type="submit" id="placeOrderBtn"
+                                            class="btn btn-block text-decoration-none fs-5 fw-bold border rounded-2 bg-transparent my-3"
+                                            style="color: #BC4C2A;">PLACE ORDER</button>
+                                    </form>
+                                    <div id="paypal-button-container"></div>
                                 </div>
-                                <div id="couponMessage" class="mt-2"></div>
                             </div>
-                            <form action="/payment" method="post" class="mx-3" id="paymentForm" data-selected-address="<%= JSON.stringify(selectedAddress) %>">
-                                <input type="hidden" id="appliedCouponCode" name="couponCode" value="">
-                                <h5>Wallet Balance: ₹<span id="walletBalance"></span></h5>
-                                <label for="useWalletAmount">Use from wallet:</label>
-                                <input type="number" id="useWalletAmount" name="useWalletAmount" min="0" step="0.01">
-                                <div class="form-group">
-                                    <label>
-                                        <h5>Select Payment Method</h5>
-                                    </label><br>
-                                    <div class="form-check">
-                                        <input class="form-check-input payment-method" type="radio" name="paymentMethod" id="cod" value="cod" checked>
-                                        <label class="form-check-label" for="cod">
-                                            <p style="font-size: 1rem;">Cash on Delivery</p>
-                                        </label>
-                                    </div>
-                                    <div class="form-check payment-method">
-                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
-                                        <label class="form-check-label" for="paypal">
-                                            <p style="font-size: 1rem;">PayPal</p>
-                                        </label>
-                                    </div>
-                                </div>
-                                <button type="submit" id="placeOrderBtn" class="btn btn-block text-decoration-none fs-5 fw-bold border rounded-2 bg-transparent my-3" style="color: #BC4C2A;">PLACE ORDER</button>
-                            </form>
-                            <div id="paypal-button-container"></div>
                         </div>
                     </div>
                 </div>
             </div>
             </div>
-        </div>
-    </div>
-    <%- include ("../layout/footerUser.ejs") %>
-            <script>
+            <%- include ("../layout/footerUser.ejs") %>
+                <script>
 
-            </script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const paymentForm = document.getElementById('paymentForm');
-                    console.log(paymentForm)
-                    const paymentMethods = document.querySelectorAll('.payment-method');
-                    const placeOrderBtn = document.getElementById('placeOrderBtn');
-                    const paypalButtonContainer = document.getElementById('paypal-button-container');
-                    const walletBalanceSpan = document.getElementById('walletBalance');
-                    const useWalletAmountInput = document.getElementById('useWalletAmount');
-                    const couponCodeInput = document.getElementById('couponCode');
-                    const couponBtn = document.getElementById('couponBtn');
-                    const couponMessage = document.getElementById('couponMessage');
-                    const appliedCouponCodeInput = document.getElementById('appliedCouponCode');
-                    const codRadio = document.getElementById('cod');
-                    const paypalRadio = document.getElementById('paypal');
-                    const totalElement = document.querySelector('.total');
-                    const codMessageDiv = document.createElement('div');
+                </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const paymentForm = document.getElementById('paymentForm');
+                        console.log(paymentForm)
+                        const paymentMethods = document.querySelectorAll('.payment-method');
+                        const placeOrderBtn = document.getElementById('placeOrderBtn');
+                        const paypalButtonContainer = document.getElementById('paypal-button-container');
+                        const walletBalanceSpan = document.getElementById('walletBalance');
+                        const useWalletAmountInput = document.getElementById('useWalletAmount');
+                        const couponCodeInput = document.getElementById('couponCode');
+                        const couponBtn = document.getElementById('couponBtn');
+                        const couponMessage = document.getElementById('couponMessage');
+                        const appliedCouponCodeInput = document.getElementById('appliedCouponCode');
+                        const codRadio = document.getElementById('cod');
+                        const paypalRadio = document.getElementById('paypal');
+                        const walletRadio = document.getElementById('wallet');
+                        const totalElement = document.querySelector('.total');
+                        const codMessageDiv = document.createElement('div');
 
-                    let appliedCoupon = null;
+                        let appliedCoupon = null;
 
-                    couponBtn.addEventListener('click', function () {
-                        if (appliedCoupon) {
-                            removeCoupon();
-                        } else {
-                            applyCoupon();
+                        couponBtn.addEventListener('click', function () {
+                            if (appliedCoupon) {
+                                removeCoupon();
+                            } else {
+                                applyCoupon();
+                            }
+                        });
+
+                        function applyCoupon() {
+                            const couponCode = couponCodeInput.value.trim();
+                            if (couponCode) {
+                                fetch('/apply-coupon', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ couponCode, }),
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            appliedCoupon = data.coupon;
+                                            appliedCouponCodeInput.value = couponCode;
+                                            couponMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                                            updateTotalAmount(data.newSubTotal, data.grandTotal, data.coupon.discount);
+                                            couponBtn.textContent = 'Remove';
+                                            couponBtn.classList.replace('btn-outline-secondary', 'btn-outline-danger');
+                                            couponCodeInput.disabled = true;
+                                            if (data.updateCOD) {
+                                                updateCODAvailability();
+                                            }
+                                        } else {
+                                            couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        couponMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
+                                    });
+                            }
                         }
-                    });
 
-                    function applyCoupon() {
-                        const couponCode = couponCodeInput.value.trim();
-                        if (couponCode) {
-                            fetch('/apply-coupon', {
+
+                        function removeCoupon() {
+                            const couponCode = couponCodeInput.value.trim();
+                            fetch('/remove-coupon', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -195,13 +271,14 @@
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
-                                        appliedCoupon = data.coupon;
-                                        appliedCouponCodeInput.value = couponCode;
-                                        couponMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                                        updateTotalAmount(data.newSubTotal, data.grandTotal, data.coupon.discount);
-                                        couponBtn.textContent = 'Remove';
-                                        couponBtn.classList.replace('btn-outline-secondary', 'btn-outline-danger');
-                                        couponCodeInput.disabled = true;
+                                        appliedCoupon = null;
+                                        appliedCouponCodeInput.value = '';
+                                        couponMessage.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
+                                        updateTotalAmount(data.newSubTotal, data.grandTotal, 0);
+                                        couponBtn.textContent = 'Apply';
+                                        couponBtn.classList.replace('btn-outline-danger', 'btn-outline-secondary');
+                                        couponCodeInput.disabled = false;
+                                        couponCodeInput.value = '';
                                         if (data.updateCOD) {
                                             updateCODAvailability();
                                         }
@@ -214,254 +291,229 @@
                                     couponMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
                                 });
                         }
-                    }
 
 
-                    function removeCoupon() {
-                        const couponCode = couponCodeInput.value.trim();
-                        fetch('/remove-coupon', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ couponCode, }),
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    appliedCoupon = null;
-                                    appliedCouponCodeInput.value = '';
-                                    couponMessage.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
-                                    updateTotalAmount(data.newSubTotal, data.grandTotal, 0);
-                                    couponBtn.textContent = 'Apply';
-                                    couponBtn.classList.replace('btn-outline-danger', 'btn-outline-secondary');
-                                    couponCodeInput.disabled = false;
-                                    couponCodeInput.value = '';
-                                    if (data.updateCOD) {
-                                        updateCODAvailability();
-                                    }
-                                } else {
-                                    couponMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                        codMessageDiv.id = 'codMessage';
+                        codRadio.parentNode.appendChild(codMessageDiv);
+
+                        let paypalButtonsRendered = false;
+
+                        function updateCODAvailability() {
+                            const totalText = totalElement.textContent;
+                            const totalValue = parseFloat(totalText.replace('₹', '').trim());
+
+                            if (totalValue > 1000) {
+                                codRadio.disabled = true;
+                                codMessageDiv.textContent = 'Cash on Delivery is not available for orders above ₹1000.';
+                                codMessageDiv.style.color = 'red';
+                                if (codRadio.checked) {
+                                    paypalRadio.checked = true;
+
                                 }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                couponMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again.</div>';
-                            });
-                    }
-
-
-                    codMessageDiv.id = 'codMessage';
-                    codRadio.parentNode.appendChild(codMessageDiv);
-
-                    let paypalButtonsRendered = false;
-
-                    function updateCODAvailability() {
-                        const totalText = totalElement.textContent;
-                        const totalValue = parseFloat(totalText.replace('₹', '').trim());
-
-                        if (totalValue > 1000) {
-                            codRadio.disabled = true;
-                            codMessageDiv.textContent = 'Cash on Delivery is not available for orders above ₹1000.';
-                            codMessageDiv.style.color = 'red';
-                            if (codRadio.checked) {
-                                paypalRadio.checked = true;
-
+                            } else {
+                                codRadio.disabled = false;
+                                codMessageDiv.textContent = '';
                             }
-                        } else {
-                            codRadio.disabled = false;
-                            codMessageDiv.textContent = '';
+
+                            updateButtonVisibility();
                         }
 
-                        updateButtonVisibility();
-                    }
 
 
 
+                        function updateButtonVisibility() {
+                            const isWalletSelected = walletRadio.checked;
+                            const isPayPalSelected = paypalRadio.checked;
+                            const isCODSelected = codRadio.checked;
+                            const isWalletPayment = placeOrderBtn.dataset.paymentMethod === 'wallet';
 
-                    function updateButtonVisibility() {
-                        const isPayPalSelected = paypalRadio.checked;
-                        const isWalletPayment = placeOrderBtn.dataset.paymentMethod === 'wallet';
-                        if (isWalletPayment) {
-                            paypalButtonContainer.style.display = 'none';
-                            placeOrderBtn.style.display = 'block';
-                        } else {
                             paypalButtonContainer.style.display = isPayPalSelected ? 'block' : 'none';
-                            placeOrderBtn.style.display = isPayPalSelected ? 'none' : 'block';
+                            placeOrderBtn.style.display = (isWalletSelected || isCODSelected) ? 'block' : 'none';
+
 
                             if (isPayPalSelected && !paypalButtonsRendered) {
                                 renderPayPalButtons();
                             }
+
+
                         }
 
-                    }
+                        function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
+                            document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
+                            document.querySelector('.total').textContent = `₹${grandTotal}`;
 
-                    function updateTotalAmount(newSubTotal, grandTotal, couponDiscount = 0) {
-                        document.querySelector('.sub_total').textContent = `₹${newSubTotal}`;
-                        document.querySelector('.total').textContent = `₹${grandTotal}`;
+                            const couponDiscountRow = document.getElementById('couponDiscountRow');
+                            const couponDiscountElement = document.querySelector('.coupon-discount')
+                            if (couponDiscount > 0) {
+                                couponDiscountRow.style.display = 'table-row';
+                                couponDiscountElement.textContent = `₹${couponDiscount}`;
 
-                        const couponDiscountRow = document.getElementById('couponDiscountRow');
-                        const couponDiscountElement = document.querySelector('.coupon-discount')
-                        if (couponDiscount > 0) {
-                            couponDiscountRow.style.display = 'table-row';
-                            couponDiscountElement.textContent = `₹${couponDiscount}`;
+                            } else {
+                                couponDiscountRow.style.display = 'table-row';
+                                couponDiscountElement.textContent = '₹0';
+                            }
 
-                        } else {
-                            couponDiscountRow.style.display = 'table-row';
-                            couponDiscountElement.textContent = '₹0';
+                            updateCODAvailability();
+
                         }
 
-                        updateCODAvailability();
 
-                    }
-
-
-                    function renderPayPalButtons() {
-                        console.log('Rendering PayPal buttons');
-                        paypalButtonContainer.innerHTML = '';
-                        paypal.Buttons({
-                            createOrder: function (data, actions) {
-                                const selectedAddressString = paymentForm.dataset.selectedAddress;
-                                const selectedAddress = JSON.parse(selectedAddressString || '{}');
-                                return fetch('/create-paypal-order', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({
-                                        selectedAddress: selectedAddress,
-                                        useWalletAmount: useWalletAmountInput.value,
-                                        couponCode: appliedCouponCodeInput.value
-                                    }),
-                                }).then(function (res) {
-                                    console.log('Server response received');
-                                    return res.json();
-                                }).then(function (orderData) {
-                                    console.log('Order created:', orderData);
-
-                                    if (!orderData.id) {
-                                        throw new Error('Order ID missing in response');
-                                    }
-                                    return orderData.id;
-
-                                }).catch(function (error) {
-                                    console.error('Error creating order:', error);
-                                });
-                            },
-                            onApprove: function (data, actions) {
-                                return actions.order.capture().then(function (details) {
-
-                                    return fetch('/paypal-success', {
-                                        method: 'post',
+                        function renderPayPalButtons() {
+                            console.log('Rendering PayPal buttons');
+                            paypalButtonContainer.innerHTML = '';
+                            paypal.Buttons({
+                                createOrder: function (data, actions) {
+                                    const selectedAddressString = paymentForm.dataset.selectedAddress;
+                                    const selectedAddress = JSON.parse(selectedAddressString || '{}');
+                                    return fetch('/create-paypal-order', {
+                                        method: 'POST',
                                         headers: {
-                                            'content-type': 'application/json'
+                                            'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
-                                            orderID: data.orderID,
-                                            payerID: data.payerID,
-                                            paymentID: details.id
-                                        })
+                                            selectedAddress: selectedAddress,
+                                            useWalletAmount: useWalletAmountInput.value,
+                                            couponCode: appliedCouponCodeInput.value
+                                        }),
+                                    }).then(function (res) {
+                                        console.log('Server response received');
+                                        return res.json();
+                                    }).then(function (orderData) {
+                                        console.log('Order created:', orderData);
+
+                                        if (!orderData.id) {
+                                            throw new Error('Order ID missing in response');
+                                        }
+                                        return orderData.id;
+
+                                    }).catch(function (error) {
+                                        console.error('Error creating order:', error);
                                     });
-                                }).then(function (res) {
-                                    if (res.ok) {
-                                        window.location.href = '/order-confirmation/' + data.orderID;
-                                    } else {
-                                        window.location.href = '/order-history';
-                                    }
+                                },
+                                onApprove: function (data, actions) {
+                                    return actions.order.capture().then(function (details) {
 
-                                });
-                            },
-                            onCancel: function (data) {
-                                console.log('Payment cancelled', data);
-                                window.location.href = '/order-history';
-                            },
-                            onError: function (err) {
-                                console.error('PayPal button error:', err);
-                                window.location.href = '/order-history';
-                            }
-                        }).render('#paypal-button-container').then(function () {
-                            paypalButtonsRendered = true;
-                        }).catch(function (error) {
-                            console.error('PayPal button render error:', error);
-                        });
+                                        return fetch('/paypal-success', {
+                                            method: 'post',
+                                            headers: {
+                                                'content-type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                orderID: data.orderID,
+                                                payerID: data.payerID,
+                                                paymentID: details.id
+                                            })
+                                        });
+                                    }).then(function (res) {
+                                        if (res.ok) {
+                                            window.location.href = '/order-confirmation/' + data.orderID;
+                                        } else {
+                                            window.location.href = '/order-history';
+                                        }
 
-                    }
+                                    });
+                                },
+                                onCancel: function (data) {
+                                    console.log('Payment cancelled', data);
+                                    window.location.href = '/order-history';
+                                },
+                                onError: function (err) {
+                                    console.error('PayPal button error:', err);
+                                    window.location.href = '/order-history';
+                                }
+                            }).render('#paypal-button-container').then(function () {
+                                paypalButtonsRendered = true;
+                            }).catch(function (error) {
+                                console.error('PayPal button render error:', error);
+                            });
 
-
-                    codRadio.addEventListener('change', function () {
-                        placeOrderBtn.dataset.paymentMethod = '';
-                        updateButtonVisibility();
-                    });
-
-                    paypalRadio.addEventListener('change', function () {
-                        placeOrderBtn.dataset.paymentMethod = '';
-                        updateButtonVisibility();
-                    });
-
-                    updateCODAvailability()
-
-                    placeOrderBtn.addEventListener('click', function (event) {
-                        const totalText = totalElement.textContent;
-                        const totalValue = parseFloat(totalText.replace('₹', '').trim());
-
-                        if (codRadio.checked && totalValue > 1000) {
-                            event.preventDefault();
-                            alert('Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.');
-                            paypalRadio.checked = true;
-                            updateButtonVisibility();
                         }
-                    });
 
 
-
-                    fetch('/my-wallet/balance')
-                        .then(response => response.json())
-                        .then(data => {
-                            const walletBalance = data.balance.toFixed(2);
-                            walletBalanceSpan.textContent = walletBalance;
-                            useWalletAmountInput.max = walletBalance;
-                            checkWalletSufficiency(walletBalance);
-                            updateButtonVisibility();
-                        });
-
-                    function checkWalletSufficiency(walletBalance) {
-                        totalText = totalElement.textContent;
-                        const totalValue = parseFloat(totalText.replace('₹', '').trim());
-                        if (walletBalance >= totalValue) {
-                            useWalletAmountInput.value = totalValue;
-                            useWalletAmountInput.disabled = true;
-                            codRadio.disabled = true;
-                            paypalRadio.disabled = true;
-                            placeOrderBtn.textContent = 'Pay with Wallet';
-                            placeOrderBtn.dataset.paymentMethod = 'wallet';
-
-                            paypalButtonContainer.style.display = 'none';
-                            placeOrderBtn.style.display = 'block';
-                            document.querySelector('.form-group').style.display = 'none';
-                        } else {
-                            useWalletAmountInput.value = walletBalance;
+                        codRadio.addEventListener('change', function () {
                             placeOrderBtn.dataset.paymentMethod = '';
+                            updateButtonVisibility();
+                        });
 
-                            document.querySelector('.form-group').style.display = 'block';
+                        paypalRadio.addEventListener('change', function () {
+                            placeOrderBtn.dataset.paymentMethod = '';
+                            updateButtonVisibility();
+                        });
+                        walletRadio.addEventListener('change', function () {
+                            placeOrderBtn.dataset.paymentMethod = '';
+                            updateButtonVisibility();
+                        });
+
+                        updateCODAvailability()
+
+
+
+                        fetch('/my-wallet/balance')
+                            .then(response => response.json())
+                            .then(data => {
+                                const walletBalance = data.balance.toFixed(2);
+                                walletBalanceSpan.textContent = walletBalance;
+                                useWalletAmountInput.max = walletBalance;
+                                checkWalletSufficiency(walletBalance);
+                                updateButtonVisibility();
+                            });
+
+                        function checkWalletSufficiency(walletBalance) {
+                            totalText = totalElement.textContent;
+                            const totalValue = parseFloat(totalText.replace('₹', '').trim());
+                            if (walletBalance >= totalValue) {
+                                useWalletAmountInput.value = totalValue;
+                                useWalletAmountInput.disabled = true;
+                                walletRadio.checked = true;
+                                codRadio.disabled = true;
+                                paypalRadio.disabled = true;
+                                placeOrderBtn.textContent = 'Pay with Wallet';
+                                placeOrderBtn.dataset.paymentMethod = 'wallet';
+                            } else {
+                                useWalletAmountInput.value = walletBalance;
+                                // placeOrderBtn.dataset.paymentMethod = '';
+                                useWalletAmountInput.disabled = false;
+                                walletRadio.checked = false;
+                                codRadio.disabled = false;
+                                paypalRadio.disabled = false;
+                                placeOrderBtn.textContent = 'Place Order';
+
+                            }
                             updateButtonVisibility();
                         }
-                    }
 
-                    placeOrderBtn.addEventListener('click', function (event) {
-                        event.preventDefault();
-                        const totalText = totalElement.textContent;
-                        const totalValue = parseFloat(totalText.replace('₹', '').trim());
+                        placeOrderBtn.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            const totalText = totalElement.textContent;
+                            const totalValue = parseFloat(totalText.replace('₹', '').trim());
 
-                        if (placeOrderBtn.dataset.paymentMethod === 'wallet') {
-                            // Send a request to process wallet payment
+                            let paymentMethod = '';
+                            if (walletRadio.checked) {
+                                paymentMethod = 'wallet';
+                            } else if (codRadio.checked) {
+                                paymentMethod = 'cod';
+                            } else if (paypalRadio.checked) {
+                                paymentMethod = 'paypal';
+                            }
+
+                            if (paymentMethod === 'cod' && totalValue > 1000) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Cash on Delivery Unavailable',
+                                    text: 'Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.',
+                                    confirmButtonText: 'Okay'
+                                });
+                                return;
+                            }
                             fetch('/payment', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({
-                                    paymentMethod: 'wallet',
+                                    paymentMethod: 'paymentMethod',
                                     amount: totalValue,
+                                    useWalletAmount: useWalletAmountInput.value,
                                     selectedAddress: paymentForm.dataset.selectedAddress,
                                     couponCode: appliedCouponCodeInput.value
                                 }),
@@ -478,40 +530,10 @@
                                     console.error('Error:', error);
                                     alert('An error occurred while processing your payment.');
                                 });
-                        } else if (codRadio.checked && totalValue > 1000) {
-                            alert('Cash on Delivery is not available for orders above ₹1000. Please choose a different payment method.');
-                            paypalRadio.checked = true;
-                            updateButtonVisibility();
-                        } else {
-                            fetch('/payment', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    paymentMethod: codRadio.checked ? 'cod' : 'other',
-                                    selectedAddress: paymentForm.dataset.selectedAddress,
-                                    useWalletAmount: useWalletAmountInput.value,
-                                    couponCode: appliedCouponCodeInput.value
-                                }),
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        window.location.href = '/order-confirmation/' + data.orderId;
-                                    } else {
-                                        alert('Order placement failed: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while placing your order.');
-                                });
-                        }
-                    });
 
-                })
-            </script>
+                        })
+                    })
+                </script>
     </body>
 
 </html>
