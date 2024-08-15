@@ -14,17 +14,41 @@ const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 const checkBlocked = require('../middleware/checkBlocked');
 const checkOfferExpiry = require('../middleware/offerCheckMiddleware');
+const User = require('../models/user'); 
 
-
+function getCartCount(user) {
+    if (user && user.cart && Array.isArray(user.cart.products)) {
+      return user.cart.products.reduce((total, item) => total + (item.quantity || 0), 0);
+    }
+    return 0;
+  }
+ 
 
 // middlewares 
 userRoute.use(express.static('public'));
 userRoute.use(session({
     secret: "secretkey",
-    resave: true,
-    saveUninitialized:true,
-    store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING })
+    resave: false,
+    saveUninitialized:false,
+    store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
+    cookie: { secure: process.env.NODE_ENV === 'production' }
 }))
+
+userRoute.use(async (req, res, next) => {
+    if (req.session.passport && req.session.passport.user && !req.user) {
+      try {
+        req.user = await User.findById(req.session.passport.user);
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    }
+    
+    console.log('Middleware user:', req.user);
+    res.locals.user = req.user;
+    res.locals.cartCount = req.user ? getCartCount(req.user) : 0;
+    console.log('Middleware cartCount:', res.locals.cartCount);
+    next();
+  });
 userRoute.use(noCache());
 userRoute.use(bodyParser.json());
 userRoute.use(bodyParser.urlencoded({ extended: true }));
@@ -32,6 +56,7 @@ userRoute.use(passport.initialize());
 userRoute.use(passport.session());
 userRoute.use(methodOverride('_method'));
 userRoute.use(checkBlocked);
+
 
 
 userRoute.set('view engine', 'ejs');
@@ -48,16 +73,22 @@ userRoute.get('/google', passport.authenticate('google', {
     scope:['email','profile']
 }));
 
-userRoute.get('/auth/google/callback',
-    passport.authenticate('google',{
-        scope:['profile'] ,
-        successRedirect:'/',
-        failureRedirect:'/signin'
-    })
-);
+userRoute.get('/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', (err, user, info) => {
+        if (err) { return next(err); }
+        if (!user) { return res.redirect('/signin'); }
+        req.logIn(user, (err) => {
+            if (err) { return next(err); }
+            const state = JSON.parse(Buffer.from(req.query.state, 'base64').toString());
+            return res.redirect(decodeURIComponent(state.returnUrl || '/'));
+        });
+    })(req, res, next);
+});
 
 userRoute.get('/signin',userController.loadSigIn);
 userRoute.post('/signin', (req, res, next) => {
+    const returnUrl = req.body.returnUrl || '/';
+    console.log(returnUrl)
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);
@@ -69,7 +100,7 @@ userRoute.post('/signin', (req, res, next) => {
             if (err) {
                 return next(err);
             }
-            return res.redirect('/');
+            return res.redirect(decodeURIComponent(returnUrl));
         });
     })(req, res, next);
 });
@@ -84,16 +115,12 @@ userRoute.post('/forgot-password', userController.requestOtp);
 userRoute.post('/otp',userController.verifyFPOTP);
 userRoute.post('/reset-password', userController.updatePassword);
 userRoute.get('/shopall',userController.loadShopall);
-// userRoute.get('/bags', userController.loadBags);
-// userRoute.get('/wallets',userController.loadWallets);
-// userRoute.get('/belts', userController.loadBelts);
-// userRoute.get('/phonecases', userController.loadPhoneCases);
 userRoute.get('/products/:id', checkOfferExpiry, userController.loadProductDetails);
-userRoute.post('/add-to-cart', isAuthenticated, userController.addToCart);
+userRoute.post('/add-to-cart',  userController.addToCart);
 userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
 userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
 userRoute.post('/cart/remove', isAuthenticated, userController.removeCartItem);
-userRoute.get('/cart/count', isAuthenticated, userController.countCartItems);
+// userRoute.get('/get-cart-count', isAuthenticated, userController.getCartCount);
 userRoute.get('/checkout', isAuthenticated, userController.displayAddressSelection);
 userRoute.post('/checkout', isAuthenticated, userController.selectedAddress);
 userRoute.get('/payment', isAuthenticated, userController.displayPayment);

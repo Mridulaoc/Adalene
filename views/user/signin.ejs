@@ -43,6 +43,7 @@
                           <span id="passwordError" style="color: red;"></span>
 
                         </div>
+                        <input type="hidden" name="returnUrl" value="<%= returnUrl %>">
                         <div class="mb-3 " style="border-color: #BC4C2A;">
                           <input type="submit" class="form-control  fs-6" value="SIGN IN" style="color: #BC4C2A;"
                             required>
@@ -53,7 +54,7 @@
           </div>
 
           <div class="mb-3" style=" width: 90%;">
-            <button class="form-control text-center  fs-6"><a href="/google" class="text-decoration-none "
+            <button class="form-control text-center  fs-6"><a href="/google?returnUrl=<%= encodeURIComponent(returnUrl) %>" class="text-decoration-none "
                 style="color: #BC4C2A;">Google</a></button>
           </div>
           <p><a href="/forgot-password" class="fs-6 text-decoration-none" style="color: #BC4C2A;">Forgot Password?</a>

@@ -62,7 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const excludeOutOfStock = urlParams.get('excludeOutOfStock') === 'true';
     document.getElementById('showOutOfStock').checked = excludeOutOfStock;
 });
+function updateCartCount(count) {
+  const cartCountElement = document.getElementById('cartItemCount');
+  cartCountElement.textContent = count;
+  cartCountElement.style.display = count > 0 ? 'inline-block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const cartCountElement = document.getElementById('cartItemCount');
+  const count = parseInt(cartCountElement.textContent) || 0;
+  updateCartCount(count);
+})
 
-
+window.updateCartCount = updateCartCount;
 window.updateProducts = updateProducts;
 window.updatePriceValue = updatePriceValue;

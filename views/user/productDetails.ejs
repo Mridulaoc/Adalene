@@ -104,7 +104,7 @@
                                                     <%= relatedProducts[i].prod_name %>
                                                 </p>
                                                 <p class="card-text fs-5">₹<%= relatedProducts[i].prod_price %>
-                                                    
+
                                                 </p>
 
                                             </div>
@@ -174,7 +174,19 @@
                                 addToCartButton.innerText = 'ADD TO CART';
                                 addToCartButton.style.backgroundColor = '#BC4C2A';
                             }
+                            const cartCountElement = document.getElementById('cartItemCount');
+                            console.log('Cart count element:', cartCountElement);
+                            const count = parseInt(cartCountElement.textContent) || 0;
+                            console.log('Initial cart count on load:', count);
+                            if (count > 0) {
+                                cartCountElement.style.display = 'inline-block';
+                            } else {
+                                cartCountElement.style.display = 'none';
+                            }
+                            updateCartCount(count);
                         };
+
+
 
 
                         // functiions for increment decrement 
@@ -237,6 +249,8 @@
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 });
+                                console.log('Cart count received from server:', result.cartCount);
+                                updateCartCount(result.cartCount)
                             } else {
                                 Swal.fire({
                                     title: 'Error!',
@@ -245,6 +259,20 @@
                                     confirmButtonText: 'OK'
                                 });
                             }
+                        }
+                        console.log('Client-side cart count:', <%= cartCount %>);
+                        console.log('EJS template cart count:', <%= cartCount %>);
+                        console.log('EJS template user:', <% - JSON.stringify(user) %>);
+
+                        function updateCartCount(count) {
+                            const cartCountElement = document.getElementById('cartItemCount');
+                            cartCountElement.textContent = count;
+                            if (count > 0) {
+                                cartCountElement.style.display = 'inline-block';
+                            } else {
+                                cartCountElement.style.display = 'none';
+                            }
+                            console.log('Updated cart count:', count);
                         }
 
 

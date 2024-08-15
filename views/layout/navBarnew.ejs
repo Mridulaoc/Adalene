@@ -50,7 +50,9 @@
               
             </li> 
             <li><a href="/wishlist"><i class="fa-regular fa-heart" style="color: #bc4c2a;"></i></a></li>
-            <li><a href="/cart"><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i><span id="cartItemCount"></span></a>
+            <li ><a href="/cart" ><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i><span id="cartItemCount" class="cart-count    translate-middle badge rounded-pill " style="background-color: #bc4c2a; display: <%= (cartCount > 0) ? 'inline-block' : 'none' %>;">
+              <%= cartCount %>
+            </span></span></a>
           </ul>
       </div>
       <button

@@ -192,9 +192,8 @@
             </div>
             </div>
             <%- include ("../layout/footerUser.ejs") %>
-                <script>
 
-                </script>
+
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const paymentForm = document.getElementById('paymentForm');
@@ -319,6 +318,9 @@
                         }
 
 
+                        console.log('EJS template cart count:', <%= cartCount %>);
+                        console.log('EJS template user:', <% - JSON.stringify(user) %>);
+                        console.log('Is user authenticated:', <%= !!user %>);
 
 
                         function updateButtonVisibility() {
@@ -465,6 +467,7 @@
                                 useWalletAmountInput.value = totalValue;
                                 useWalletAmountInput.disabled = true;
                                 walletRadio.checked = true;
+                                walletRadio.disabled = false;
                                 codRadio.disabled = true;
                                 paypalRadio.disabled = true;
                                 placeOrderBtn.textContent = 'Pay with Wallet';
@@ -474,6 +477,7 @@
                                 // placeOrderBtn.dataset.paymentMethod = '';
                                 useWalletAmountInput.disabled = false;
                                 walletRadio.checked = false;
+                                walletRadio.disabled = true; 
                                 codRadio.disabled = false;
                                 paypalRadio.disabled = false;
                                 placeOrderBtn.textContent = 'Place Order';
