@@ -2,55 +2,56 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 <body>
-  <%- include ("../layout/navBarnew.ejs") %>
+  <%- include ("../layout/navbar.ejs") %>
   <div class="container-fluid">
-    <div class="container  d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form" >
+    <div
+          class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-8 col-lg-6 col-10 form">
       <form action="/addresses/edit/<%= userData._id %>/<%= addressIndex %>?_method=PUT" method="post" class=""  autocomplete="off" style="width: 90%;" >
         <h4 class="text-center my-3">Edit Address</h4>
        
         <div class="d-flex gap-3">
-        <div class="mb-3 ">           
+          <div class="mb-3 " style="width: 100%;">          
           <label for="houseNo" class="form-label">House No</label>
           <input type="text" class="form-control" id="houseNo" name="houseNo" onchange="validateName('houseNo')" value="<%= address.houseNo %>" required >
           <span id="houseNoError" style="color: red;"></span>
         </div>
-        <div class="mb-3 ">           
+        <div class="mb-3 " style="width: 100%;">      
           <label for="street" class="form-label">Street</label>
           <input type="text" class="form-control" id="street" name="street" onchange="validateName('street')"  value="<%= address.street %>"  required >
           <span id="streetError" style="color: red;"></span>
         </div>
       </div>
       <div class="d-flex gap-3">
-        <div class="mb-3 ">           
+        <div class="mb-3 " style="width: 100%;">        
           <label for="city" class="form-label">City</label>
           <input type="text" class="form-control" id="city" name="city" onchange="validateName('city')"  value="<%= address.city %>"  required >
           <span id="cityError" style="color: red;"></span>
         </div>
-        <div class="mb-3 ">           
+        <div class="mb-3 " style="width: 100%;">         
           <label for="state" class="form-label">State</label>
           <input type="text" class="form-control" id="state" name="state" onchange="validateName('state')"  value="<%= address.state %>"  required >
           <span id="stateError" style="color: red;"></span>
         </div>
       </div>
       <div class="d-flex gap-3">
-        <div class="mb-3 ">           
+        <div class="mb-3 " style="width: 100%;">       
           <label for="country" class="form-label">Country</label>
           <input type="text" class="form-control" id="country" name="country" onchange="validateName('country')"  value="<%= address.country %>"  required >
           <span id="countryError" style="color: red;"></span>
         </div>
-        <div class="mb-3 ">           
+        <div class="mb-3 " style="width: 100%;">         
           <label for="zipcode" class="form-label">Zipcode</label>
           <input type="text" class="form-control" id="zipcode" name="zipcode" onchange="validateName('zipcode')"  value="<%= address.zipCode %>"  required >
           <span id="zipcodeError" style="color: red;"></span>
         </div>
       </div>
-      <div class="mb-3">
+      <div class="mb-3 " style="width: 100%;">
         <input type="submit" class="form-control fs-5" value="SAVE ADDRESS" required />
       </div>
       </form>
     </div>
   </div>
-  <%- include ("../layout/footerAdmin.ejs") %>
+  <%- include ("../layout/footerUser.ejs") %>
 </body>
 <script>
   function validateName(fieldId) {

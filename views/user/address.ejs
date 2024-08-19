@@ -1,89 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-   <%- include ("../layout/navBarnew.ejs") %>
-   <div class="container-fluid mb-5" style="height: 100vh;">
-    <div class="container">
-        <h4>Account</h4>
-        <div class="d-flex gap-5 ">
-            <%- include ("../layout/profileSidebar.ejs") %>
-           
-        <div class="col-8 border shadow rounded px-5 mb-5">
-            <h4 class="text-center" style="padding: 1.5rem 10rem;">Addresses</h4>
-            <% if(userData.addresses.length > 0){%>         
-            <% userData.addresses.forEach((address,index)=>{%>          
-            <div class="d-flex justify-content-between  gap-5 mb-5">
-                <div>
-                    <p class="fs-5"><%= address.houseNo %></p>
-                    <p class="fs-5"><%= address.street %></p>
-                    <p class="fs-5"><%= address.city %></p>
-                    <p class="fs-5"><%= address.state %></p>
-                    <p class="fs-5"><%= address.country %></p>
-                    <p class="fs-5"><%= address.zipCode %></p>
-                    <a href="/addresses/edit/<%= userData._id %>/<%= index %>">
-                    <button class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent" style="color: #BC4C2A; ">EDIT ADDRESS</button>
-                    </a>
-                    <button class="px-3 text-decoration-none fs-6 border rounded-2 bg-transparent delete-address" style="color: #BC4C2A;" data-id="<%= userData._id %>" data-index="<%= index %>">DELETE ADDRESS</button>
+
+    <body>
+        <%- include ("../layout/navbar.ejs") %>
+            <div class="container-fluid  px-0" >
+                <div class="container mb-5">
+                    <h4>Account</h4>
+                    <div class="d-flex gap-5 row mb-5 ">
+                        <div class="col-12 d-md-none mb-3">
+                            <button id="accountToggle" class="border-0 px-2 py-1 rounded"
+                                style="background-color: #BC4C2A; color: white; ">
+                                <i class="fa-solid fa-user mx-1" style="color:white;"></i>My Account
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-3 d-none d-md-block border px-2 py-5 rounded" id="profileSidebar">
+                            <p><a href="/profile" class="text-decoration-none fs-5 " style="color: #888888;">Profile</a>
+                            </p>
+                            <p><a href="/change-password" class="text-decoration-none fs-5 "
+                                    style="color: #888888;">Change Password</a></p>
+                            <p><a href="/addresses" class="text-decoration-none fs-5 "
+                                    style="color: #888888;">Addresses</a></p>
+                            <p><a href="/order-history" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Orders</a></p>
+                            <p><a href="/my-wallet" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Wallet</a></p>
+                            <p><a href="/my-referrals" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Referrals</a></p>
+                            <p><a href="/wishlist" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Wishlist</a></p>
+                        </div>
+
+                        <div class="col-11 col-md-8 col-sm-11 mx-auto border shadow rounded">
+                            <div class="row">
+                            <h4 class="text-center" style="padding: 1.5rem 10rem;">Addresses</h4>
+                            <% if(userData.addresses.length> 0){%>
+                                <div class="col-10 col-md-6">
+                                <% userData.addresses.forEach((address,index)=>{%>
+                                    <div class="d-flex justify-content-between  gap-5 mb-5">
+                                        <div>
+                                            <p class="fs-5">
+                                                <%= address.houseNo %>
+                                            </p>
+                                            <p class="fs-5">
+                                                <%= address.street %>
+                                            </p>
+                                            <p class="fs-5">
+                                                <%= address.city %>
+                                            </p>
+                                            <p class="fs-5">
+                                                <%= address.state %>
+                                            </p>
+                                            <p class="fs-5">
+                                                <%= address.country %>
+                                            </p>
+                                            <p class="fs-5">
+                                                <%= address.zipCode %>
+                                            </p>
+                                            <a href="/addresses/edit/<%= userData._id %>/<%= index %>" class="text-decoration-none">
+                                                <button
+                                                    class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent"
+                                                    style="color: #BC4C2A; "><i class="fa-solid fa-pen-to-square" style="color: #bc4c2a;"></i></button>
+                                            </a>
+                                            <button
+                                                class="px-3 text-decoration-none fs-6 border rounded-2 bg-transparent delete-address"
+                                                style="color: #BC4C2A;" data-id="<%= userData._id %>"
+                                                data-index="<%= index %>"><i class="fa-solid fa-trash-can" style="color: #bc4c2a;"></i></button>
+                                        </div>
+
+                                        <%})%>
+                                    </div>
+                                </div>
+                                    <% } else {%>
+                                        <p>Address not found</p>
+                                        <%}%>
+
+                                            <div class="text-center my-5">
+                                                <a href="/addresses/add"
+                                                    class="px-3 py-2 text-decoration-none text-center fs-6  border rounded-2"
+                                                    style="background-color: #BC4C2A;width: 50%; margin:0 auto; color: white;  ">ADD
+                                                    ADDRESS</a>
+                                                </div>                </div>
+                        </div>
+                    </div>
                 </div>
-                              
-                <%})%>
-            </div> 
-            <% } else {%>
-            <p>Address not found</p>
-            <%}%>       
-        
-        <div class="text-center my-5">
-        <a href="/addresses/add" class="px-3 py-2 text-decoration-none text-center fs-6  border rounded-2" style="background-color: #BC4C2A;width: 50%; margin:0 auto; color: white;  " >ADD ADDRESS</a>  
-    </div> 
-    </div>
-    </div>
-    </div>
-  </div>
-  <%- include ("../layout/footerAdmin.ejs") %>
-  <script>
-    document.querySelectorAll('.delete-address').forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.dataset.id;
-                const addressIndex = this.dataset.index;
-                
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        
-                        fetch(`/addresses/delete/${userId}/${addressIndex}`, {
-                            method: 'DELETE',
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Deleted!',
-                                    'The address has been deleted.',
-                                    'success'
-                                ).then(() => {
-                                    location.reload(); 
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Failed!',
-                                    'Failed to delete address.',
-                                    'error'
-                                );
-                            }
+            </div>
+            <%- include ("../layout/footerUser.ejs") %>
+                <script>
+                    document.querySelectorAll('.delete-address').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const userId = this.dataset.id;
+                            const addressIndex = this.dataset.index;
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "You won't be able to revert this!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, delete it!'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                    fetch(`/addresses/delete/${userId}/${addressIndex}`, {
+                                        method: 'DELETE',
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                Swal.fire(
+                                                    'Deleted!',
+                                                    'The address has been deleted.',
+                                                    'success'
+                                                ).then(() => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire(
+                                                    'Failed!',
+                                                    'Failed to delete address.',
+                                                    'error'
+                                                );
+                                            }
+                                        });
+                                }
+                            });
                         });
-                    }
-                });
-            });
-        });
-    </script>
-  </script>
-</body>
+                    });
+                </script>
+                
+    </body>
+
 </html>

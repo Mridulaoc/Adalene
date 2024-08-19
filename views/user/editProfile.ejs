@@ -1,124 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
-<body>
-  <%- include ("../layout/navBarnew.ejs") %>
-  <div class="container-fluid">
-    <div  class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form">
-        <h4>Edit Profile</h4>
-        <form action="/profile/edit/<%= userData._id %>?_method=PUT" method="post" class=""  autocomplete="off" style="width: 90%;">
-            <% if(typeof message !== "undefined"){%>
-                <div class="alert alert-danger" ><%= message %></div>       
-            <%}%>
-        
-            <% if(locals.success){%>
-                <div class="alert alert-success" ><%= success %></div> 
-            <%}%>
-            <div class="mb-3 ">           
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" onchange="validateName()" required value="<%= userData.user_name %>">
-                <span id="nameError" style="color: red;"></span>
-              </div>
-              <div class="mb-3 ">           
-                <label for="email" class="form-label"> Email address</label>
-                <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required value="<%= userData.user_email %>">
-                <span id="emailError" style="color: red;"></span>
-              </div>                  
-              <div class="mb-3 ">           
-                <label for="mobileno" class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" id="mobileno" name="mobileno" onchange="validateNumber()" required value="<%= userData.user_contact %>">
-                <span id="numberError" style="color: red;"></span>
-              </div>          
-              <div class="mb-3">
-                <label for="gender" class="form-label">Gender</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="gender" id="female" value="Female" <%= userData.user_gender === 'Female' ? 'checked' : '' %>>
-                    <label class="form-check-label" for="female">Female</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="gender" id="male" value="Male" <%= userData.user_gender === 'Male' ? 'checked' : '' %>>
-                    <label class="form-check-label" for="male">Male</label>
-                </div>
-                <div id="genderError" class="text-danger"></div>
-              </div>
-              <div class="form-group mb-3">
-                <label for="dateOfBirth">Date of Birth</label>
-                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="<%= userData.user_dob ? userData.user_dob.toISOString().substring(0, 10) : '' %>" required>
-                <div id="dateOfBirthError" class="text-danger"></div> 
-            </div>
-              <div class="mb-3 " style="border-color: #BC4C2A;">       
-                <input type="submit" class="form-control  fs-6"  value="SAVE DETAILS" style="color: #BC4C2A;"  required>
-              </div>    
-            </form>      
-    </div>
-  </div>
-  <%- include ("../layout/footerAdmin.ejs") %>
 
-  <script>
-     function validateName(){
+  <body>
+    <%- include ("../layout/navBarnew.ejs") %>
+      <div class="container-fluid">
+        <div
+          class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-8 col-lg-6 col-10 form">
+          <h4>Edit Profile</h4>
+          <form action="/profile/edit/<%= userData._id %>?_method=PUT" method="post" class="" autocomplete="off"
+            style="width: 90%;">
+            <% if(typeof message !=="undefined" ){%>
+              <div class="alert alert-danger">
+                <%= message %>
+              </div>
+              <%}%>
+
+                <% if(locals.success){%>
+                  <div class="alert alert-success">
+                    <%= success %>
+                  </div>
+                  <%}%>
+                    <div class="mb-3 ">
+                      <label for="name" class="form-label">Name</label>
+                      <input type="text" class="form-control" id="name" name="name" onchange="validateName()" required
+                        value="<%= userData.user_name %>">
+                      <span id="nameError" style="color: red;"></span>
+                    </div>
+                    <div class="mb-3 ">
+                      <label for="email" class="form-label"> Email address</label>
+                      <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"
+                        required value="<%= userData.user_email %>">
+                      <span id="emailError" style="color: red;"></span>
+                    </div>
+                    <div class="mb-3 ">
+                      <label for="mobileno" class="form-label">Mobile Number</label>
+                      <input type="text" class="form-control" id="mobileno" name="mobileno" onchange="validateNumber()"
+                        required value="<%= userData.user_contact %>">
+                      <span id="numberError" style="color: red;"></span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="gender" class="form-label">Gender</label>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="Female"
+                          <%=userData.user_gender==='Female' ? 'checked' : '' %>>
+                        <label class="form-check-label" for="female">Female</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="Male"
+                          <%=userData.user_gender==='Male' ? 'checked' : '' %>>
+                        <label class="form-check-label" for="male">Male</label>
+                      </div>
+                      <div id="genderError" class="text-danger"></div>
+                    </div>
+                    <div class="form-group mb-3">
+                      <label for="dateOfBirth">Date of Birth</label>
+                      <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
+                        value="<%= userData.user_dob ? userData.user_dob.toISOString().substring(0, 10) : '' %>"
+                        required>
+                      <div id="dateOfBirthError" class="text-danger"></div>
+                    </div>
+                    <div class="mb-3 " style="border-color: #BC4C2A;">
+                      <input type="submit" class="form-control  fs-6" value="SAVE DETAILS" style="color: #BC4C2A;"
+                        required>
+                    </div>
+          </form>
+        </div>
+      </div>
+      <%- include ("../layout/footerUser.ejs") %>
+
+        <script>
+          function validateName() {
             const name = document.getElementById("name").value.trim();
             const nameError = document.getElementById("nameError");
-            
-            if(name.length<5){
-                nameError.textContent = "Name must be atleat 5 characters long"
+
+            if (name.length < 5) {
+              nameError.textContent = "Name must be atleat 5 characters long"
             }
 
-        }
-              
-    
-        function validateEmail() {
-        const email = document.getElementById("email");
-        const emailError = document.getElementById("emailError");
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-       
-        if (emailPattern.test(email.value)) {
-          emailError.textContent = "";
-        } else {
-          emailError.textContent = "Invalid email id";
-        }
-    } 
-    
-      function validateNumber() {
-        const mobileno = document.getElementById("mobileno").value;
-        const numberError = document.getElementById("numberError");    
-        if(isNaN(mobileno)) { 
-          numberError.textContent = 'Mobile number should be digits' 
-        }
-        if(mobileno.length >10 ){
-          numberError.textContent = 'Mobile number must be 10 digits'
-        }
-        if(mobileno.length <10 ){
-          numberError.textContent = 'Mobile number must be 10 digits'
-        }
-        if((mobileno.charAt(0) !=9) && (mobileno.charAt(0) !=8) && (mobileno.charAt(0)!=7)){
-          numberError.textContent = 'Mobile number must start with 9, 8 or 7'
-        }
-      }
+          }
 
-      const genderInputs = document.querySelectorAll('input[name="gender"]');
-      genderInputs.forEach(input => {
-        input.addEventListener('change', function() {
-        const genderError = document.getElementById('genderError');
-        const genderChecked = Array.from(genderInputs).some(input => input.checked);
-        if (genderChecked) {
-        genderError.textContent = '';
-        } else {
-        genderError.textContent = 'Please select a gender.';
-        }
-        });
-        });
 
-      const dateOfBirthInput = document.getElementById('dateOfBirth');
-      dateOfBirthInput.addEventListener('change', function() {
-        const dateOfBirthError = document.getElementById('dateOfBirthError');
+          function validateEmail() {
+            const email = document.getElementById("email");
+            const emailError = document.getElementById("emailError");
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-        if (dateOfBirthInput.value) {
-        dateOfBirthError.textContent = '';
-        } else {
-        dateOfBirthError.textContent = 'Please enter your date of birth.';
-        }
-      });     
+            if (emailPattern.test(email.value)) {
+              emailError.textContent = "";
+            } else {
+              emailError.textContent = "Invalid email id";
+            }
+          }
 
-  </script>
-</body>
+          function validateNumber() {
+            const mobileno = document.getElementById("mobileno").value;
+            const numberError = document.getElementById("numberError");
+            if (isNaN(mobileno)) {
+              numberError.textContent = 'Mobile number should be digits'
+            }
+            if (mobileno.length > 10) {
+              numberError.textContent = 'Mobile number must be 10 digits'
+            }
+            if (mobileno.length < 10) {
+              numberError.textContent = 'Mobile number must be 10 digits'
+            }
+            if ((mobileno.charAt(0) != 9) && (mobileno.charAt(0) != 8) && (mobileno.charAt(0) != 7)) {
+              numberError.textContent = 'Mobile number must start with 9, 8 or 7'
+            }
+          }
+
+          const genderInputs = document.querySelectorAll('input[name="gender"]');
+          genderInputs.forEach(input => {
+            input.addEventListener('change', function () {
+              const genderError = document.getElementById('genderError');
+              const genderChecked = Array.from(genderInputs).some(input => input.checked);
+              if (genderChecked) {
+                genderError.textContent = '';
+              } else {
+                genderError.textContent = 'Please select a gender.';
+              }
+            });
+          });
+
+          const dateOfBirthInput = document.getElementById('dateOfBirth');
+          dateOfBirthInput.addEventListener('change', function () {
+            const dateOfBirthError = document.getElementById('dateOfBirthError');
+
+            if (dateOfBirthInput.value) {
+              dateOfBirthError.textContent = '';
+            } else {
+              dateOfBirthError.textContent = 'Please enter your date of birth.';
+            }
+          });
+
+        </script>
+  </body>
+
 </html>
