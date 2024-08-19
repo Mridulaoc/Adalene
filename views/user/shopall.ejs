@@ -3,33 +3,37 @@
 <%- include ("../layout/header.ejs") %>
 
   <body>
-    <%- include ("../layout/navBarnew.ejs") %>
+    <%- include ("../layout/navbar.ejs") %>
       <div class="conatiner-fluid">
-        <div class="container " style="margin-top: 5rem;">
+        <div class="container border">
           <p><a href="/" class="text-decoration-none text-black">Home</a>><%= currentCategory ?
               currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1) : 'All Products' %>
           </p>
-          <div class=" my-5 d-flex">
-            <div class="row">
-              <!-- Filter button for mobile -->
-              <div class="col-12 d-md-none mb-3">
-                <button id="filterToggle" class="btn btn-primary">
-                  <i class="fas fa-filter"></i> Filters
-                </button>
-              </div>
-            <div class="col-md-3 d-flex flex-column d-none d-md-block gap-3 my-5 " id="sidebar">
-              <form action="" class="d-flex mb-3" >
-                <input type="text" placeholder="Search" value="<%= search %>" name="search" class="form-control me-2" id="search">
+
+          <div class="row">
+            <!-- Filter button for mobile -->
+            <div class="col-12 d-md-none mb-3">
+              <button id="filterToggle" class="btn btn-primary" >
+                <i class="fas fa-filter"></i> Filters
+              </button>
+            </div>
+
+            <div class=" col-12 col-md-3 border d-md-block d-none" id="filterSidebar">
+              <form action="" class="d-flex mb-3">
+                <input type="text" placeholder="Search" value="<%= search %>" name="search" class="form-control me-2"
+                  id="search">
                 <input type="submit" class="border rounded-2 fw-bold" value="Search">
               </form>
               <div class="mb-3">
                 <h4>Browse By</h4>
-                <% categories.forEach(category =>{%>
-                  <a class=" nav-link <%= currentCategory === category.cat_name ? 'active' : '' %>" style="cursor: pointer;" onclick="updateProducts('<%= category.cat_name %>')"><%= category.cat_name %></a>
-                <%})%>
+                <a href="/shopall" class="nav-link">All Products</a>
+                <% categories.forEach(category=>{%>
+                  <a class=" nav-link <%= currentCategory === category.cat_name ? 'active' : '' %>"
+                    style="cursor: pointer;" onclick="updateProducts('<%= category.cat_name %>')">
+                    <%= category.cat_name %>
+                  </a>
+                  <%})%>
               </div>
-          
-              
               <div class="mb-3">
                 <label class="fs-5 fw-bold">Color:</label>
                 <div class="d-flex flex-wrap gap-2">
@@ -46,25 +50,29 @@
               <div class="mb-3">
                 <label for="priceRange" class="fs-5 fw-bold">Price Range: <span id="priceValue"></span></label>
                 <input type="range" class="form-range" id="priceRange" min="0" max="10000" step="100"
-                  value="<%= maxPrice %>" oninput="updatePriceValue(this.value)" onchange="updateProducts()" style="width: 80%;">
-              </div>   
-                <div class="mb-3">
-                  <div class="form-check">
-                  <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock ? 'checked' : '' %>>
+                  value="<%= maxPrice %>" oninput="updatePriceValue(this.value)" onchange="updateProducts()"
+                  style="width: 80%;">
+              </div>
+              <div class="mb-3">
+                <div class="form-check">
+                  <input type="checkbox" id="showOutOfStock" onchange="updateProducts()" <%=excludeOutOfStock
+                    ? 'checked' : '' %>>
                   <label for="showOutOfStock">Exclude out of stock</label>
                 </div>
-              </div>                  
               </div>
-
-              <div class="col-9 d-flex flex-column align-items-center">
-                <h1>
-                  <%= currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1)
-                    : 'All Products' %>
-                </h1>
-                <div class="d-flex justify-content-end align-items-center mt-5" style="width: 100%;">
-                <div class="d-flex gap-3 " style="width:50% ">
+            </div>
+            <!-- <div id="filterOverlay" class="d-md-none"
+              style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1040;">
+            </div> -->
+            <div class="col-md-9 col-sm-12 border ">
+              <h1 class="text-center">
+                <%= currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1)
+                  : 'All Products' %>
+              </h1>
+              <div class="d-flex justify-content-end">
                 <label for="sortBy" class="fs-4 ">Sort by:</label>
-                <select id="sortBy" onchange="updateProducts()" class="form-control mx-2 fs-5 text-uppercase gap-3" style="width: 75%; color: gray; ">
+                <select id="sortBy" onchange="updateProducts()" class="form-control mx-2 fs-5 text-uppercase gap-3"
+                  style="width: 30%; color: gray; ">
                   <option value="popularity" <%=sortBy==='popularity' ? 'selected' : '' %>>Popularity</option>
                   <option value="priceAsc" <%=sortBy==='priceAsc' ? 'selected' : '' %>>Price: low to high</option>
                   <option value="priceDesc" <%=sortBy==='priceDesc' ? 'selected' : '' %>>Price: high to low</option>
@@ -75,57 +83,82 @@
                   <option value="zToA" <%=sortBy==='zToA' ? 'selected' : '' %>>Z - A</option>
                 </select>
               </div>
-              </div>
-                <div class="px-5 py-5 gap-5 border my-5 d-flex flex-wrap">
-                 
-                  <% if(products.length> 0){
-                    for(let i=0; i<products.length; i++){ %>
-                      <a href="/products/<%= products[i]._id %>" class="text-decoration-none">
-                        <div class=" shadow d-flex flex-column align-items-center" style="width: 17rem; height: 30rem;">
-                          <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top px-2 py-2"
-                            alt="...">
-                          <div class="card-body d-flex flex-column align-items-center py-1">
-                            <p class="fs-6 ">
-                              <%= products[i].prod_name %>
-                            </p>
-                            <% if (products[i].discountedPrice) { %>
-                              <p class=" fs-5 ">
-                                <span class="text-decoration-line-through">₹<%= products[i].prod_mrp %></span>
-                              <p class="text-danger">₹<%= Math.round(products[i].discountedPrice) %>
+              <div class="border">
+                <% if(products.length> 0){%>
+                  <div class="row">
+                    <% for(let i=0; i<products.length; i++){ %>
+                      <div class="col-lg-4 col-md-6 col-sm-6 col-12 mb-4 d-flex justify-content-center">
+                        <a href="/products/<%= products[i]._id %>" class="text-decoration-none">
+                          <div class=" border d-flex flex-column align-items-center"
+                            style="width: 17rem; height: 28rem;">
+                            <img src="\uploads\<%= products[i].prod_images[0] %>" class="card-img-top px-2 py-2"
+                              alt="...">
+                            <div class="card-body d-flex flex-column align-items-center py-1">
+                              <p class="fs-6 ">
+                                <%= products[i].prod_name %>
                               </p>
-                              </p>
-                              <% } else { %>
-                                <p class="card-text fs-5" style="line-height: 1;">₹<%= products[i].prod_mrp %>
+                              <% if (products[i].discountedPrice) { %>
+                                <p class=" fs-5 ">
+                                  <span class="text-decoration-line-through">₹<%= products[i].prod_mrp %></span>
+                                <p class="text-danger">₹<%= Math.round(products[i].discountedPrice) %>
                                 </p>
-                                <% } %>
-
+                                </p>
+                                <%} else{%>
+                                  <p class="card-text fs-5" style="line-height: 1;">₹<%= products[i].prod_mrp %>
                                   </p>
-                                  <p>
+                                  <%}%>
                                     <% if(products[i].prod_quantity>0){ %>
                                       <p></p>
-                                      <%} else { %>
+                                      <%}else{%>
                                         <p class="fs-5 fw-bold" style="line-height: 1;"> OUT OF STOCK</p>
                                         <%}%>
-                                  </p>
+                            </div>
                           </div>
-                        </div>
-                      </a>
+                        </a>
+                      </div>
+
                       <%}%>
                         <%}else{%>
-
-                          Data not found
-
+                          Data not found.
                           <%}%>
-                          
-                </div>
-                <%- include('../layout/pagination.ejs') %>
+                  </div>
+
               </div>
               <br>
+              <div class="d-flex  justify-content-center">
+                <%- include('../layout/pagination.ejs') %>
+              </div>
 
+              <br>
+            </div>
           </div>
         </div>
       </div>
       <%- include ("../layout/footerUser.ejs") %>
+      <script>
+        // JavaScript for toggling sidebar
+        document.getElementById('filterToggle').addEventListener('click', function() {
+          const sidebar = document.getElementById('filterSidebar');
+          const overlay = document.getElementById('filterOverlay');
+          if (sidebar.classList.contains('d-none')) {
+            sidebar.classList.remove('d-none');
+            sidebar.classList.add('d-block');
+            overlay.style.display = 'block';
+          } else {
+            sidebar.classList.remove('d-block');
+            sidebar.classList.add('d-none');
+            overlay.style.display = 'none';
+          }
+        });
+      
+        // Hide sidebar when clicking outside of it (on the overlay)
+        document.getElementById('filterOverlay').addEventListener('click', function() {
+          const sidebar = document.getElementById('filterSidebar');
+          sidebar.classList.remove('d-block');
+          sidebar.classList.add('d-none');
+          this.style.display = 'none';
+        });
+      </script>
   </body>
 
 </html>

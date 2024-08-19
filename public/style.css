@@ -233,9 +233,18 @@ footer .btn-outline-dark:hover {
   color: white;
 }
 
+@media screen and (max-width:989px){
+  html {
+    font-size: 85%;
+  }
+  .offcanvas.offcanvas-end {
+    width: 100%;
+  }
+}
+
 @media screen and (max-width: 768px) {
   html {
-    font-size: 62.5%;
+    font-size: 70%;
   }
 
   form {
