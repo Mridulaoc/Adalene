@@ -15,16 +15,9 @@ const methodOverride = require('method-override');
 const checkBlocked = require('../middleware/checkBlocked');
 const checkOfferExpiry = require('../middleware/offerCheckMiddleware');
 const User = require('../models/user'); 
+const getWishlistCount = require('../middleware/wishlistMiddleware');
 
-function getCartCount(user) {
-    if (user && user.cart && Array.isArray(user.cart.products)) {
-      return user.cart.products.reduce((total, item) => total + (item.quantity || 0), 0);
-    }
-    return 0;
-  }
- 
 
-// middlewares 
 userRoute.use(express.static('public'));
 userRoute.use(session({
     secret: "secretkey",
@@ -33,22 +26,9 @@ userRoute.use(session({
     store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
     cookie: { secure: process.env.NODE_ENV === 'production' }
 }))
+userRoute.use(getWishlistCount);
 
-userRoute.use(async (req, res, next) => {
-    if (req.session.passport && req.session.passport.user && !req.user) {
-      try {
-        req.user = await User.findById(req.session.passport.user);
-      } catch (err) {
-        console.error('Error fetching user:', err);
-      }
-    }
-    
-    console.log('Middleware user:', req.user);
-    res.locals.user = req.user;
-    res.locals.cartCount = req.user ? getCartCount(req.user) : 0;
-    console.log('Middleware cartCount:', res.locals.cartCount);
-    next();
-  });
+
 userRoute.use(noCache());
 userRoute.use(bodyParser.json());
 userRoute.use(bodyParser.urlencoded({ extended: true }));
@@ -106,7 +86,7 @@ userRoute.post('/signin', (req, res, next) => {
 });
 
 userRoute.get('/',  userController.successGoogleLogin)
-userRoute.get('/home',  userController.loadHome);
+// userRoute.get('/home',  userController.loadHome);
 userRoute.get('/failure', userController.failureGoogleLogin);
 userRoute.get('/', userController.loadSigIn);
 userRoute.post('/', userController.verifySignIn);

@@ -74,22 +74,50 @@ p {
   background-image: url("hero img.webp");
 }
 
-.header {
-  position: absolute;
-  top: 45%;
-  left: 48%;
-  color: white;
-
-  z-index: 100;
+.hero h1{
+  font-size: 4rem;
+  letter-spacing: .2em;
+  z-index: 1;
 }
 
-.button1 {
-  position: absolute;
-  top: 50%;
-  left: 45%;
-  color: white;
+.heroBtn{
+  border: 1px solid white;
+  outline: none;
+  padding: 1rem 5rem ;
+ 
+ 
+}
 
-  z-index: 100;
+
+.heroBtn:hover{
+  background-color: white !important;
+  color: #bc4c2a !important;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  
+  pointer-events: none; /* Allow clicks to pass through the overlay */
+}
+
+.shopallbtn{
+  color: #bc4c2a;
+  
+  border: 1px solid #bc4c2a;
+  outline: none;
+  padding: .5rem 5rem ;
+  z-index: 1;
+
+}
+
+.shopallbtn:hover{
+  color: white;
+  background-color: #bc4c2a !important;
 }
 .image-container {
   position: relative;
@@ -172,6 +200,39 @@ p {
   flex-direction: column;
   min-height: 100vh;
 }
+
+footer h2 {
+  font-family: 'Georgia', serif;
+  font-weight: 400;
+  color: #c55;
+}
+
+footer h5 {
+  margin-bottom: 20px;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+footer input.form-control {
+  border-color: #c55;
+}
+
+footer .btn-outline-dark {
+  color: #c55;
+  border-color: #c55;
+}
+
+footer .btn-outline-dark:hover {
+  background-color: #c55;
+  color: white;
+}
+
 @media screen and (max-width: 768px) {
   html {
     font-size: 62.5%;
@@ -183,7 +244,13 @@ p {
   .offcanvas.offcanvas-end {
     width: 100%;
   }
-
+  .navbar-brand {
+    font-family: "Great Vibes", cursive;
+    color: #bc4c2a;
+    font-size: 3rem;
+    text-decoration: none;
+  }
+  
   .hero {
     background-image: url("mobilehero.jpg");
     background-position: center center;

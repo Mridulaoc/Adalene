@@ -12,9 +12,10 @@
                     <div class="container my-5">
                         <div class="row align-items-start">
                             <div class="col-6 d-flex flex-column align-items-center" style="position: relative;">
-                                <div style="position: absolute; right: 15%;" class="">
-                                    <i class="fa-regular fa-heart fs-3" style="color: #bc4c2a; cursor: pointer;"
-                                        id="addToWishlistBtn" data-product-id="<%= products._id %>"
+                                <div style="position: relative;">
+                                    <i class="fa-<%= isInWishlist ? 'solid' : 'regular' %> fa-heart fs-3"
+                                        style="color: #bc4c2a; cursor: pointer;" id="addToWishlistBtn"
+                                        data-product-id="<%= products._id %>"
                                         data-is-in-wishlist="<%= isInWishlist ? 'true' : 'false' %>"></i>
                                 </div>
                                 <div class="image-container" onmousemove="zoomIn(event)" onmouseleave="zoomOut()">
@@ -103,9 +104,16 @@
                                                 <p class="fs-6">
                                                     <%= relatedProducts[i].prod_name %>
                                                 </p>
-                                                <p class="card-text fs-5">₹<%= relatedProducts[i].prod_price %>
-
-                                                </p>
+                                                <% if(appliedOffer){ %>
+                                                    <p class="text-decoration-line-through"> ₹<%= products.prod_mrp %>
+                                                    </p>
+                                                    <p class="text-danger"> ₹<%= discountedPrice.toFixed(2) %> (<%=
+                                                                appliedOffer.discount_percentage %>% off)</p>
+                
+                                                    <%} else {%>
+                                                        <p>₹<%= products.prod_mrp %>
+                                                        </p>
+                                                        <%} %>
 
                                             </div>
                                         </div>
@@ -260,9 +268,6 @@
                                 });
                             }
                         }
-                        console.log('Client-side cart count:', <%= cartCount %>);
-                        console.log('EJS template cart count:', <%= cartCount %>);
-                        console.log('EJS template user:', <% - JSON.stringify(user) %>);
 
                         function updateCartCount(count) {
                             const cartCountElement = document.getElementById('cartItemCount');
@@ -275,6 +280,13 @@
                             console.log('Updated cart count:', count);
                         }
 
+                        function updateWishlistCount(count) {
+                            const wishlistCountElements = document.querySelectorAll('#wishlistItemCount');
+                            wishlistCountElements.forEach(element => {
+                                element.textContent = count;
+                                element.style.display = count > 0 ? 'inline-block' : 'none';
+                            });
+                        }
 
                         // add to wishlist 
                         const wishlistIcon = document.getElementById('addToWishlistBtn');
@@ -287,8 +299,9 @@
 
                         updateWishlistIcon();
 
-                        wishlistIcon.addEventListener('click', function () {
+                        document.getElementById('addToWishlistBtn').addEventListener('click', function () {
                             const productId = this.dataset.productId;
+                            const isInWishlist = this.dataset.isInWishlist === 'true';
                             const endpoint = isInWishlist ? '/wishlist/remove' : '/wishlist/add';
 
                             fetch(endpoint, {
@@ -298,18 +311,16 @@
                                 },
                                 body: JSON.stringify({ productId: productId })
                             })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
+                                .then(response => response.json())
                                 .then(data => {
-                                    isInWishlist = !isInWishlist;
-                                    updateWishlistIcon();
+                                    this.dataset.isInWishlist = !isInWishlist;
+                                    this.classList.toggle('fa-regular', isInWishlist);
+                                    this.classList.toggle('fa-solid', !isInWishlist);
+                                    updateWishlistCount(data.wishlistCount);
+
                                     Swal.fire({
                                         title: 'Success!',
-                                        text: isInWishlist ? 'Product added to wishlist successfully!' : 'Product removed from wishlist successfully!',
+                                        text: isInWishlist ? 'Product removed from wishlist successfully!' : 'Product added to wishlist successfully!',
                                         icon: 'success',
                                         confirmButtonText: 'OK'
                                     });
@@ -318,15 +329,13 @@
                                     console.error('Error updating wishlist:', error);
                                     Swal.fire({
                                         title: 'Error!',
-                                        text: isInWishlist ? 'Failed to remove product from wishlist.' : 'Failed to add product to wishlist.',
+                                        text: 'Failed to update wishlist.',
                                         icon: 'error',
                                         confirmButtonText: 'OK'
                                     });
                                 });
                         });
-
-
-
+                        
                     </script>
 
 

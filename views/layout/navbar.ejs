@@ -18,9 +18,9 @@
     <title>Mridula O C</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg sticky-top  fixed-top d-flex px-3">
+    <nav class="navbar navbar-expand-lg  d-flex px-3">
       <div class="container-fluid">
-        <a class="navbar-brand" href="index.html">Mridula O C</a>
+        <a class="navbar-brand" href="index.html">adalene.</a>
         
         <div
           class="offcanvas offcanvas-end"
@@ -29,9 +29,9 @@
           aria-labelledby="offcanvasNavbarLabel"
           
         >
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-              Mridula O C
+          <div class="offcanvas-header text-center">
+            <h5 class="navbar-brand" id="offcanvasNavbarLabel">
+              adalene.
             </h5>
             <button
               type="button"
@@ -42,43 +42,68 @@
           </div>
           <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-center align-items-center flex-grow-1 pe-3">
-              <li class="d-md-none mt-3"><a href="/profile"><i class="fa-solid fa-user" style="color: #bc4c2a;"></i></a></li>
-                <li></li>
+              <!-- <li class="d-md-none mt-3"><a href="/profile"><i class="fa-solid fa-user" style="color: #bc4c2a;"></i></a></li>
+                <li></li> -->
               <li class="nav-item">
-                <a class="nav-link active mx-lg-2" aria-current="page" href="index.html"
-                  >Home</a
+                <a class="nav-link active mx-lg-2" aria-current="page" href="/shopall"
+                  >Shop All</a
                 >
               </li>
               <li class="nav-item">
-                <a class="nav-link mx-lg-2" href="about.html">About</a>
+                <a class="nav-link mx-lg-2" href="/shopall?category=Bags">Bags</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link mx-lg-2" href="resume.html">Resume</a>
+                <a class="nav-link mx-lg-2" href="/shopall?category=Wallets">Wallets</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link mx-lg-2" href="services.html">Services</a>
+                <a class="nav-link mx-lg-2" href="/shopall?category=Belts">Belts</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link mx-lg-2" href="portfolio.html">Portfolio</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link mx-lg-2" href="contact.html">Contact</a>
-              </li>
+              
             </ul>
             <div class="d-md-none mt-3">
               <ul class="navbar-nav d-flex justify-content-between align-items-center gap-3 fs-5">
                 <li><a href="/profile"><i class="fa-solid fa-user" style="color: #bc4c2a;"></i></a></li>
-                <li></li>
-                <li><a href="/wishlist">Wishlist</a></li>
-                <li><a href="/cart">Cart<span id="cartItemCount"></span></a></li>
+                <li>
+                  <% if(user){%>
+                    <a href="/signout" class="text-decoration-none" style="color: #bc4c2a;"> Sign Out </a>
+                    <%}else{%>
+                      <a href="/signin" class="text-decoration-none" style="color: #bc4c2a;">Sign In </a>
+                      <%}%>
+                </li>
+                <li><a href="/wishlist"><i class="fa-regular fa-heart" style="color: #bc4c2a;"></i><span id="wishlistItemCount" class="wishlist-count translate-middle badge rounded-pill"
+                  style="background-color: #bc4c2a; display: <%= (wishlistCount > 0) ? 'inline-block' : 'none' %>;">
+              <%= wishlistCount || 0 %>
+            </span></a></li>
+                <li><a href="/cart"><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i><span id="cartItemCount"
+                  class="cart-count    translate-middle badge rounded-pill "
+                  style="background-color: #bc4c2a; display: <%= (cartCount > 0) ? 'inline-block' : 'none' %>;">
+                  <%= cartCount || 0 %>
+                </span></li>
               </ul>
             </div>
           </div>
         </div>
         <div class="d-none d-md-block">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between align-items-center gap-3 fs-5 ">            
-            <li><a href="/wishlist"><i class="fa-regular fa-heart" style="color: #bc4c2a;"></i></a></li>
-            <li><a href="/cart"><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i><span id="cartItemCount"></span></a>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex justify-content-between align-items-center gap-3 fs-5 "> 
+            <li><a href="/profile"><i class="fa-solid fa-user" style="color: #bc4c2a;"></i></a></li>
+                <li>
+                  <% if(user){%>
+                    <a href="/signout" class="text-decoration-none" style="color: #bc4c2a;"> Sign Out </a>
+                    <%}else{%>
+                      <a href="/signin" class="text-decoration-none" style="color: #bc4c2a;">Sign In </a>
+                      <%}%>
+                </li>           
+            <li><a href="/wishlist"><i class="fa-regular fa-heart" style="color: #bc4c2a;"></i><span id="wishlistItemCount" class="wishlist-count translate-middle badge rounded-pill"
+              style="background-color: #bc4c2a; display: <%= (wishlistCount > 0) ? 'inline-block' : 'none' %>;">
+          <%= wishlistCount || 0 %>
+        </span></a></li>
+            <li><a href="/cart"><i class="fa-solid fa-cart-shopping" style="color: #bc4c2a;"></i><span id="cartItemCount"
+                  class="cart-count    translate-middle badge rounded-pill "
+                  style="background-color: #bc4c2a; display: <%= (cartCount > 0) ? 'inline-block' : 'none' %>;">
+                  <%= cartCount || 0 %>
+                </span>
+                </a>
+            </li>
           </ul>
         </div>
         <button

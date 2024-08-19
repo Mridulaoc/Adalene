@@ -69,18 +69,66 @@ const successGoogleLogin = async (req, res) => {
           appliedDiscount,
         };
       });
-      // const user = await User.findById(req.user.id).populate(
-      //   "cart.products.product"
-      // );
-      // const cartCount = user.cart.products.reduce(
-      //   (count, item) => count + item.quantity,
-      //   0
-      // );
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+
 
       res.render("home", {
         products: productsWithDiscounts,
         user: req.user,
-        // cartCount: cartCount,
+        cartCount: cartCount,
+      });
+    }else{
+      const popularProducts = await Products.find({
+        prod_status: "ACTIVE",
+        is_deleted: false,
+      })
+        .sort({ prod_rating: -1 })
+        .limit(4)
+        .populate("offer")
+        .populate({
+          path: "prod_category",
+          populate: { path: "offer" },
+        });
+
+      // Calculate discounted prices
+      const productsWithDiscounts = popularProducts.map((product) => {
+        let discountedPrice = product.prod_price;
+        let appliedDiscount = 0;
+
+        if (product.offer && product.offer.discount_percentage) {
+          appliedDiscount = product.offer.discount_percentage;
+        } else if (
+          product.prod_category &&
+          product.prod_category.offer &&
+          product.prod_category.offer.discount_percentage
+        ) {
+          appliedDiscount = product.prod_category.offer.discount_percentage;
+        }
+
+        if (appliedDiscount > 0) {
+          discountedPrice = product.prod_price * (1 - appliedDiscount / 100);
+        }
+
+        return {
+          ...product.toObject(),
+          discountedPrice: Math.round(discountedPrice * 100) / 100,
+          appliedDiscount,
+        };
+      });   
+
+
+      res.render("home", {
+        products: productsWithDiscounts,
+        user: req.user,
+        cartCount: 0,
       });
     }
   } catch (error) {
@@ -417,26 +465,7 @@ const updatePassword = async (req, res) => {
   }
 };
 
-const loadHome = async (req, res) => {
-  try {
-    console.log("home");
-    const popularProducts = await Products.find({
-      prod_status: "ACTIVE",
-      is_deleted: false,
-    })
-      .sort({ prod_rating: -1 })
-      .limit(4);
 
-    console.log(popularProducts);
-    res.render("home", {
-      products: popularProducts,
-      user: req.user,
-      cart: req.cart,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
 const loadShopall = async (req, res) => {
   try {
     let search = "";
@@ -532,16 +561,15 @@ const loadShopall = async (req, res) => {
     });
 
     const count = await Products.find(filter).countDocuments();
-    // const cartCount = getCartCount(req.user);
-
-    const user = await User.findById(req.user.id).populate(
-      "cart.products.product"
-    );
-    const cartCount = user.cart.products.reduce(
-      (count, item) => count + item.quantity,
-      0
-    );
-
+    let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
     res.render("shopall", {
       products: productsWithDiscounts,
       totalPages: Math.ceil(count / limit),
@@ -593,7 +621,7 @@ const loadProductDetails = async (req, res) => {
     let discountedPrice = products.prod_mrp;
     let appliedOffer = null;
     const now = new Date();
-    console.log(products.offer);
+   
 
     // Check for product-specific offer
     if (
@@ -635,29 +663,68 @@ const loadProductDetails = async (req, res) => {
       .populate("offer")
       .populate("prod_size")
       .populate("prod_color")
-      .limit(4);
+      .limit(4);    
 
-    // const user = req.user;
-    // console.log("User object:", user);
-    // const cartCount = user ? await getCartCount(user):0;
-    // console.log("Server-side cart count:", cartCount);
+      const relatedProductsWithOffers = relatedProducts.map(product => {
+        let discountedPrice = product.prod_mrp;
+        let appliedOffer = null;
+  
+        // Check for product-specific offer
+        if (
+          product.offer &&
+          now >= new Date(product.offer.start_date) &&
+          now <= new Date(product.offer.end_date)
+        ) {
+          const productDiscount =
+            product.prod_mrp * (product.offer.discount_percentage / 100);
+          discountedPrice = product.prod_mrp - productDiscount;
+          appliedOffer = product.offer;
+        }
+        // If no valid product-specific offer, check for category offer
+        else if (
+          product.prod_category.offer &&
+          now >= new Date(product.prod_category.offer.start_date) &&
+          now <= new Date(product.prod_category.offer.end_date)
+        ) {
+          const categoryDiscount =
+            product.prod_mrp *
+            (product.prod_category.offer.discount_percentage / 100);
+          discountedPrice = product.prod_mrp - categoryDiscount;
+          appliedOffer = product.prod_category.offer;
+        }
+  
+        return {
+          ...product.toObject(),
+          discountedPrice: Math.round(discountedPrice),
+          appliedOffer
+        };
+      });
 
-    const user = await User.findById(req.user.id).populate(
-      "cart.products.product"
-    );
-    const cartCount = user.cart.products.reduce(
-      (count, item) => count + item.quantity,
-      0
-    );
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+
+    let wishlistCount = 0;
+    if (req.user) {
+      const wishlist = await Wishlist.findById(req.user.id);
+      wishlistCount = wishlist ? wishlist.products.length : 0;
+    }
 
     res.render("productDetails", {
       products,
-      relatedProducts,
+      relatedProducts:relatedProductsWithOffers,
       discountedPrice: Math.round(discountedPrice),
       user: req.user,
       isInWishlist,
       appliedOffer,
       cartCount: cartCount,
+      wishlistCount
     });
   } catch (error) {
     console.log(error);
@@ -802,9 +869,10 @@ const displayAddAddress = async (req, res) => {
       (count, item) => count + item.quantity,
       0
     );
+    const returnUrl = req.query.returnUrl || '/addresses';
     res
       .status(200)
-      .render("addAddress", { userData: userData, user: req.user, cartCount });
+      .render("addAddress", { userData: userData, user: req.user, cartCount,returnUrl });
   } catch (error) {
     console.log(error);
     res.status(500).send("Server Error");
@@ -816,6 +884,7 @@ const addAddress = async (req, res) => {
   const userId = req.user.id;
   console.log(userId);
   console.log(houseNo, street, city, state, zipcode, country);
+  const returnUrl = req.query.returnUrl || '/addresses';
 
   const newAddress = {
     houseNo: houseNo,
@@ -834,7 +903,7 @@ const addAddress = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).send("User not found");
     }
-    res.status(200).redirect("/addresses");
+    res.status(200).redirect(returnUrl);
   } catch (error) {
     console.log(error);
   }
@@ -1337,7 +1406,10 @@ const addToWishlist = async (req, res) => {
       await wishlist.save();
     }
 
-    res.status(200).json({ message: "Product added to wishlist" });
+    const updatedWishlist = await Wishlist.findOne({ user: userId });
+    const wishlistCount = updatedWishlist ? updatedWishlist.products.length : 0;
+    
+    res.status(200).json({ message: "Product added to wishlist",  wishlistCount:wishlistCount});
   } catch (error) {
     console.error("Error adding product to wishlist:", error);
     res.status(500).json({ error: "Failed to add product to wishlist" });
@@ -1356,8 +1428,10 @@ const removeFromWishlist = async (req, res) => {
       );
       await wishlist.save();
     }
+    const updatedWishlist = await Wishlist.findOne({ user: userId });
+    const wishlistCount = updatedWishlist ? updatedWishlist.products.length : 0;
 
-    res.status(200).json({ message: "Product removed from wishlist" });
+    res.status(200).json({ message: "Product removed from wishlist",  wishlistCount:wishlistCount });
   } catch (error) {
     console.error("Error removing product from wishlist:", error);
     res.status(500).json({ error: "Failed to remove product from wishlist" });
@@ -1423,15 +1497,18 @@ const getWishlist = async (req, res) => {
       user: req.user,
       wishlist: {
         ...wishlist.toObject(),
-        products: productsWithDiscounts,
-        cartCount: cartCount,
+        products: productsWithDiscounts,        
       },
+      cartCount: cartCount,
+      wishlistCount: wishlist ? wishlist.products.length : 0,
     });
   } catch (error) {
     console.error("Error getting wishlist:", error);
     res.status(500).json({ error: "Failed to get wishlist" });
   }
 };
+
+
 
 const getReferrals = async (req, res) => {
   try {
@@ -2241,51 +2318,7 @@ const userSignOut = async (req, res) => {
   }
 };
 
-// const getProductsByCategory = async (req, res) => {
-//   try {
-//     const categories = await Category.find({});
-//     const {
-//       categoryId,
-//       page = 1,
-//       limit = 10,
-//       sortBy = "popularity",
-//     } = req.query;
-//     console.log(categoryId);
 
-//     let filter = {
-//       is_deleted: false,
-//       prod_status: "ACTIVE",
-//       prod_category: ObjectId(categoryId),
-//     };
-
-//     const sortOptions = {
-//       popularity: { prod_rating: -1 },
-//       priceAsc: { prod_price: 1 },
-//       priceDesc: { prod_price: -1 },
-//       avgRating: { prod_rating: -1 },
-//       featured: { is_bestseller: -1 },
-//       newArrivals: { created_on: -1 },
-//       aToZ: { prod_name: 1 },
-//       zToA: { prod_name: -1 },
-//     };
-
-//     const products = await Products.find(filter)
-//       .sort(sortOptions[sortBy])
-//       .skip((page - 1) * limit)
-//       .limit(Number(limit));
-
-//     const totalProducts = await Products.countDocuments(filter);
-
-//     res.json({
-//       products,
-//       totalPages: Math.ceil(totalProducts / limit),
-//       currentPage: Number(page),
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 
 const createPaypalOrderForRetry = async (req, res) => {
   try {
@@ -2342,7 +2375,7 @@ module.exports = {
   failureGoogleLogin,
   loadSigIn,
   verifySignIn,
-  loadHome,
+  // loadHome,
   loadForgotPassword,
   requestOtp,
   verifyFPOTP,
