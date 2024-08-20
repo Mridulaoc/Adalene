@@ -4,7 +4,7 @@
 
     <body>
         <%- include ("../layout/navbar.ejs") %>
-            <div class="container-fluid  px-0" >
+            <div class="container-fluid  px-0">
                 <div class="container mb-5">
                     <h4>Account</h4>
                     <div class="d-flex gap-5 row mb-5 ">
@@ -33,44 +33,48 @@
 
                         <div class="col-11 col-md-8 col-sm-11 mx-auto border shadow rounded">
                             <div class="row">
-                            <h4 class="text-center" style="padding: 1.5rem 10rem;">Addresses</h4>
-                            <% if(userData.addresses.length> 0){%>
-                                <div class="col-10 col-md-6">
-                                <% userData.addresses.forEach((address,index)=>{%>
-                                    <div class="d-flex justify-content-between  gap-5 mb-5">
-                                        <div>
-                                            <p class="fs-5">
-                                                <%= address.houseNo %>
-                                            </p>
-                                            <p class="fs-5">
-                                                <%= address.street %>
-                                            </p>
-                                            <p class="fs-5">
-                                                <%= address.city %>
-                                            </p>
-                                            <p class="fs-5">
-                                                <%= address.state %>
-                                            </p>
-                                            <p class="fs-5">
-                                                <%= address.country %>
-                                            </p>
-                                            <p class="fs-5">
-                                                <%= address.zipCode %>
-                                            </p>
-                                            <a href="/addresses/edit/<%= userData._id %>/<%= index %>" class="text-decoration-none">
-                                                <button
-                                                    class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent"
-                                                    style="color: #BC4C2A; "><i class="fa-solid fa-pen-to-square" style="color: #bc4c2a;"></i></button>
-                                            </a>
-                                            <button
-                                                class="px-3 text-decoration-none fs-6 border rounded-2 bg-transparent delete-address"
-                                                style="color: #BC4C2A;" data-id="<%= userData._id %>"
-                                                data-index="<%= index %>"><i class="fa-solid fa-trash-can" style="color: #bc4c2a;"></i></button>
-                                        </div>
+                                <h4 class="text-center" style="padding: 1.5rem 10rem;">Addresses</h4>
+                                <% if(userData.addresses.length> 0){%>
+                                    <div class="col-10 col-md-6">
+                                        <% userData.addresses.forEach((address,index)=>{%>
+                                            <div class="d-flex justify-content-between  gap-5 mb-5">
+                                                <div>
+                                                    <p class="fs-5">
+                                                        <%= address.houseNo %>
+                                                    </p>
+                                                    <p class="fs-5">
+                                                        <%= address.street %>
+                                                    </p>
+                                                    <p class="fs-5">
+                                                        <%= address.city %>
+                                                    </p>
+                                                    <p class="fs-5">
+                                                        <%= address.state %>
+                                                    </p>
+                                                    <p class="fs-5">
+                                                        <%= address.country %>
+                                                    </p>
+                                                    <p class="fs-5">
+                                                        <%= address.zipCode %>
+                                                    </p>
+                                                    <a href="/addresses/edit/<%= userData._id %>/<%= index %>"
+                                                        class="text-decoration-none">
+                                                        <button
+                                                            class="px-3 text-decoration-none fs-6  border rounded-2 bg-transparent"
+                                                            style="color: #BC4C2A; "><i
+                                                                class="fa-solid fa-pen-to-square"
+                                                                style="color: #bc4c2a;"></i></button>
+                                                    </a>
+                                                    <button
+                                                        class="px-3 text-decoration-none fs-6 border rounded-2 bg-transparent delete-address"
+                                                        style="color: #BC4C2A;" data-id="<%= userData._id %>"
+                                                        data-index="<%= index %>"><i class="fa-solid fa-trash-can"
+                                                            style="color: #bc4c2a;"></i></button>
+                                                </div>
 
-                                        <%})%>
+                                                <%})%>
+                                            </div>
                                     </div>
-                                </div>
                                     <% } else {%>
                                         <p>Address not found</p>
                                         <%}%>
@@ -80,7 +84,8 @@
                                                     class="px-3 py-2 text-decoration-none text-center fs-6  border rounded-2"
                                                     style="background-color: #BC4C2A;width: 50%; margin:0 auto; color: white;  ">ADD
                                                     ADDRESS</a>
-                                                </div>                </div>
+                                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,8 +133,21 @@
                             });
                         });
                     });
+
+                    // JavaScript for toggling sidebar
+                    document.getElementById('accountToggle').addEventListener('click', function () {
+                        const sidebar = document.getElementById('profileSidebar');
+                        if (sidebar.classList.contains('d-none')) {
+                            sidebar.classList.remove('d-none');
+                            sidebar.classList.add('d-block');
+                        } else {
+                            sidebar.classList.remove('d-block');
+                            sidebar.classList.add('d-none');
+
+                        }
+                    });
                 </script>
-                
+
     </body>
 
 </html>

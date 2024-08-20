@@ -69,6 +69,19 @@
       }
 
     }
+
+    // JavaScript for toggling sidebar
+    document.getElementById('accountToggle').addEventListener('click', function() {
+          const sidebar = document.getElementById('profileSidebar');        
+          if (sidebar.classList.contains('d-none')) {
+            sidebar.classList.remove('d-none');
+            sidebar.classList.add('d-block');           
+          } else {
+            sidebar.classList.remove('d-block');
+            sidebar.classList.add('d-none');
+            
+          }
+        });
   </script>
 
 </html>
