@@ -20,8 +20,13 @@ const getWalletTransactions = async (req, res) => {
     const wallet = await Wallet.findOne({ user: req.user.id });
     if (wallet) {
         wallet.transactions.sort((a, b) => b.date - a.date);
+        transactions = wallet.transactions;
+        transactionCount = transactions.length;
       }
-    res.json({ transactions: wallet ? wallet.transactions : [] });
+      const page = 1;
+      const limit = 10;
+      const totalPages = Math.ceil(transactionCount / limit);
+    res.json({ transactions: wallet ? wallet.transactions : [], currentPage: page, limit: limit, totalPages:totalPages});
   } catch (error) {
     res.status(500).json({ error: "Error fetching wallet transactions" });
   }
@@ -56,7 +61,14 @@ const addToWallet = async (userId, amount, description) => {
 
 const loadMyWallet = async (req,res)=>{
     try {
-        res.render('userWallet',{user:req.user})
+      const userData = await User.findById(req.user.id).populate(
+        "cart.products.product"
+      );
+      const cartCount = userData.cart.products.reduce(
+        (count, item) => count + item.quantity,
+        0
+      );
+        res.render('userWallet',{user:req.user,cartCount})
     } catch (error) {
         console.log(error)
     }

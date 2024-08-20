@@ -2,10 +2,10 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 <body>
-  <%- include ("../layout/navBarnew.ejs") %>
+  <%- include ("../layout/navbar.ejs") %>
    
   <div class="container-fluid">
-    <div class="container border py-3 shadow rounded " style="width: 50%; margin: 1rem auto;">
+    <div class="container border py-3 my-3 shadow rounded col-md-8 col-lg-6 col-10 " >
         <h4 class="py-3 px-3">Select Address</h4>
         <div class="d-flex justify-content-end px-3">
         <a href="/addresses/add?returnUrl=/checkout" class=" text-decoration-none fs-6  border rounded-2 px-2 py-1" style="color: #BC4C2A; " >ADD ADDRESS</a>
@@ -39,6 +39,6 @@
 
     </div>
   </div> 
-  <%- include ("../layout/footerAdmin.ejs") %>
+  <%- include ("../layout/footerUser.ejs") %>
 </body>
 </html>

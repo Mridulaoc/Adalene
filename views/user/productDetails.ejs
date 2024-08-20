@@ -3,34 +3,34 @@
 <%- include ("../layout/header.ejs") %>
 
     <body>
-        <%- include ("../layout/navBarnew.ejs") %>
+        <%- include ("../layout/navbar.ejs") %>
 
-            <div class="container_fluid">
-                <div class="container" style="margin-top: 5rem">
+            <div class="container-fluid px-0 ">
+                <div class="container my-5">
                     <p><a href="/" class="text-decoration-none text-black">Home</a>><%= products.prod_name %>
                     </p>
-                    <div class="container my-5">
-                        <div class="row align-items-start">
-                            <div class="col-6 d-flex flex-column align-items-center" style="position: relative;">
-                                <div style="position: relative;">
-                                    <i class="fa-<%= isInWishlist ? 'solid' : 'regular' %> fa-heart fs-3"
-                                        style="color: #bc4c2a; cursor: pointer;" id="addToWishlistBtn"
-                                        data-product-id="<%= products._id %>"
-                                        data-is-in-wishlist="<%= isInWishlist ? 'true' : 'false' %>"></i>
-                                </div>
-                                <div class="image-container" onmousemove="zoomIn(event)" onmouseleave="zoomOut()">
-                                    <img src="\uploads\<%= products.prod_images[0] %>" alt="" id="mainImage">
-                                    <img src="\uploads\<%= products.prod_images[0] %>" alt="" class='zoomed-image'>
-                                </div>
-                                <div id="thumbnailContainer" class="d-flex justify-content-center flex-wrap mt-3">
-                                    <% products.prod_images.forEach((image, index)=> { %>
-                                        <img src="\uploads\<%= image %>" alt="" class="thumbnail-image m-2"
-                                            style="width: 80px; height: 80px; cursor: pointer;"
-                                            onclick="changeImage('<%= image %>', this)">
-                                        <% }) %>
-                                </div>
+                    <div class="row d-flex justify-content-between  ">
+                        <div class="col-12 col-md-6 d-flex flex-column align-items-center" style="position: relative;">
+                            <div class="py-5" style="position: relative;">
+                                <i class="fa-<%= isInWishlist ? 'solid' : 'regular' %> fa-heart fs-3"
+                                    style="color: #bc4c2a; cursor: pointer;" id="addToWishlistBtn"
+                                    data-product-id="<%= products._id %>"
+                                    data-is-in-wishlist="<%= isInWishlist ? 'true' : 'false' %>"></i>
                             </div>
-                            <div class="col-6">
+                            <div class="image-container" onmousemove="zoomIn(event)" onmouseleave="zoomOut()">
+                                <img src="\uploads\<%= products.prod_images[0] %>" alt="" id="mainImage">
+                                <img src="\uploads\<%= products.prod_images[0] %>" alt="" class='zoomed-image'>
+                            </div>
+                            <div id="thumbnailContainer" class="d-flex justify-content-center flex-wrap mt-3">
+                                <% products.prod_images.forEach((image, index)=> { %>
+                                    <img src="\uploads\<%= image %>" alt="" class="thumbnail-image m-2"
+                                        style="width: 80px; height: 80px; cursor: pointer;"
+                                        onclick="changeImage('<%= image %>', this)">
+                                    <% }) %>
+                            </div>
+                        </div>
+                        <div class="col-10 col-md-6 py-5 mx-auto  ">
+                            <div class="d-flex flex-column align-items-start ">
                                 <h3>
                                     <%= products.prod_name %> (<%= products.prod_rating %> <i
                                                 class="fa-solid fa-star fs-6" style="color: #FFD43B;"></i>)
@@ -45,8 +45,6 @@
                                         <p>Price: ₹<%= products.prod_mrp %>
                                         </p>
                                         <%} %>
-
-
                                             <p>Size : <%= products.prod_size.size %>
                                             </p>
                                             <p>Colour : <%= products.prod_color.color_name %>
@@ -61,10 +59,11 @@
                                                             <%}%>
                                             </p>
                                             <p>PRODUCT INFO</p>
-                                            <hr style="width:60%; height: 2px; color: #BC4C2A;">
-                                            <p class="fs-5" style="width: 70%; margin-bottom: 2rem;">
+                                            <hr style="width:90%; height: 2px; color: #BC4C2A;">
+                                            <p class="fs-5" style="width: 90%; margin-bottom: 2rem;">
                                                 <%= products.prod_desc %>
                                             </p>
+
                                             <div class="d-flex align-items-center my-3">
                                                 <button class="px-3 py-1 fw-bold border border-1"
                                                     style="background-color: #BC4C2A; color: white;border:none;"
@@ -79,7 +78,6 @@
                                                     onclick="incrementQuantity()">+</button>
                                             </div>
                                             <span id="quantity-availablity" class="fs-5 my-3"></span>
-
                                             <div class="d-flex flex-column gap-3">
                                                 <button class="px-5 py-3 fs-5 text-white fw-bold" id="addToCartBtn"
                                                     style="border: none;background-color: #BC4C2A;"
@@ -88,28 +86,84 @@
                                             </div>
                             </div>
                         </div>
+
+
+
+                    </div>
+                </div>
+
+                <div class="container my-5 mx-auto d-flex flex-column justify-content-center align-items-center">
+                    <h2 class="text-center" style="color:#BC4C2A">RELATED PRODUCTS</h2>
+
+                    <!-- Carousel for Small Screens -->
+                    <div id="productCarousel" class="carousel slide d-sm-block d-md-none" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <% if(relatedProducts.length> 0) { %>
+                                <% relatedProducts.forEach((product, index)=> { %>
+                                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                        <div class="d-flex justify-content-center">
+                                            <a href="/products/<%= product._id %>" class="text-decoration-none">
+                                                <div class="card shadow" style="width: 15rem;">
+                                                    <img src="/uploads/<%= product.prod_images[0] %>"
+                                                        class="card-img-top" alt="<%= product.prod_name %>">
+                                                    <div class="card-body d-flex flex-column align-items-center">
+                                                        <p class="fs-6">
+                                                            <%= product.prod_name %>
+                                                        </p>
+                                                        <% if(appliedOffer){ %>
+                                                            <p class="text-decoration-line-through"> ₹<%=
+                                                                    products.prod_mrp %>
+                                                            </p>
+                                                            <p class="text-danger"> ₹<%= discountedPrice.toFixed(2) %> (
+                                                                    <%= appliedOffer.discount_percentage %>% off)</p>
+
+                                                            <%} else {%>
+                                                                <p>₹<%= products.prod_mrp %>
+                                                                </p>
+                                                                <%} %>
+
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <p>No related products found.</p>
+                                            <% } %>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
 
-                    <div class="container my-5 mx-5 d-flex flex-column justify-content-center align-items-center">
-                        <h2 class="" style="color:#BC4C2A">Related Products</h2>
-                        <div class="d-flex justify-content-between my-5 mx-5 gap-5">
-                            <%if(relatedProducts.length> 0){
-                                for(let i=0; i<relatedProducts.length; i++){ %>
-                                    <a href="/products/<%= relatedProducts[i]._id %>" class="text-decoration-none"
-                                        style="width: 22rem; height: 32rem;">
+                    <!-- Grid for Large Screens -->
+                    <div class="d-none d-md-flex justify-content-between my-5 gap-5 mx-auto"
+                        style="overflow-x: hidden;">
+                        <% if(relatedProducts.length> 0) { %>
+                            <% relatedProducts.forEach(product=> { %>
+                                <a href="/products/<%= product._id %>" class="text-decoration-none">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 ">
                                         <div class="card shadow" style="width: 18rem;">
-                                            <img src="\uploads\<%= relatedProducts[i].prod_images[0] %>"
-                                                class="card-img-top" alt="...">
+                                            <img src="/uploads/<%= product.prod_images[0] %>" class="card-img-top"
+                                                alt="<%= product.prod_name %>">
                                             <div class="card-body d-flex flex-column align-items-center">
                                                 <p class="fs-6">
-                                                    <%= relatedProducts[i].prod_name %>
+                                                    <%= product.prod_name %>
                                                 </p>
                                                 <% if(appliedOffer){ %>
                                                     <p class="text-decoration-line-through"> ₹<%= products.prod_mrp %>
                                                     </p>
                                                     <p class="text-danger"> ₹<%= discountedPrice.toFixed(2) %> (<%=
                                                                 appliedOffer.discount_percentage %>% off)</p>
-                
+
                                                     <%} else {%>
                                                         <p>₹<%= products.prod_mrp %>
                                                         </p>
@@ -117,226 +171,261 @@
 
                                             </div>
                                         </div>
-                                        <%}%>
-                                            <%}else{%>
-
-                                                Data not found
-
-                                                <%}%>
-
-                        </div>
+                                    </div>
+                                </a>
+                                <% }); %>
+                                    <% } else { %>
+                                        <p>No related products found.</p>
+                                        <% } %>
                     </div>
-                    </a>
+
                 </div>
                 <%- include ("../layout/footerUser.ejs") %>
-                    <script>
-                        function zoomIn(event) {
-                            const imageContainer = event.currentTarget;
-                            const zoomedImage = imageContainer.querySelector('.zoomed-image');
-                            const rect = imageContainer.getBoundingClientRect();
-                            const x = event.clientX - rect.left;
-                            const y = event.clientY - rect.top;
+            </div>
+            <script>
+                function zoomIn(event) {
+                    const imageContainer = event.currentTarget;
+                    const zoomedImage = imageContainer.querySelector('.zoomed-image');
+                    const rect = imageContainer.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
 
-                            zoomedImage.style.display = 'block';
-                            zoomedImage.style.transform = `translate(-${x}px, -${y}px) scale(1.5)`;
-                        }
+                    zoomedImage.style.display = 'block';
+                    zoomedImage.style.transform = `translate(-${x}px, -${y}px) scale(1.5)`;
+                }
 
-                        function zoomOut() {
-                            const zoomedImage = document.querySelector('.zoomed-image');
-                            zoomedImage.style.display = 'none';
-                        }
+                function zoomOut() {
+                    const zoomedImage = document.querySelector('.zoomed-image');
+                    zoomedImage.style.display = 'none';
+                }
 
 
-                        function changeImage(imageSrc, clickedThumbnail) {
-                            const mainImage = document.getElementById('mainImage');
-                            const zoomedImage = document.querySelector('.zoomed-image');
+                function changeImage(imageSrc, clickedThumbnail) {
+                    const mainImage = document.getElementById('mainImage');
+                    const zoomedImage = document.querySelector('.zoomed-image');
 
-                            mainImage.src = `\\uploads\\${imageSrc}`;
-                            zoomedImage.src = `\\uploads\\${imageSrc}`;
+                    mainImage.src = `\\uploads\\${imageSrc}`;
+                    zoomedImage.src = `\\uploads\\${imageSrc}`;
 
-                            // Remove 'active' class from all thumbnails
-                            const thumbnails = document.querySelectorAll('.thumbnail-image');
-                            thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
+                    // Remove 'active' class from all thumbnails
+                    const thumbnails = document.querySelectorAll('.thumbnail-image');
+                    thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
 
-                            // Add 'active' class to clicked thumbnail
-                            clickedThumbnail.classList.add('active-thumbnail');
-                        }
+                    // Add 'active' class to clicked thumbnail
+                    clickedThumbnail.classList.add('active-thumbnail');
+                }
 
-                        // Call this function when the page loads to set the first image as active
-                        window.onload = function () {
-                            const firstThumbnail = document.querySelector('.thumbnail-image');
-                            if (firstThumbnail) {
-                                firstThumbnail.classList.add('active-thumbnail');
-                            }
-                            const stockQuantity = <%= products.prod_quantity %>;
-                            console.log(stockQuantity)
-                            const addToCartButton = document.getElementById('addToCartBtn');
-                            const quantityInput = document.getElementById('quantityInput');
+                // Call this function when the page loads to set the first image as active
+                window.onload = function () {
+                    const firstThumbnail = document.querySelector('.thumbnail-image');
+                    if (firstThumbnail) {
+                        firstThumbnail.classList.add('active-thumbnail');
+                    }
+                    const stockQuantity = <%= products.prod_quantity %>;
+                    console.log(stockQuantity)
+                    const addToCartButton = document.getElementById('addToCartBtn');
+                    const quantityInput = document.getElementById('quantityInput');
 
-                            if (stockQuantity === 0) {
-                                addToCartButton.disabled = true;
-                                addToCartButton.innerText = 'OUT OF STOCK';
-                                addToCartButton.style.backgroundColor = '#d3d3d3'; // Change to grey or any other color to indicate disabled state
-                            } else {
-                                addToCartButton.disabled = false;
-                                addToCartButton.innerText = 'ADD TO CART';
-                                addToCartButton.style.backgroundColor = '#BC4C2A';
-                            }
+                    if (stockQuantity === 0) {
+                        addToCartButton.disabled = true;
+                        addToCartButton.innerText = 'OUT OF STOCK';
+                        addToCartButton.style.backgroundColor = '#d3d3d3'; // Change to grey or any other color to indicate disabled state
+                    } else {
+                        addToCartButton.disabled = false;
+                        addToCartButton.innerText = 'ADD TO CART';
+                        addToCartButton.style.backgroundColor = '#BC4C2A';
+                    }
+                    const cartCountElement = document.getElementById('cartItemCount');
+                    console.log('Cart count element:', cartCountElement);
+                    const count = parseInt(cartCountElement.textContent) || 0;
+                    console.log('Initial cart count on load:', count);
+                    if (count > 0) {
+                        cartCountElement.style.display = 'inline-block';
+                    } else {
+                        cartCountElement.style.display = 'none';
+                    }
+                    updateCartCount(count);
+                };
+
+
+
+
+                // functiions for increment decrement 
+
+                function incrementQuantity() {
+                    let maxQuantityPerUser = 5;
+                    const quantityInput = document.getElementById('quantityInput');
+                    const maxValue = quantityInput.max;
+                    console.log(maxValue)
+                    let quantity = parseInt(quantityInput.value);
+                    console.log(quantity)
+                    let quantityAvailablity = document.getElementById('quantity-availablity');
+                    if (quantity + 1 > maxValue) {
+                        quantityAvailablity.innerText = `Only ${maxValue} stocks left `
+                    } else if (quantity >= maxQuantityPerUser) {
+                        quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
+                    } else {
+                        quantityInput.value = quantity + 1;
+                    }
+                }
+
+
+
+
+                function decrementQuantity() {
+                    const quantityInput = document.getElementById('quantityInput');
+                    let quantity = parseInt(quantityInput.value);
+                    if (quantity > 1) {
+                        quantityInput.value = quantity - 1;
+                    }
+                }
+                // function updateCartCount(count) {
+                //     const cartCountElement = document.getElementById('cartItemCount');
+                //     cartCountElement.textContent = count;
+                //     if (count > 0) {
+                //         cartCountElement.style.display = 'inline-block';
+                //     } else {
+                //         cartCountElement.style.display = 'none';
+                //     }
+                //     console.log('Updated cart count:', count);
+                // }
+
+                async function updateCartCount() {
+                    try {
+                        const response = await fetch('/get-cart-count');
+                        const result = await response.json();
+                        if (result.success) {
                             const cartCountElement = document.getElementById('cartItemCount');
-                            console.log('Cart count element:', cartCountElement);
-                            const count = parseInt(cartCountElement.textContent) || 0;
-                            console.log('Initial cart count on load:', count);
-                            if (count > 0) {
-                                cartCountElement.style.display = 'inline-block';
-                            } else {
-                                cartCountElement.style.display = 'none';
-                            }
-                            updateCartCount(count);
-                        };
-
-
-
-
-                        // functiions for increment decrement 
-
-                        function incrementQuantity() {
-                            let maxQuantityPerUser = 5;
-                            const quantityInput = document.getElementById('quantityInput');
-                            const maxValue = quantityInput.max;
-                            console.log(maxValue)
-                            let quantity = parseInt(quantityInput.value);
-                            console.log(quantity)
-                            let quantityAvailablity = document.getElementById('quantity-availablity');
-                            if (quantity + 1 > maxValue) {
-                                quantityAvailablity.innerText = `Only ${maxValue} stocks left `
-                            } else if (quantity >= maxQuantityPerUser) {
-                                quantityAvailablity.innerText = 'Maximum quantity per user exceeded'
-                            } else {
-                                quantityInput.value = quantity + 1;
-                            }
+                            cartCountElement.textContent = result.cartCount;
+                            cartCountElement.style.display = result.cartCount > 0 ? 'inline-block' : 'none';
+                        } else {
+                            console.error('Error getting cart count:', result.message);
                         }
-
-
-
-
-                        function decrementQuantity() {
-                            const quantityInput = document.getElementById('quantityInput');
-                            let quantity = parseInt(quantityInput.value);
-                            if (quantity > 1) {
-                                quantityInput.value = quantity - 1;
-                            }
-                        }
-
-
-                        // add to cart function 
-                        async function addToCart(productId) {
-                            const quantityInput = document.getElementById('quantityInput');
-                            const quantity = quantityInput.value;
-                            const maxValue = quantityInput.max;
-
-                            const response = await fetch('/add-to-cart', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ productId, quantity, maxValue })
-                            });
-
-                            if (response.status === 401) {
-                                const result = await response.json();
-                                if (result.redirectUrl) {
-                                    window.location.href = result.redirectUrl;
-                                }
-                                return;
-                            }
-                            const result = await response.json();
-                            if (result.success) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: 'Product added to cart successfully!',
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                });
-                                console.log('Cart count received from server:', result.cartCount);
-                                updateCartCount(result.cartCount)
-                            } else {
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: 'Failed to add product to cart.',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        }
-
-                        function updateCartCount(count) {
-                            const cartCountElement = document.getElementById('cartItemCount');
-                            cartCountElement.textContent = count;
-                            if (count > 0) {
-                                cartCountElement.style.display = 'inline-block';
-                            } else {
-                                cartCountElement.style.display = 'none';
-                            }
-                            console.log('Updated cart count:', count);
-                        }
-
-                        function updateWishlistCount(count) {
-                            const wishlistCountElements = document.querySelectorAll('#wishlistItemCount');
-                            wishlistCountElements.forEach(element => {
-                                element.textContent = count;
-                                element.style.display = count > 0 ? 'inline-block' : 'none';
-                            });
-                        }
-
-                        // add to wishlist 
-                        const wishlistIcon = document.getElementById('addToWishlistBtn');
-                        let isInWishlist = wishlistIcon.dataset.isInWishlist === 'true';
-
-                        function updateWishlistIcon() {
-                            wishlistIcon.classList.toggle('fa-regular', !isInWishlist);
-                            wishlistIcon.classList.toggle('fa-solid', isInWishlist);
-                        }
-
-                        updateWishlistIcon();
-
-                        document.getElementById('addToWishlistBtn').addEventListener('click', function () {
-                            const productId = this.dataset.productId;
-                            const isInWishlist = this.dataset.isInWishlist === 'true';
-                            const endpoint = isInWishlist ? '/wishlist/remove' : '/wishlist/add';
-
-                            fetch(endpoint, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ productId: productId })
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    this.dataset.isInWishlist = !isInWishlist;
-                                    this.classList.toggle('fa-regular', isInWishlist);
-                                    this.classList.toggle('fa-solid', !isInWishlist);
-                                    updateWishlistCount(data.wishlistCount);
-
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        text: isInWishlist ? 'Product removed from wishlist successfully!' : 'Product added to wishlist successfully!',
-                                        icon: 'success',
-                                        confirmButtonText: 'OK'
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('Error updating wishlist:', error);
-                                    Swal.fire({
-                                        title: 'Error!',
-                                        text: 'Failed to update wishlist.',
-                                        icon: 'error',
-                                        confirmButtonText: 'OK'
-                                    });
-                                });
+                    } catch (error) {
+                        console.error('Error updating cart icon:', error);
+                    }
+                }
+                setInterval(updateCartCount, 5000);
+                let cartCount = 0;
+                // add to cart function 
+                async function addToCart(productId) {
+                    const quantityInput = document.getElementById('quantityInput');
+                    const quantity = quantityInput.value;
+                    const maxValue = quantityInput.max;
+                    try {
+                        const response = await fetch('/add-to-cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ productId, quantity, maxValue })
                         });
-                        
-                    </script>
+
+                        if (response.status === 401) {
+                            const result = await response.json();
+                            if (result.redirectUrl) {
+                                window.location.href = result.redirectUrl;
+                            }
+                            return;
+                        }
+                        const result = await response.json();
+                        if (result.success) {
+                            
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Product added to cart successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                            cartCount = result.cartCount;
+                            await updateCartCount();
+                            setInterval(location.reload(),50000)
+                            console.log('Cart count received from server:', cartCount);
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Failed to add product to cart.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            })
+                        }
+                    }
+                    catch (error) {
+                        console.error('Error adding to cart:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while adding the product to the cart.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+
+                // function updateCart() {
+                //     const cartCountElement = document.getElementById('cartItemCount');
+                //     cartCountElement.textContent = cartCount;
+                //     cartCountElement.style.display = cartCount > 0 ? 'inline-block' : 'none';
+                // }
+
+
+
+                function updateWishlistCount(count) {
+                    const wishlistCountElements = document.querySelectorAll('#wishlistItemCount');
+                    wishlistCountElements.forEach(element => {
+                        element.textContent = count;
+                        element.style.display = count > 0 ? 'inline-block' : 'none';
+                    });
+                }
+
+                // add to wishlist 
+                const wishlistIcon = document.getElementById('addToWishlistBtn');
+                let isInWishlist = wishlistIcon.dataset.isInWishlist === 'true';
+
+                function updateWishlistIcon() {
+                    wishlistIcon.classList.toggle('fa-regular', !isInWishlist);
+                    wishlistIcon.classList.toggle('fa-solid', isInWishlist);
+                }
+
+                updateWishlistIcon();
+
+                document.getElementById('addToWishlistBtn').addEventListener('click', function () {
+                    const productId = this.dataset.productId;
+                    const isInWishlist = this.dataset.isInWishlist === 'true';
+                    const endpoint = isInWishlist ? '/wishlist/remove' : '/wishlist/add';
+
+                    fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productId: productId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            this.dataset.isInWishlist = !isInWishlist;
+                            this.classList.toggle('fa-regular', isInWishlist);
+                            this.classList.toggle('fa-solid', !isInWishlist);
+                            updateWishlistCount(data.wishlistCount);
+
+                            Swal.fire({
+                                title: 'Success!',
+                                text: isInWishlist ? 'Product removed from wishlist successfully!' : 'Product added to wishlist successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error updating wishlist:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Failed to update wishlist.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                });
+
+            </script>
 
 
 

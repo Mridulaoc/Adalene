@@ -97,6 +97,7 @@ userRoute.post('/reset-password', userController.updatePassword);
 userRoute.get('/shopall',userController.loadShopall);
 userRoute.get('/products/:id', checkOfferExpiry, userController.loadProductDetails);
 userRoute.post('/add-to-cart',  userController.addToCart);
+userRoute.get('/get-cart-count', userController.getCartCount)
 userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
 userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
 userRoute.post('/cart/remove', isAuthenticated, userController.removeCartItem);

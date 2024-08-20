@@ -2,14 +2,35 @@
 <html lang="en">
 <%- include ("../layout/header.ejs") %>
 
-    <body>
-        <%- include ("../layout/navBarnew.ejs") %>
+    <body class="px-0">
+        <%- include ("../layout/navbar.ejs") %>
             <div class="container-fluid mb-5">
                 <div class="container">
                     <h4>Account</h4>
-                    <div class="d-flex gap-5 ">
-                        <%- include ("../layout/profileSidebar.ejs") %>
-                        <div class="col-8 border shadow rounded px-5 fs-6">
+                    <div class="row d-flex gap-5">
+                        <div class="col-12 d-md-none mb-3">
+                            <button id="accountToggle" class="border-0 px-2 py-1 rounded"
+                                style="background-color: #BC4C2A; color: white; ">
+                                <i class="fa-solid fa-user mx-1" style="color:white;"></i>My Account
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-3 d-none d-md-block border px-2 py-5 rounded" id="profileSidebar">
+                            <p><a href="/profile" class="text-decoration-none fs-5 " style="color: #888888;">Profile</a>
+                            </p>
+                            <p><a href="/change-password" class="text-decoration-none fs-5 "
+                                    style="color: #888888;">Change Password</a></p>
+                            <p><a href="/addresses" class="text-decoration-none fs-5 "
+                                    style="color: #888888;">Addresses</a></p>
+                            <p><a href="/order-history" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Orders</a></p>
+                            <p><a href="/my-wallet" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Wallet</a></p>
+                            <p><a href="/my-referrals" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Referrals</a></p>
+                            <p><a href="/wishlist" class="text-decoration-none fs-5 " style="color: #888888;">My
+                                    Wishlist</a></p>
+                        </div>
+                        <div class="col-12 col-md-8 col-sm-12 mx-auto border shadow rounded px-3">
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Order Details</h4>
                             <p>Order Id : <%= order.orderId %>
                             </p>
@@ -25,49 +46,57 @@
                             </p>
                             <p>Coupon Discount: <%= order.discount %>
                             </p>
-                            <button id="download-invoice" class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "style="color: #BC4C2A;">Download Invoice</button>
+                            <button id="download-invoice"
+                                class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
+                                style="color: #BC4C2A;">Download Invoice</button>
 
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Products</h4>
-                            <table class="table">
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                                <% order.products.forEach(item=>{%>
+                            <div class="table-responsive">
+                                <table class="table border">
                                     <tr>
-                                        <td class="d-flex flex-column py-5"><img src="/uploads/<%= item.product.prod_images[0]%>" height="50px" width="50px"><%= item.product.prod_name %></td>
-                                        <td class="py-5">
-                                            <%= Math.round(item.price) %>
-                                        </td>
-                                        <td class="py-5">
-                                            <%= item.quantity %>
-                                        </td>
-                                        <td class="py-5">
-                                            <%= Math.round(item.price * item.quantity) %>
-                                        </td>
-                                        <td class="py-5">
-                                            <%= item.productStatus %>
-                                        </td>
-                                        <td class="py-5">
-                                            <% if(item.productStatus==='Pending' ){%>
-                                                <button
-                                                    class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
-                                                    style="color: #BC4C2A;"
-                                                    onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
-                                                <%} else if (order.status==='Delivered' ){ %>
+                                        <th>Product Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    <% order.products.forEach(item=>{%>
+                                        <tr>
+                                            <td class="d-flex flex-column py-5"><img
+                                                    src="/uploads/<%= item.product.prod_images[0]%>" height="50px"
+                                                    width="50px">
+                                                <%= item.product.prod_name %>
+                                            </td>
+                                            <td class="py-5">
+                                                <%= Math.round(item.price) %>
+                                            </td>
+                                            <td class="py-5">
+                                                <%= item.quantity %>
+                                            </td>
+                                            <td class="py-5">
+                                                <%= Math.round(item.price * item.quantity) %>
+                                            </td>
+                                            <td class="py-5">
+                                                <%= item.productStatus %>
+                                            </td>
+                                            <td class="py-5">
+                                                <% if(item.productStatus==='Pending' ){%>
                                                     <button
                                                         class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
                                                         style="color: #BC4C2A;"
-                                                        onclick="returnOrderItem('<%= order._id %>','<%= item.product._id %>')">RETURN</button>
-                                                    <%}%>
-                                        </td>
-                                    </tr>
-                                    <%})%>
-                            </table>
+                                                        onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
+                                                    <%} else if (order.status==='Delivered' ){ %>
+                                                        <button
+                                                            class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
+                                                            style="color: #BC4C2A;"
+                                                            onclick="returnOrderItem('<%= order._id %>','<%= item.product._id %>')">RETURN</button>
+                                                        <%}%>
+                                            </td>
+                                        </tr>
+                                        <%})%>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,6 +187,19 @@
                             Swal.fire('Error', 'An error occurred while processing the return request.', 'error');
                         }
                     }
+
+                    // JavaScript for toggling sidebar
+                    document.getElementById('accountToggle').addEventListener('click', function () {
+                        const sidebar = document.getElementById('profileSidebar');
+                        if (sidebar.classList.contains('d-none')) {
+                            sidebar.classList.remove('d-none');
+                            sidebar.classList.add('d-block');
+                        } else {
+                            sidebar.classList.remove('d-block');
+                            sidebar.classList.add('d-none');
+
+                        }
+                    });
 
 
 

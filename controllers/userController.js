@@ -663,7 +663,7 @@ const loadProductDetails = async (req, res) => {
       .populate("offer")
       .populate("prod_size")
       .populate("prod_color")
-      .limit(4);    
+      .limit(3);    
 
       const relatedProductsWithOffers = relatedProducts.map(product => {
         let discountedPrice = product.prod_mrp;
@@ -1620,18 +1620,18 @@ const addToCart = async (req, res) => {
       await user.save();
       req.session.user = user;
 
-      const userData = await User.findById(req.user.id).populate(
-        "cart.products.product"
-      );
-      const cartCount = userData.cart.products.reduce(
-        (count, item) => count + item.quantity,
-        0
-      );
+      // const userData = await User.findById(req.user.id).populate(
+      //   "cart.products.product"
+      // );
+      // const cartCount = userData.cart.products.reduce(
+      //   (count, item) => count + item.quantity,
+      //   0
+      // );
       res.json({
         success: true,
         message: "Product added to cart successfully!",
         offerApplied: offerApplied,
-        cartCount: cartCount,
+        cartCount: user.cart.products.reduce((count, item) => count + item.quantity,0),
       });
     } catch (error) {
       console.error(error);
@@ -1779,6 +1779,37 @@ const removeCartItem = async (req, res) => {
 //   }
 //   return user.cart.products.reduce((count, item) => count + item.quantity, 0);
 // };
+
+// Server-side route
+// app.get('/get-cart-count', async (req, res) => {
+//   if (!req.user) {
+//     return res.status(401).json({ success: false, message: 'User not authenticated' });
+//   }
+
+//   try {
+//     const user = await User.findById(req.user.id).populate('cart.products.product');
+//     const cartCount = user.cart.products.reduce((count, item) => count + item.quantity, 0);
+//     res.json({ success: true, cartCount: cartCount });
+//   } catch (error) {
+//     console.error('Error getting cart count:', error);
+//     res.status(500).json({ success: false, message: 'Failed to get cart count' });
+//   }
+// });
+
+const getCartCount = async(req, res) =>{
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id).populate('cart.products.product');
+    const cartCount = user.cart.products.reduce((count, item) => count + item.quantity, 0);
+    res.json({ success: true, cartCount: cartCount });
+  } catch (error) {
+    console.error('Error getting cart count:', error);
+    res.status(500).json({ success: false, message: 'Failed to get cart count' });
+  }
+}
 
 const displayAddressSelection = async (req, res) => {
   try {
@@ -2295,7 +2326,14 @@ const displayOrderConfirmation = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
     console.log("Order found:", order);
-    res.render("orderConfirmation", { order, user: req.user });
+    const userData = await User.findById(req.user.id).populate(
+      "cart.products.product"
+    );
+    const cartCount = userData.cart.products.reduce(
+      (count, item) => count + item.quantity,
+      0
+    );
+    res.render("orderConfirmation", { order, user: req.user,cartCount });
   } catch (error) {
     console.error("Error in displayOrderConfirmation:", error);
     res.status(500).json({
@@ -2421,4 +2459,5 @@ module.exports = {
   returnOrderRequest,
   downloadInvoice,
   // getCartCount,
+  getCartCount
 };
