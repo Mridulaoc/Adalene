@@ -1,5 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Playwrite+AU+VIC:wght@100..400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@font-face {
+  font-family: 'Didot';
+  src: url('/fonts/DidotItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/AvenirLight.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 * {
   margin: 0;
@@ -8,6 +21,10 @@
 }
 body {
   overflow-x: hidden;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+ 
 }
 
 html {
@@ -28,19 +45,26 @@ p {
 
 .navbar {
   height: 10rem;
+  font-family: 'Avenir';
+  font-size: 1.6rem;
 }
 .navbar-brand {
-  font-family: "Great Vibes", cursive;
+  font-family: 'Didot';
   color: #bc4c2a;
-  font-size: 5rem;
+  font-size: 4rem;
   text-decoration: none;
 }
 
 .nav-link {
   font-size: 1.3rem;
-  color: #888888;
+  color: #111111;
   position: relative;
 }
+
+.nav-link.active {
+  color: #bc4c2a !important;
+}
+
 
 .cart-count {
   font-size: 0.75rem;
