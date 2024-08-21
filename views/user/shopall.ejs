@@ -35,7 +35,7 @@
                   <%})%>
               </div>
               <div class="mb-3">
-                <label class="fs-5 fw-bold mb-3">Color:</label>
+                <label class="h4 mb-3">Color:</label>
                 <div class="d-flex flex-wrap gap-2">
                   <% colors.forEach(color=> { %>
                     <div class="color-radio">
@@ -48,7 +48,7 @@
                 </div>
               </div>
               <div class="mb-3">
-                <label for="priceRange" class="fs-5 fw-bold">Price Range: <span id="priceValue"></span></label>
+                <label for="priceRange" class="h4 mb-3">Price Range: <span id="priceValue"></span></label>
                 <input type="range" class="form-range" id="priceRange" min="0" max="10000" step="100"
                   value="<%= maxPrice %>" oninput="updatePriceValue(this.value)" onchange="updateProducts()"
                   style="width: 80%;">
@@ -69,9 +69,9 @@
                 <%= currentCategory ? currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1)
                   : 'All Products' %>
               </h1>
-              <div class="d-flex justify-content-end my-2">
-                <label for="sortBy" class="fs-4 ">Sort by:</label>
-                <select id="sortBy" onchange="updateProducts()" class="form-control mx-2 fs-5 text-uppercase gap-3"
+              <div class="d-flex justify-content-end align-items-center my-2">
+                <label for="sortBy" class="fs-5 ">Sort by:</label>
+                <select id="sortBy" onchange="updateProducts()" class="form-control mx-2 fs-6 text-uppercase gap-3"
                   style="width: 30%; color: gray; ">
                   <option value="popularity" <%=sortBy==='popularity' ? 'selected' : '' %>>Popularity</option>
                   <option value="priceAsc" <%=sortBy==='priceAsc' ? 'selected' : '' %>>Price: low to high</option>

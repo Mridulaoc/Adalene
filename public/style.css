@@ -34,7 +34,7 @@ html {
   flex-grow: 1;
 }
 p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 .activemode {
   color: #bc4c2a;
@@ -59,6 +59,7 @@ p {
   font-size: 1.3rem;
   color: #111111;
   position: relative;
+ 
 }
 
 .nav-link.active {
@@ -99,15 +100,19 @@ p {
 }
 
 .hero h1{
-  font-size: 4rem;
+  font-size: 3.5rem;
   letter-spacing: .2em;
-  z-index: 1;
+  z-index: 2;
+  position: relative;
+  font-family: 'poppins';
 }
 
 .heroBtn{
   border: 1px solid white;
   outline: none;
   padding: 1rem 5rem ;
+  z-index: 2;
+  position: relative;
  
  
 }
@@ -124,8 +129,8 @@ p {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-  
+  background: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+  z-index: 1;
   pointer-events: none; /* Allow clicks to pass through the overlay */
 }
 
@@ -226,7 +231,7 @@ p {
 }
 
 footer h2 {
-  font-family: 'Georgia', serif;
+  font-family: "Avenir";
   font-weight: 400;
   color: #c55;
 }
@@ -237,6 +242,8 @@ footer h5 {
 
 footer a {
   text-decoration: none;
+  font-family: "Avenir";
+  font-size: 1.2rem;
 }
 
 footer a:hover {
