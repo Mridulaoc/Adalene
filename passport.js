@@ -6,10 +6,12 @@ const bcrypt = require('bcrypt');
 require('dotenv/config')
 
 
+
+
 passport.use(
     new googleStrategy({
-    clientID:"79618050499-8jbji070v2i38494p5ourjb34u2srcio.apps.googleusercontent.com",
-    clientSecret:"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",
+    clientID:process.env.PASSPORT_CLIENT_ID,
+    clientSecret:process.env.PASSPORT_CLIENT_SECRET,
     callbackURL:"http://localhost:3000/auth/google/callback",
     passReqToCallback:true,
 },
@@ -17,14 +19,17 @@ passport.use(
   {
     try {
         let user = await User.findOne({ user_googleId: profile.id }).exec();
+        
         if (user && user.authMethod !== 'google') {
             return done(null, false, { message: 'Please use password login.' });
         }
         if (!user) {
             user = new User({
-                useer_email: profile.emails[0].value,
+                user_email: profile.emails[0].value,
+                user_name: profile.displayName ,
                 user_googleId: profile.id,
                 authMethod: 'google'
+                
             });
             await user.save();
         }

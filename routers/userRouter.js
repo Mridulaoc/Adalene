@@ -59,8 +59,19 @@ userRoute.get('/auth/google/callback', (req, res, next) => {
         if (!user) { return res.redirect('/signin'); }
         req.logIn(user, (err) => {
             if (err) { return next(err); }
-            const state = JSON.parse(Buffer.from(req.query.state, 'base64').toString());
-            return res.redirect(decodeURIComponent(state.returnUrl || '/'));
+            let returnUrl = '/';
+            if(req.query.state){
+                try {
+                    const state = JSON.parse(Buffer.from(req.query.state, 'base64').toString());
+                    if (state.returnUrl) {
+                        returnUrl = decodeURIComponent(state.returnUrl);
+                    }
+                } catch (error) {
+                    console.error('Error parsing state:', error);
+                }
+            }
+            
+            return res.redirect(returnUrl);
         });
     })(req, res, next);
 });
