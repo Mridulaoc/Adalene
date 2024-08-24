@@ -8,12 +8,11 @@
             <div class="container-fluid py-5 px-0">
                 <div class="container mb-5 ">
                     <h2>Your Cart</h2>
-                    <div class="row d-flex gap-2">                        
+                    <div class="row d-flex">                        
                         <% if(cart.products.length > 0) { %>
-                            <div class="col-12 col-lg-8 ">
+                            <div class="col-12 col-md-8">
                                 <% cart.products.forEach(item => { %>
-                                    
-                                    <div class="card mb-2">
+                                    <div class="card ">
                                         <div class="card-body">
                                             <div class="d-flex align-items-center gap-3">
                                                 <img src="/uploads/<%= item.product.prod_images[0] %>" alt="" height="100px" width="100px" class="img-fluid">
@@ -35,11 +34,10 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    
-                                </div>
+                                    </div>
                                 <%})%>
                             </div>
-                            <div class="col-12  col-lg-3">
+                            <div class="col-12  col-lg-4">
                                 <div class="card mb-4">
                                     <div class="card-body">
                                         <table class="table  ">

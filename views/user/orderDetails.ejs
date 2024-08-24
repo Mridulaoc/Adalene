@@ -51,52 +51,34 @@
                                 style="color: #BC4C2A;">Download Invoice</button>
 
                             <h4 class="text-center" style="padding: 1.5rem 10rem;">Products</h4>
-                            <div class="table-responsive">
-                                <table class="table border">
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                    <% order.products.forEach(item=>{%>
-                                        <tr>
-                                            <td class="d-flex flex-column py-5"><img
-                                                    src="/uploads/<%= item.product.prod_images[0]%>" height="50px"
-                                                    width="50px">
-                                                <%= item.product.prod_name %>
-                                            </td>
-                                            <td class="py-5">
-                                                <%= Math.round(item.price) %>
-                                            </td>
-                                            <td class="py-5">
-                                                <%= item.quantity %>
-                                            </td>
-                                            <td class="py-5">
-                                                <%= Math.round(item.price * item.quantity) %>
-                                            </td>
-                                            <td class="py-5">
-                                                <%= item.productStatus %>
-                                            </td>
-                                            <td class="py-5">
-                                                <% if(item.productStatus==='Pending' ){%>
-                                                    <button
-                                                        class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
-                                                        style="color: #BC4C2A;"
-                                                        onclick="cancelOrderItem('<%= order._id %>','<%= item.product._id %>')">CANCEL</button>
-                                                    <%} else if (order.status==='Delivered' ){ %>
-                                                        <button
-                                                            class="px-3 text-decoration-none fs-6 fw-bold  border rounded-2 bg-transparent "
-                                                            style="color: #BC4C2A;"
-                                                            onclick="returnOrderItem('<%= order._id %>','<%= item.product._id %>')">RETURN</button>
-                                                        <%}%>
-                                            </td>
-                                        </tr>
-                                        <%})%>
-                                </table>
+                            <div class="row gap-2 mb-5 ">
+                                <% order.products.forEach(item => { %>
+                                    <div class="col-12">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <img src="/uploads/<%= item.product.prod_images[0] %>" height="50px" width="50px" class="me-3">
+                                                    <p class="card-title m-0"><%= item.product.prod_name %></p>
+                                                </div>
+                                               
+                                                <p class="card-text">Price: <span>₹<%= Math.round(item.price) %></span> </p>
+                                                <p class="card-text">Quantity:<span><%= item.quantity %></span></p>
+                                                <p class="card-text">Total:<span> ₹<%= Math.round(item.price * item.quantity) %></span></p>
+                                                <p class="card-text">Status: <%= item.productStatus %></p>
+                                            
+                                            </div>
+                                            <div class="card-footer bg-transparent border-0" style="width: 30%;">
+                                                <% if (item.productStatus === 'Pending') { %>
+                                                    <button class="btn px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent" onclick="cancelOrderItem('<%= order._id %>', '<%= item.product._id %>')" style="color: #BC4C2A;">Cancel</button>
+                                                <% } else if (order.status === 'Delivered') { %>
+                                                    <button class="btn px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent" onclick="returnOrderItem('<%= order._id %>', '<%= item.product._id %>')" style="color: #BC4C2A;">Return</button>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
                             </div>
+                            
                         </div>
                     </div>
                 </div>

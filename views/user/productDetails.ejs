@@ -63,20 +63,13 @@
                                             <p class="fs-5" style="width: 90%; margin-bottom: 2rem;">
                                                 <%= products.prod_desc %>
                                             </p>
-
-                                            <div class="d-flex align-items-center my-3">
-                                                <button class="px-3 py-1 fw-bold border border-1"
-                                                    style="background-color: #BC4C2A; color: white;border:none;"
-                                                    onclick="decrementQuantity()">-</button>
+                                            <div class="d-flex align-items-center">
+                                                <button class="btn  px-2" onclick="decrementQuantity()" style="border:1px solid #BC4C2A;">-</button>
                                                 <input type="number" id="quantityInput" value="1" min="1"
-                                                    max="<%= products.prod_quantity %>"
-                                                    class="py-1 text-center border border-1"
-                                                    style="border-left: none; border-right: none;outline: none; "
-                                                    readonly>
-                                                <button class="px-3 py-1 fw-bold border border-1 "
-                                                    style="background-color: #BC4C2A; color: white;border:none;"
-                                                    onclick="incrementQuantity()">+</button>
+                                                max="<%= products.prod_quantity %>" class="form-control text-center mx-2" readonly>
+                                                <button class="btn  px-2" onclick="incrementQuantity()" style="border:1px solid #BC4C2A;">+</button>
                                             </div>
+                                            
                                             <span id="quantity-availablity" class="fs-5 my-3"></span>
                                             <div class="d-flex flex-column gap-3">
                                                 <button class="px-5 py-3 fs-5 text-white fw-bold" id="addToCartBtn"

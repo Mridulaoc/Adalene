@@ -32,62 +32,56 @@
                         </div>
                         <div class="col-12 col-md-8 col-sm-12 mx-auto border shadow rounded ">
                             <h4 class="text-center my-3">Order History</h4>
-                            <%if (orders.length> 0 ) {%>
-                                <div class="table-responsive">
-                                <table class="table " >
-                                    <tr class="fs-6">
-                                        <th scope="col" class="text-center">Order ID</th>
-                                        <th scope="col" class="text-center">Date</th>
-                                        <th scope="col" class="text-center">Total</th>
-                                        <th scope="col" class="text-center">Status</th>
-                                        <th scope="col" class="text-center">Payment Status</th>
-                                        <th scope="col" colspan="3" class="text-center">Actions</th>
-                                    </tr>
-
-                                    <% orders.forEach(order=>{%>
-                                        <tr class="">
-                                            <td class="py-2 "><a href="/order-details/<%= order._id %>"
-                                                    class="text-decoration-none text-black fw-bold">
-                                                    <%= order.orderId %>
-                                                </a></td>
-                                            <td class="py-2 ">
-                                                <%= moment(order.orderDate).format('D/MM/YYYY, h:mm:ss') %>
-                                            </td>
-                                            <td class="py-2 ">₹<%= Math.round(order.total) %>
-                                            </td>
-                                            <td class="py-2 ">
-                                                <%= order.status %>
-                                            </td>
-                                            <td class="py-2">
-                                                <%= order.paymentStatus %>
-                                            </td>
-                                            <td class="py-2">
-                                                <% if (order.status==='Pending' ) { %>
-                                                    <button
-                                                        class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
-                                                        style="color: #BC4C2A;"
-                                                        onclick="cancelOrder('<%= order._id %>')">CANCEL
-                                                        ORDER</button>
-                                                    <% } else if (order.status==='Delivered' ) { %>
-                                                        <button
-                                                            class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
-                                                            style="color: #BC4C2A;"
-                                                            onclick="returnOrder('<%= order._id %>')">RETURN
-                                                            ORDER</button>
-                                                        <% } %>
-                                                            <% if (order.paymentStatus==='Failed' ) { %>
+                            <% if (orders.length> 0) { %>
+                                <div class="row gap-2 ">
+                                    <% orders.forEach(order=> { %>
+                                        <div class="col-12">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h5 class="card-title text-center">
+                                                        <a href="/order-details/<%= order._id %>"
+                                                            class="text-decoration-none text-black fw-bold">
+                                                            Order ID: <%= order.orderId %>
+                                                        </a>
+                                                    </h5>
+                                                    <p class="card-text"><strong>Date:</strong>
+                                                        <%= moment(order.orderDate).format('D/MM/YYYY, h:mm:ss') %>
+                                                    </p>
+                                                    <p class="card-text"><strong>Total:</strong> ₹<%=
+                                                            Math.round(order.total) %>
+                                                    </p>
+                                                    <p class="card-text"><strong>Status:</strong>
+                                                        <%= order.status %>
+                                                    </p>
+                                                    <p class="card-text"><strong>Payment Status:</strong>
+                                                        <%= order.paymentStatus %>
+                                                    </p>
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <% if (order.status==='Pending' ) { %>
+                                                            <button
+                                                                class="btn px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                                onclick="cancelOrder('<%= order._id %>')"
+                                                                style="color: #BC4C2A;">Cancel Order</button>
+                                                            <% } else if (order.status==='Delivered' ) { %>
                                                                 <button
-                                                                    class="px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
-                                                                    style="color: #BC4C2A;"
-                                                                    onclick="retryPayment('<%= order._id %>')">RETRY
-                                                                    PAYMENT</button>
+                                                                    class="btn px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                                    onclick="returnOrder('<%= order._id %>')"
+                                                                    style="color: #BC4C2A;">Return Order</button>
                                                                 <% } %>
-                                            </td>
-                                        </tr>
+                                                                    <% if (order.paymentStatus==='Failed' ) { %>
+                                                                        <button
+                                                                            class="btn px-3 text-decoration-none fs-6 fw-bold border rounded-2 bg-transparent"
+                                                                            onclick="retryPayment('<%= order._id %>')"
+                                                                            style="color: #BC4C2A;">Retry
+                                                                            Payment</button>
+                                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <% }) %>
-                                </table>
-                            </div>
-                                <%} else {%>
+                                </div>
+                                <% } else { %>
                                     <h3>No orders found</h3>
                                     <% } %>
                                         
@@ -100,7 +94,7 @@
                                                         <div class="d-flex gap-3 ">
                                                             <% for (let i=1; i <=totalPages; i++ ){ %>
                                                                 <a href="?page=<%= i %>"
-                                                                    class="text-decoration-none fw-bold fs-5 button rounded">
+                                                                    class="text-decoration-none fw-bold fs-5 button rounded d-none d-lg-block">
                                                                     <%= i %>
                                                                 </a>
                                                                 <%}%>
