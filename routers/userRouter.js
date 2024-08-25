@@ -49,9 +49,18 @@ userRoute.post('/signup', userController.verifySignUp);
 userRoute.get('/verify',userController.loadVerify);
 userRoute.post('/verify', userController.verifyOTP);
 userRoute.post('/resend', userController.resendOTP);
-userRoute.get('/google', passport.authenticate('google', {
-    scope:['email','profile']
-}));
+// userRoute.get('/google', passport.authenticate('google', {
+//     scope:['email','profile']
+// }));
+
+userRoute.get('/google', (req, res, next) => {
+    const returnUrl = req.query.returnUrl || '/';
+    const state = Buffer.from(JSON.stringify({returnUrl})).toString('base64');
+    passport.authenticate('google', {
+        scope: ['profile', 'email'],
+        state: state
+    })(req, res, next);
+});
 
 userRoute.get('/auth/google/callback', (req, res, next) => {
     passport.authenticate('google', (err, user, info) => {
@@ -60,6 +69,7 @@ userRoute.get('/auth/google/callback', (req, res, next) => {
         req.logIn(user, (err) => {
             if (err) { return next(err); }
             let returnUrl = '/';
+            console.log(req.query.state)
             if(req.query.state){
                 try {
                     const state = JSON.parse(Buffer.from(req.query.state, 'base64').toString());
