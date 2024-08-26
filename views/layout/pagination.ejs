@@ -7,7 +7,7 @@
         <div class="d-flex gap-3 ">
           <% for (let i=1; i <=totalPages; i++ ){ %>
             <a href="?page=<%= i %>&sortBy=<%= sortBy %>&order=<%= order %>&search=<%= search %><%= currentCategory ? '&category=' + currentCategory : '' %><%= selectedColors ? '&color=' + selectedColors : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>&excludeOutOfStock=<%= excludeOutOfStock %>"
-              class="text-decoration-none fw-bold fs-5 button rounded">
+              class="text-decoration-none fw-bold fs-5 button rounded d-none d-lg-block">
               <%= i %>
             </a>
             <%}%>
