@@ -1,6 +1,6 @@
 
 
-function isAuthenticated(req, res, next) {
+function isAdminAuthenticated(req, res, next) {
     if (req.session && req.session.userid) {
         return next();
     } else {
@@ -9,11 +9,12 @@ function isAuthenticated(req, res, next) {
 }
 
 function isNotAuthenticated(req, res, next) {
-    if (!req.session && !req.session.userid) {
-        res.status(301).redirect('/admin')
-    } else {
+    if (!req.session || !req.session.userid) {
         return next();
+        
+    } else {
+        res.status(301).redirect('/admin/dashboard')
     }
 }
-module.exports = {isAuthenticated,isNotAuthenticated};
+module.exports = {isAdminAuthenticated,isNotAuthenticated};
 

@@ -19,26 +19,12 @@ mongoose.connect(process.env.CONNECTION_STRING)
 
 const port = process.env.PORT;
 
-app.use(attachCartData);
-const userRoute = require('./routers/userRouter');
-app.use('/',userRoute);
-
 const adminRoute = require('./routers/adminRouter');
 app.use('/admin',adminRoute);
 
-// const guestRoute = require('./routers/guestRouter');
-// app.use('/guest',guestRoute);
-
-// const categoryRoute = require('./routers/categoryRouter');
-// app.use('/admin', categoryRoute);
-
-// const productRoute = require('./routers/productRouter');
-// app.use('/admin', productRoute);
-
-// const userManagementRoute = require('./routers/userManagementRouter');
-// app.use('/admin', userManagementRoute)
-
-
+app.use(attachCartData);
+const userRoute = require('./routers/userRouter');
+app.use('/',userRoute);
 
 
 app.listen(port, ()=>{
