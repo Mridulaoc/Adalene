@@ -115,7 +115,6 @@ userRoute.post('/signin', (req, res, next) => {
 });
 
 userRoute.get('/',  userController.successGoogleLogin)
-// userRoute.get('/home',  userController.loadHome);
 userRoute.get('/failure', userController.failureGoogleLogin);
 userRoute.get('/', userController.loadSigIn);
 userRoute.post('/', userController.verifySignIn);
@@ -127,50 +126,58 @@ userRoute.get('/shopall',userController.loadShopall);
 userRoute.get('/products/:id', checkOfferExpiry, userController.loadProductDetails);
 userRoute.post('/add-to-cart',  userController.addToCart);
 userRoute.get('/get-cart-count', userController.getCartCount)
-userRoute.get('/cart',isAuthenticated, userController.loadCartPage);
-userRoute.post('/cart/update', isAuthenticated, userController.updateCart);
-userRoute.post('/cart/remove', isAuthenticated, userController.removeCartItem);
-// userRoute.get('/get-cart-count', isAuthenticated, userController.getCartCount);
-userRoute.get('/checkout', isAuthenticated, userController.displayAddressSelection);
-userRoute.post('/checkout', isAuthenticated, userController.selectedAddress);
-userRoute.get('/payment', isAuthenticated, userController.displayPayment);
-userRoute.post('/apply-coupon', isAuthenticated, couponController.applyCoupon);
-userRoute.post('/remove-coupon', isAuthenticated, couponController.removeCoupon);
-userRoute.post('/paypal-success', isAuthenticated, userController.paypalSuccess);
-// userRoute.post('/paypal-cancel', isAuthenticated, userController.paypalCancel);
-userRoute.post('/payment', isAuthenticated, userController.processPayment);
-userRoute.post('/create-paypal-order',isAuthenticated, userController.createPaypalOrder);
-userRoute.get('/create-paypal-order/:orderId',isAuthenticated, userController.createPaypalOrderForRetry);
-userRoute.get('/order-confirmation/:orderId', isAuthenticated, userController.displayOrderConfirmation);
-userRoute.get('/retry-payment/:orderId',isAuthenticated,userController.createPaypalOrderForRetry);
-userRoute.get('/profile', isAuthenticated, userController.displayProfile);
-userRoute.get('/profile/edit/:id', isAuthenticated, userController.displayEditProfile);
-userRoute.put('/profile/edit/:id',isAuthenticated, userController.updateProfile);
-userRoute.get('/addresses', isAuthenticated, userController.displayAddresses);
-userRoute.get('/addresses/add', isAuthenticated, userController.displayAddAddress);
-userRoute.post('/addresses/add', isAuthenticated, userController.addAddress);
-userRoute.get('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.displayEditAddress);
-userRoute.put('/addresses/edit/:id/:addressIndex', isAuthenticated, userController.updateAddress);
-userRoute.delete('/addresses/delete/:id/:addressIndex', isAuthenticated, userController.deleteAddress)
-userRoute.get('/change-password', isAuthenticated, userController.displayChangePassword);
-userRoute.post('/change-password', isAuthenticated, userController.changePassword);
-userRoute.get('/order-history', isAuthenticated, userController.displayOrderHistory);
-userRoute.post('/cancel-order', isAuthenticated, userController.cancelOrder);
-userRoute.get('/order-details/:orderId', isAuthenticated, userController.displayOrderDetails)
-userRoute.post('/cancel-order-item', isAuthenticated, userController.cancelOrderItem);
-userRoute.post('/return-order-item', isAuthenticated, userController.returnOrderItem);
-// userRoute.post('/return-order',isAuthenticated, userController.returnOrder);
-userRoute.post('/return-order-request',isAuthenticated, userController.returnOrderRequest)
-userRoute.get('/download-invoice/:orderId',isAuthenticated,userController.downloadInvoice)
-userRoute.get('/my-wallet', isAuthenticated, walletController.loadMyWallet);
-userRoute.get('/my-wallet/balance', isAuthenticated, walletController.getWalletBalance);
-userRoute.get('/my-wallet/transactions', isAuthenticated, walletController.getWalletTransactions);
-// userRoute.post('/process-wallet-payment', isAuthenticated, walletController.processWalletPayment)
-userRoute.get('/wishlist',isAuthenticated,userController.getWishlist);
-userRoute.post('/wishlist/add', isAuthenticated, userController.addToWishlist);
-userRoute.post('/wishlist/remove', isAuthenticated, userController.removeFromWishlist);
-userRoute.get('/my-referrals', isAuthenticated, userController.getReferrals);
 userRoute.get('/signout',  userController.userSignOut);
+
+
+userRoute.use(isAuthenticated);
+userRoute.get('/cart', userController.loadCartPage);
+userRoute.post('/cart/update', userController.updateCart);
+userRoute.post('/cart/remove', userController.removeCartItem);
+
+userRoute.get('/checkout',   userController.displayAddressSelection);
+userRoute.post('/checkout',   userController.selectedAddress);
+userRoute.get('/payment',   userController.displayPayment);
+userRoute.post('/apply-coupon',   couponController.applyCoupon);
+userRoute.post('/remove-coupon',   couponController.removeCoupon);
+userRoute.post('/paypal-success',   userController.paypalSuccess);
+userRoute.post('/payment',   userController.processPayment);
+userRoute.post('/create-paypal-order',  userController.createPaypalOrder);
+userRoute.get('/create-paypal-order/:orderId',  userController.createPaypalOrderForRetry);
+userRoute.get('/order-confirmation/:orderId',   userController.displayOrderConfirmation);
+userRoute.get('/retry-payment/:orderId', userController.createPaypalOrderForRetry);
+
+userRoute.get('/profile',   userController.displayProfile);
+userRoute.get('/profile/edit/:id',   userController.displayEditProfile);
+userRoute.put('/profile/edit/:id',  userController.updateProfile);
+
+userRoute.get('/addresses',   userController.displayAddresses);
+userRoute.get('/addresses/add',   userController.displayAddAddress);
+userRoute.post('/addresses/add',   userController.addAddress);
+userRoute.get('/addresses/edit/:id/:addressIndex',   userController.displayEditAddress);
+userRoute.put('/addresses/edit/:id/:addressIndex',   userController.updateAddress);
+userRoute.delete('/addresses/delete/:id/:addressIndex',   userController.deleteAddress)
+
+userRoute.get('/change-password',   userController.displayChangePassword);
+userRoute.post('/change-password',   userController.changePassword);
+
+userRoute.get('/order-history',   userController.displayOrderHistory);
+userRoute.post('/cancel-order',   userController.cancelOrder);
+userRoute.get('/order-details/:orderId',   userController.displayOrderDetails)
+userRoute.post('/cancel-order-item',   userController.cancelOrderItem);
+userRoute.post('/return-order-item',   userController.returnOrderItem);
+userRoute.post('/return-order-request',  userController.returnOrderRequest)
+userRoute.get('/download-invoice/:orderId', userController.downloadInvoice)
+
+userRoute.get('/my-wallet',   walletController.loadMyWallet);
+userRoute.get('/my-wallet/balance',   walletController.getWalletBalance);
+userRoute.get('/my-wallet/transactions',   walletController.getWalletTransactions);
+
+userRoute.get('/wishlist', userController.getWishlist);
+userRoute.post('/wishlist/add',   userController.addToWishlist);
+userRoute.post('/wishlist/remove',   userController.removeFromWishlist);
+
+userRoute.get('/my-referrals',   userController.getReferrals);
+
 
 userRoute.use((err, req, res, next) => {
     console.error(err.stack);
