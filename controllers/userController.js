@@ -255,11 +255,20 @@ const verifySignUp = async (req, res) => {
           console.log("Email sent successfully");
         }
       });
-
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
       res.render("verify", {
         email: email,
         user: req.user,
         success: "Email sent successfully",
+        cartCount: cartCount
       });
     }
   } catch (error) {
@@ -267,11 +276,21 @@ const verifySignUp = async (req, res) => {
   }
 };
 
-const loadVerify = (req, res) => {
+const loadVerify = async (req, res) => {
   if (req.session.userId) {
+    
     res.redirect("/");
   } else {
-    res.render("verify");
+    let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+    res.render("verify",{cartCount: cartCount});
   }
 };
 
@@ -302,11 +321,21 @@ const verifyOTP = async (req, res) => {
         });
       }
     } else {
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
       const otpExpired = true;
       res.render("verify", {
         user: req.user,
         message: "OTP expired or wrong OTP",
         email: email,
+        cartCount: cartCount,
       });
     }
   } catch (error) {
@@ -337,8 +366,16 @@ const resendOTP = async (req, res) => {
       console.log("Email sent successfully");
     }
   });
-
-  res.render("verify", { email, user: req.user });
+  let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+  res.render("verify", { email, user: req.user,cartCount: cartCount });
 };
 
 const loadSigIn = (req, res) => {
@@ -352,26 +389,37 @@ const loadSigIn = (req, res) => {
 
 const verifySignIn = async (req, res) => {
   try {
-    const { email, password } = req.body;
+   
+    const { email, password,returnUrl } = req.body;
     const userData = await User.findOne({ user_email: email });
     if (userData) {
       if (!userData.isVerified) {
-        return res.render("signin", {
+        console.log(userData.isVerified)
+       res.render("signin", {
           message: "Please verify your email before signing in",
+          returnUrl
         });
       }
       passwordMatch = await bCrypt.compare(password, userData.user_password);
       if (passwordMatch) {
-        req.session.userId = userData._id;
-        res.redirect("/");
+        if(userData.isVerified){
+          req.session.userId = userData._id;
+          res.redirect(returnUrl || "/");
+        }
+        
       } else {
-        res.render("signin", { message: "Email or password is incorrect" });
+        
+        res.render("signin", { message: "Email or password is incorrect",returnUrl });
       }
     } else {
-      res.render("signin", { message: "Email or password is incorrect" });
+      res.render("signin", { message: "Email or password is incorrect",returnUrl });
     }
   } catch (error) {
     console.log(error);
+    res.render("signin", { 
+      message: "An error occurred",
+      returnUrl: req.body.returnUrl, // Pass returnUrl here
+    });
   }
 };
 
@@ -409,10 +457,20 @@ const requestOtp = async (req, res) => {
           console.log("Email sent successfully");
         }
       });
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
       res.render("otp", {
         success: "Check your email for the OTP",
         email: email,
         user: req.user,
+        cartCount
       });
     }
   } catch (error) {
@@ -425,17 +483,36 @@ const verifyFPOTP = async (req, res) => {
     const { email, otp } = req.body;
     console.log(email, otp);
     const user = await User.findOne({ user_email: email, otp: otp });
+    let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+      if (!user) {
+        return res.render("otp", {
+          incorrect: "OTP is incorrect or expired",
+          user: req.user,
+          cartCount
+        });
+      }
     const otpExpiry = user.otp_expiry;
     const otpMilliseconds = new Date(otpExpiry).getTime();
     if (user && otpMilliseconds > Date.now()) {
       user.otp = null;
       user.otp_expiry = null;
       await user.save();
-      res.render("resetPassword", { email, user: req.user });
+      
+      res.render("resetPassword", { email, user: req.user,cartCount });
     } else {
+      
       res.render("otp", {
-        incorrect: "OTP is incorrect or expired",
+        incorrect: "OTP is expired",
         user: req.user,
+        cartCount
       });
     }
   } catch (error) {
@@ -449,9 +526,20 @@ const updatePassword = async (req, res) => {
     console.log(email, password);
     const user = await User.findOne({ user_email: email });
     if (!user) {
+      let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
       return res.render("resetPassword", {
         message: "User not found",
         user: req.user,
+        cartCount,
+        returnUrl:'/signin'
       });
     }
     const sPassword = await securePassword(password);
@@ -459,7 +547,16 @@ const updatePassword = async (req, res) => {
       { user_email: email },
       { $set: { user_password: sPassword } }
     );
-    res.render("signin");
+    let cartCount =0
+      if(req.user){
+        const user = await User.findById(req.user.id).populate(
+          "cart.products.product"
+        );
+        cartCount = user.cart.products.reduce(
+          (count,item) =>count +item.quantity, 0
+        )
+      }
+    res.render("signin",{user:req.user,cartCount,returnUrl:'/signin'});
   } catch (error) {
     console.log(error);
   }

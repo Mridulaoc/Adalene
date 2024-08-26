@@ -49,9 +49,6 @@ userRoute.post('/signup', userController.verifySignUp);
 userRoute.get('/verify',userController.loadVerify);
 userRoute.post('/verify', userController.verifyOTP);
 userRoute.post('/resend', userController.resendOTP);
-// userRoute.get('/google', passport.authenticate('google', {
-//     scope:['email','profile']
-// }));
 
 userRoute.get('/google', (req, res, next) => {
     const returnUrl = req.query.returnUrl || '/';
@@ -95,7 +92,18 @@ userRoute.post('/signin', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.render('signin', { errorMessage: info.message });
+            return res.render('signin', { 
+                message: "Invalid email or password",
+                returnUrl: returnUrl 
+            });
+        }
+
+        if (!user.isVerified) {
+            
+            return res.render('signin', { 
+                message: "Please verify your email before signing in",
+                returnUrl: returnUrl 
+            });
         }
         req.logIn(user, (err) => {
             if (err) {
