@@ -10,7 +10,16 @@
         <div class="d-flex justify-content-end px-3">
         <a href="/addresses/add?returnUrl=/checkout" class=" text-decoration-none fs-6  border rounded-2 px-2 py-1" style="color: #BC4C2A; " >ADD ADDRESS</a>
         </div>
-        
+        <% if (alert) { %>
+            <script>
+              Swal.fire({
+                icon: 'warning',
+                title: 'Address Not Selected',
+                text: '<%= alertMessage %>',
+                confirmButtonText: 'OK'
+              });
+            </script>
+          <% } %>
         <form action="/checkout" method="POST" class="my-3 px-3 px-5 py-5 " id="selectAddressForm" >
             
             <div  class="d-flex justify-content-between"> 

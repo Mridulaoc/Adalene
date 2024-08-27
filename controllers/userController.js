@@ -1538,7 +1538,7 @@ const removeFromWishlist = async (req, res) => {
 const getWishlist = async (req, res) => {
   try {
     const userId = req.user.id;
-    const wishlist = await Wishlist.findOne({ user: userId }).populate({
+    let wishlist = await Wishlist.findOne({ user: userId }).populate({
       path: "products",
       populate: {
         path: "offer prod_category",
@@ -1546,11 +1546,10 @@ const getWishlist = async (req, res) => {
       },
     });
     if (!wishlist) {
-      return res.render("wishlist", {
-        user: req.user,
-        wishlist: { products: [] },
-      });
-    }
+     
+        wishlist= { products: [] }
+      };
+    
     // Calculate discounted prices and check stock
     const productsWithDiscounts = wishlist.products.map((product) => {
       let discountedPrice = product.prod_mrp;
@@ -1590,14 +1589,15 @@ const getWishlist = async (req, res) => {
       (count, item) => count + item.quantity,
       0
     );
+    const wishlistCount =  wishlist.products.length;
     res.render("wishlist", {
       user: req.user,
       wishlist: {
-        ...wishlist.toObject(),
-        products: productsWithDiscounts,        
+        ...(wishlist.toObject ? wishlist.toObject() : wishlist),
+        products: productsWithDiscounts,
       },
       cartCount: cartCount,
-      wishlistCount: wishlist ? wishlist.products.length : 0,
+      wishlistCount
     });
   } catch (error) {
     console.error("Error getting wishlist:", error);
@@ -1860,38 +1860,6 @@ const removeCartItem = async (req, res) => {
   }
 };
 
-// function getCartCount(user) {
-//   if (user && user.cart && Array.isArray(user.cart.products)) {
-//     return user.cart.products.reduce(
-//       (total, item) => total + (item.quantity || 0),
-//       0
-//     );
-//   }
-//   return 0;
-// }
-
-// const getCartCount = (user) => {
-//   if (!user.cart || !user.cart.products) {
-//     return 0;
-//   }
-//   return user.cart.products.reduce((count, item) => count + item.quantity, 0);
-// };
-
-// Server-side route
-// app.get('/get-cart-count', async (req, res) => {
-//   if (!req.user) {
-//     return res.status(401).json({ success: false, message: 'User not authenticated' });
-//   }
-
-//   try {
-//     const user = await User.findById(req.user.id).populate('cart.products.product');
-//     const cartCount = user.cart.products.reduce((count, item) => count + item.quantity, 0);
-//     res.json({ success: true, cartCount: cartCount });
-//   } catch (error) {
-//     console.error('Error getting cart count:', error);
-//     res.status(500).json({ success: false, message: 'Failed to get cart count' });
-//   }
-// });
 
 const getCartCount = async(req, res) =>{
   if (!req.user) {
@@ -1921,9 +1889,16 @@ const displayAddressSelection = async (req, res) => {
 
 const selectedAddress = async (req, res) => {
   const { selectedAddress } = req.body;
+  const user = await User.findById(req.user.id).populate("cart.products.product");
+  const cartCount = user.cart.products.reduce((count, item) => count + item.quantity, 0);
 
   if (!selectedAddress) {
-    res.status(302).redirect("/checkout");
+    res.render("addressSelection",{      
+        alert: true,
+        alertMessage: "Please select an address before proceeding to payment.",    
+        cartCount,
+        user  
+    });
   }
   req.session.selectedAddress = selectedAddress;
   res.redirect("/payment");

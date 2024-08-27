@@ -4,6 +4,7 @@ const googleStrategy = require('passport-google-oauth20').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 require('dotenv/config')
+const referralCodeGenerator = require("./utils/referralCodeGenerator");
 
 
 
@@ -18,17 +19,20 @@ passport.use(
  async(request, accessToken,refreshToken,profile,done)=>
   {
     try {
-        let user = await User.findOne({ user_googleId: profile.id }).exec();
+        let user = await User.findOne({user_email:profile.emails[0].value})
         
         if (user && user.authMethod !== 'google') {
             return done(null, false, { message: 'Please use password login.' });
         }
+        // let user = await User.findOne({ user_googleId: profile.id }).exec();
         if (!user) {
             user = new User({
                 user_email: profile.emails[0].value,
                 user_name: profile.displayName ,
                 user_googleId: profile.id,
-                authMethod: 'google'
+                authMethod: 'google',
+                referralCode: referralCodeGenerator(),
+                
                 
             });
             await user.save();
