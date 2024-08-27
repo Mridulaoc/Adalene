@@ -10,8 +10,8 @@ const paypal = require("./utils/paypal");
 
 mongoose
   .connect(process.env.CONNECTION_STRING, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+   
+    
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
   })

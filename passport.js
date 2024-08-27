@@ -12,7 +12,7 @@ passport.use(
     new googleStrategy({
     clientID:process.env.PASSPORT_CLIENT_ID,
     clientSecret:process.env.PASSPORT_CLIENT_SECRET,
-    callbackURL:"http://localhost:3000/auth/google/callback",
+    callbackURL:"http://adalene.happyforever.com/auth/google/callback",
     passReqToCallback:true,
 },
  async(request, accessToken,refreshToken,profile,done)=>

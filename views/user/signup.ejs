@@ -4,162 +4,146 @@
 <body>
 <%- include ("../layout/navbarSignIn.ejs") %>
     
-    <div class="container-fluid">
-        <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form"  >
-    
-    <form action="/signup" method="post" class=""  autocomplete="off" style="width: 90%;" onsubmit="validatePasswords()" >
-        <h4 class="mb-3 text-center"> Sign Up</h4> 
-        <p class="fs-6 text-center">Already have an account? <a href="/signin" class="text-decoration-none"><span style="color: #BC4C2A; font-weight: bold;"> Sign in</span></a></p>
-        <% if(typeof message !== "undefined"){%>
-            <div class="alert alert-danger" ><%= message %></div>       
-        <%}%>
-    
-        <% if(locals.success){%>
-            <div class="alert alert-success" ><%= success %></div> 
-        <%}%>
-        <div class="mb-3 ">           
-            <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" onchange="validateName()" required >
-            <span id="nameError" style="color: red;"></span>
-          </div>
-          <div class="mb-3 ">           
-            <label for="email" class="form-label"> Email address</label>
-            <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()"  required>
-            <span id="emailError" style="color: red;"></span>
-          </div>          
-          <div class="mb-3 d-flex flex-column ">           
-            <label for="password" class="form-label">Password</label>
-            <div class="d-flex align-items-center">
-            <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()"  required>
-            <div>            
-            <span  style="cursor: pointer;" ><i id="eyeIcon" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('password')"></i></span>
-            </div>  
-            <span id="passwordError" style="color: red;"></span> 
-                    
-          </div> 
-          <div class="mb-3 ">           
-            <label for="password" class="form-label">Confirm Password</label>
-            <div class="d-flex align-items-center">
-            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" onchange="validatePassword()"  required>
-            <span  style="cursor: pointer;" ><i id="eyeIcon" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('confirmPassword')"></i></span> 
+<div class="container-fluid">
+    <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form">
+        <form action="/signup" method="post" class="" autocomplete="off" style="width: 90%;" onsubmit="return validatePasswords()" >
+            <h4 class="mb-3 text-center"> Sign Up</h4> 
+            <p class="fs-6 text-center">Already have an account? <a href="/signin" class="text-decoration-none"><span style="color: #BC4C2A; font-weight: bold;"> Sign in</span></a></p>
+            <% if(typeof message !== "undefined"){%>
+                <div class="alert alert-danger"><%= message %></div>       
+            <%}%>
+            <% if(locals.success){%>
+                <div class="alert alert-success"><%= success %></div> 
+            <%}%>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" onchange="validateName()" required>
+                <span id="nameError" style="color: red;"></span>
             </div>
-            <span id="passwordError" style="color: red;"></span>            
-          </div> 
-          <div class="mb-3 ">           
-            <label for="mobileno" class="form-label">Mobile Number</label>
-            <input type="text" class="form-control" id="mobileno" name="mobileno" onChange="validateNumber()" required >
-            <span id="numberError" style="color: red;"></span>
-          </div>
-
-          <div class="mb-3 ">           
-            <label for="referralCode" class="form-label">Referral Code(Optional)</label>
-            <input type="text" class="form-control" id="referralCode" name="referralCode" onchange="validateName()"  >
-            <span id="nameError" style="color: red;"></span>
-          </div>
-
-          <div class="mb-3 " style="border-color: #BC4C2A;">       
-            <input type="submit" class="form-control  fs-6"  value="CREATE ACCOUNT" style="color: #BC4C2A;"  required>
-          </div>
-          <div>
-            <input type="hidden" name="authMethod" value="local" >
-          </div>    
-        </form>      
-          <div class="mb-3 text-center" >       
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()" required>
+                <span id="emailError" style="color: red;"></span>
+            </div>
+            <div class="mb-3 d-flex flex-column">
+                <label for="password" class="form-label">Password</label>
+                <div class="d-flex align-items-center">
+                    <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()" required>
+                    <span style="cursor: pointer;"><i id="eyeIconPassword" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('password', 'eyeIconPassword')"></i></span>
+                </div>
+                <span id="passwordError" style="color: red;"></span> 
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <div class="d-flex align-items-center">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" onchange="validatePassword()" required>
+                    <span style="cursor: pointer;"><i id="eyeIconConfirm" class="fa-regular fa-eye-slash eyeIcon" style="color: #dddedf;" onclick="togglePassword('confirmPassword', 'eyeIconConfirm')"></i></span>
+                </div>
+                <span id="confirmPasswordError" style="color: red;"></span>
+            </div>
+            <div class="mb-3">
+                <label for="mobileno" class="form-label">Mobile Number</label>
+                <input type="text" class="form-control" id="mobileno" name="mobileno" onchange="validateNumber()" required>
+                <span id="numberError" style="color: red;"></span>
+            </div>
+            <div class="mb-3">
+                <label for="referralCode" class="form-label">Referral Code(Optional)</label>
+                <input type="text" class="form-control" id="referralCode" name="referralCode" onchange="validateName()">
+                <span id="referralCodeError" style="color: red;"></span>
+            </div>
+            <div class="mb-3">
+                <input type="submit" class="form-control fs-6" value="CREATE ACCOUNT" style="color: #BC4C2A;" required>
+            </div>
+            <div>
+                <input type="hidden" name="authMethod" value="local">
+            </div>
+        </form>
+        <div class="mb-3 text-center">
             OR USING
-          </div>
-        
-          <div class="mb-3" style="width: 100%;">             
-            <button class="form-control text-center  fs-6" ><a href="/google" class="text-decoration-none " style="color: #BC4C2A;">Google</a></button>
-          </div>
-          
         </div>
-    </div>    
-    
-    
+        <div class="mb-3" style="width: 100%;">
+            <button class="form-control text-center fs-6"><a href="/google" class="text-decoration-none" style="color: #BC4C2A;">Google</a></button>
+        </div>
     </div>
+</div>
 
-    <%- include ("../layout/footerUser.ejs") %>
-    <script >
-        function validateName(){
-            const name = document.getElementById("name").value.trim();
-            const nameError = document.getElementById("nameError");
-            
-            if(name.length<5){
-                nameError.textContent = "Name must be atleat 5 characters long"
-            }
+<%- include ("../layout/footerUser.ejs") %>
 
+<script>
+    function validateName(){
+        const name = document.getElementById("name").value.trim();
+        const nameError = document.getElementById("nameError");
+        if(name.length < 5){
+            nameError.textContent = "Name must be at least 5 characters long";
+        } else {
+            nameError.textContent = "";
         }
-              
-    
-        function validateEmail() {
+    }
+
+    function validateEmail() {
         const email = document.getElementById("email");
         const emailError = document.getElementById("emailError");
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-       
-        if (emailPattern.test(email.value)) {
-          emailError.textContent = "";
-        } else {
-          emailError.textContent = "Invalid email id";
-        }
-    } 
-    
-      function validateNumber() {
-        const mobileno = document.getElementById("mobileno").value;
-        const numberError = document.getElementById("numberError");    
-        if(isNaN(mobileno)) { 
-          numberError.textContent = 'Mobile number should be digits' 
-        }
-        if(mobileno.length >10 ){
-          numberError.textContent = 'Mobile number must be 10 digits'
-        }
-        if(mobileno.length <10 ){
-          numberError.textContent = 'Mobile number must be 10 digits'
-        }
-        if((mobileno.charAt(0) !=9) && (mobileno.charAt(0) !=8) && (mobileno.charAt(0)!=7)){
-          numberError.textContent = 'Mobile number must start with 9, 8 or 7'
-        }
-      }
-    
-      function validatePassword(){
-        const password = document.getElementById("password");
-        const passwordError = document.getElementById("passwordError");
-        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/
-        if(!passwordPattern.test(password.value)){
-          passwordError.textContent = "Password must contain atleast 6 characters and maximum 20 characters. should contain at least one numeric digit, one uppercase and one lowercase letter"
-        }
-      }
-          
-      function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const eyeIcon = document.querySelectorAll('.eyeIcon');
-            console.log(eyeIcon)
-            if (field.type === "password") {
-                field.type = "text";
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-                
-            } else {
-                field.type = "password";
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            }
-        }
-        function validatePasswords() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-            if (password !== confirmPassword) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Passwords do not match!',
-                });
-                return false;
-            }
-            return true;
+        if (emailPattern.test(email.value)) {
+            emailError.textContent = "";
+        } else {
+            emailError.textContent = "Invalid email id";
         }
-        
-    </script>
-    
+    }
+
+    function validateNumber() {
+        const mobileno = document.getElementById("mobileno").value;
+        const numberError = document.getElementById("numberError");
+        if(isNaN(mobileno)) {
+            numberError.textContent = 'Mobile number should be digits';
+        } else if(mobileno.length !== 10) {
+            numberError.textContent = 'Mobile number must be 10 digits';
+        } else if(!['7', '8', '9'].includes(mobileno.charAt(0))) {
+            numberError.textContent = 'Mobile number must start with 9, 8 or 7';
+        } else {
+            numberError.textContent = "";
+        }
+    }
+
+    function validatePassword(){
+        const password = document.getElementById("password").value;
+        const passwordError = document.getElementById("passwordError");
+        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+        if(!passwordPattern.test(password)){
+            passwordError.textContent = "Password must be 6-20 characters, and include at least one numeric digit, one uppercase, and one lowercase letter.";
+        } else {
+            passwordError.textContent = "";
+        }
+    }
+
+    function togglePassword(fieldId, iconId) {
+        const field = document.getElementById(fieldId);
+        const eyeIcon = document.getElementById(iconId);
+        if (field.type === "password") {
+            field.type = "text";
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        } else {
+            field.type = "password";
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        }
+    }
+
+    function validatePasswords() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Passwords do not match!',
+            });
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 </html>
