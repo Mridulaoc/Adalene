@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include ("../layout/header.ejs") %>
+  <%- include ("../layout/header.ejs") %>
 <body>
-<%- include ("../layout/navbarSignIn.ejs") %>
+
+<%- include ("../layout/navBarSignIn.ejs") %>
     
-<div class="container-fluid">
+<div class="container-fluid px-0">
     <div class="container d-flex flex-column justify-content-center align-items-center border shadow px-3 py-3 my-5 rounded col-md-4 col-xs-12 form">
         <form action="/signup" method="post" class="" autocomplete="off" style="width: 90%;" onsubmit="return validatePasswords()" >
             <h4 class="mb-3 text-center"> Sign Up</h4> 
@@ -65,9 +66,10 @@
             <button class="form-control text-center fs-6"><a href="/google" class="text-decoration-none" style="color: #BC4C2A;">Google</a></button>
         </div>
     </div>
+    <%- include ("../layout/footerUser.ejs") %>
+
 </div>
 
-<%- include ("../layout/footerUser.ejs") %>
 
 <script>
     function validateName(){

@@ -157,7 +157,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const loadSignUp = (req, res) => {
+const loadSignUp = async(req, res) => {
   try {
     res.render("signup");
   } catch (error) {
